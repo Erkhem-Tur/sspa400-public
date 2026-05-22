@@ -1,0 +1,14 @@
+{
+  "name": "ТТХГ Англи хэлний сургалт",
+  "short_name": "ТТХГ Сургалт",
+  "description": "Төрийн Тусгай Хамгаалалтын Алба Хаагчийн Англи Хэлний Цахим Сургалтын Систем",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f2744",
+  "theme_color": "#1b3a6b",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/static/lms/logo.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/static/lms/logo.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

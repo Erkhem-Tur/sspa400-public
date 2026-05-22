@@ -1,0 +1,236 @@
+﻿{% load static %}
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1b3a6b">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ТТХГ Сургалт">
+  <!-- Open Graph / Facebook link preview -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="ТТХГ Цахим Сургалт">
+  <meta property="og:title" content="{% block og_title %}ТӨРИЙН ТУСГАЙ ХАМГААЛАЛТЫН АЛБА ХААГЧИЙН АНГЛИ ХЭЛНИЙ ЦАХИМ СУРГАЛТЫН СИСТЕМ{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Төрийн Тусгай Хамгаалалтын Алба Хаагчийн Англи Хэлний Цахим Сургалтын Систем — ТТХГ-ийн онлайн сургалтын платформ.{% endblock %}">
+  <meta property="og:url" content="https://sspa400v3.onrender.com{% block og_url %}{% endblock %}">
+  <meta property="og:image" content="https://sspa400v3.onrender.com/static/lms/og-cover.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="mn_MN">
+  <link rel="manifest" href="{% static 'lms/manifest.json' %}">
+  <link rel="apple-touch-icon" href="{% static 'lms/logo.png' %}">
+  <title>{% block title %}ТӨРИЙН ТУСГАЙ ХАМГААЛАЛТЫН АЛБА ХААГЧИЙН АНГЛИ ХЭЛНИЙ ЦАХИМ СУРГАЛТЫН СИСТЕМ{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root {
+      --sidebar-width: 250px;
+      --header-height: 56px;
+      --primary: #1b3a6b;
+      --primary-dark: #0f2744;
+      --gold: #c9a227;
+    }
+    body { background: #f0f4f8; font-family: system-ui, sans-serif; }
+
+    /* HEADER */
+    .app-header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1030;
+      height: var(--header-height);
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      display: flex; align-items: center; padding: 0 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.3);
+    }
+    .app-header .logo-wrap {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; color: #fff; flex: 1;
+    }
+    .app-header .logo-wrap img { width: 38px; height: 38px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,.4)); }
+    .app-header .brand-name { font-size: 11px; font-weight: 800; line-height: 1.3; letter-spacing: .3px; }
+    .sidebar-toggle { background: none; border: none; color: #fff; font-size: 20px; margin-right: 12px; cursor: pointer; }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .header-right .user-badge {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,.12); border-radius: 20px; padding: 4px 14px 4px 6px;
+      color: #fff; font-size: 13px; text-decoration: none;
+    }
+    .header-right .user-badge .avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--gold); display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 12px; color: #fff;
+    }
+
+    /* SIDEBAR */
+    .app-sidebar {
+      position: fixed; top: var(--header-height); left: 0; bottom: 0;
+      width: var(--sidebar-width); background: var(--primary-dark);
+      overflow-y: auto; z-index: 1020; transition: transform .25s;
+      display: flex; flex-direction: column;
+    }
+    .app-sidebar.collapsed { transform: translateX(calc(-1 * var(--sidebar-width))); }
+    .sidebar-nav { padding: 12px 0; flex: 1; }
+    .sidebar-title {
+      font-size: 10px; font-weight: 700; letter-spacing: 1px;
+      color: rgba(255,255,255,.4); padding: 16px 20px 6px; text-transform: uppercase;
+    }
+    .sidebar-nav a {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 20px; color: rgba(255,255,255,.75);
+      text-decoration: none; font-size: 14px; transition: all .15s;
+      border-left: 3px solid transparent;
+    }
+    .sidebar-nav a:hover, .sidebar-nav a.active {
+      background: rgba(255,255,255,.08); color: #fff;
+      border-left-color: var(--gold);
+    }
+    .sidebar-nav a i { font-size: 17px; width: 22px; }
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 1px solid rgba(255,255,255,.1);
+    }
+    .sidebar-footer a {
+      display: flex; align-items: center; gap: 8px;
+      color: rgba(255,255,255,.6); font-size: 13px; text-decoration: none;
+    }
+    .sidebar-footer a:hover { color: #fff; }
+
+    /* MAIN */
+    .app-main {
+      margin-left: var(--sidebar-width);
+      margin-top: var(--header-height);
+      padding: 24px;
+      min-height: calc(100vh - var(--header-height));
+      transition: margin-left .25s;
+    }
+    .app-main.expanded { margin-left: 0; }
+
+    /* CARDS */
+    .card { border: none; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.07); }
+    .card-header { background: #fff; border-bottom: 1px solid #f1f5f9; border-radius: 12px 12px 0 0 !important; font-weight: 700; padding: 14px 20px; }
+    .stat-card { border-radius: 12px; padding: 20px 24px; color: #fff; }
+    .stat-card .stat-num { font-size: 32px; font-weight: 900; }
+    .stat-card .stat-label { font-size: 13px; opacity: .85; margin-top: 2px; }
+
+    /* TABLE */
+    .table th { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #64748b; border-top: none; }
+    .table td { vertical-align: middle; font-size: 14px; }
+    .badge-rank { background: #e8f4fd; color: #1b3a6b; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+    .badge-score { background: #1b3a6b; color: #fff; font-size: 12px; padding: 3px 10px; border-radius: 20px; font-weight: 700; }
+
+    /* FORM */
+    .form-control, .form-select { border-radius: 8px; border: 1.5px solid #e2e8f0; padding: 10px 14px; font-size: 14px; }
+    .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(27,58,107,.1); }
+    .form-label { font-weight: 600; font-size: 13px; color: #475569; margin-bottom: 6px; }
+    .btn-primary { background: var(--primary); border-color: var(--primary); }
+    .btn-primary:hover { background: var(--primary-dark); border-color: var(--primary-dark); }
+
+    @media(max-width: 768px) {
+      .app-sidebar { transform: translateX(calc(-1 * var(--sidebar-width))); }
+      .app-sidebar.mobile-open { transform: translateX(0); }
+      .app-main { margin-left: 0; }
+    }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="app-header">
+  <button class="sidebar-toggle" id="sidebarToggle"><i class="bi bi-list"></i></button>
+  <a href="{% url 'dashboard' %}" class="logo-wrap">
+    <img src="{% static 'lms/logo.png' %}" alt="ТТХГ">
+    <div>
+      <div class="brand-name">ТӨРИЙН ТУСГАЙ ХАМГААЛАЛТЫН АЛБА ХААГЧИЙН АНГЛИ ХЭЛНИЙ ЦАХИМ СУРГАЛТЫН СИСТЕМ</div>
+      <div class="brand-sub"></div>
+    </div>
+  </a>
+  <div class="header-right">
+    <button id="pwaInstallBtn" onclick="installPWA()" title="Апп суулгах"
+      style="display:none;align-items:center;gap:6px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:5px 12px;border-radius:8px;font-size:12px;cursor:pointer;">
+      <i class="bi bi-download"></i> Апп суулгах
+    </button>
+    {% if user.is_authenticated and user.is_staff %}
+    <a href="/admin/" class="user-badge">
+      <div class="avatar"><i class="bi bi-shield-lock" style="font-size:13px;"></i></div>
+      <span class="d-none d-sm-inline">Admin</span>
+    </a>
+    {% endif %}
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<aside class="app-sidebar" id="sidebar">
+  <nav class="sidebar-nav">
+    <div class="sidebar-title">Үндсэн цэс</div>
+    <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+      <i class="bi bi-house-door"></i> Нүүр хуудас
+    </a>
+    <a href="{% url 'worksheets' %}" class="{% if request.resolver_match.url_name == 'worksheets' %}active{% endif %}">
+      <i class="bi bi-journal-text"></i> Worksheets &amp; Tests
+    </a>
+    <a href="{% url 'videos' %}" class="{% if request.resolver_match.url_name == 'videos' %}active{% endif %}">
+      <i class="bi bi-play-circle"></i> Видео хичээлүүд
+    </a>
+    {% if user.is_authenticated and user.is_staff %}
+    <div class="sidebar-title">Удирдлага</div>
+    <a href="{% url 'dept_manage' %}" class="{% if request.resolver_match.url_name == 'dept_manage' or request.resolver_match.url_name == 'dept_edit' %}active{% endif %}">
+      <i class="bi bi-building-gear"></i> Хэлтэс удирдах
+    </a>
+    <a href="{% url 'admin:index' %}">
+      <i class="bi bi-shield-lock"></i> Admin
+    </a>
+    {% endif %}
+  </nav>
+  <div class="sidebar-footer">
+    {% if user.is_authenticated %}
+    <a href="{% url 'logout' %}"><i class="bi bi-box-arrow-left"></i> Гарах</a>
+    {% else %}
+    <a href="/admin/"><i class="bi bi-shield-lock"></i> Admin нэвтрэх</a>
+    {% endif %}
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="app-main" id="mainContent">
+  {% block content %}{% endblock %}
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const toggle = document.getElementById('sidebarToggle');
+  const sidebar = document.getElementById('sidebar');
+  const main = document.getElementById('mainContent');
+  const isMobile = () => window.innerWidth <= 768;
+  toggle.addEventListener('click', () => {
+    if (isMobile()) {
+      sidebar.classList.toggle('mobile-open');
+    } else {
+      sidebar.classList.toggle('collapsed');
+      main.classList.toggle('expanded');
+    }
+  });
+
+  // PWA service worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('{% static "lms/sw.js" %}');
+  }
+
+  // PWA install prompt
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const btn = document.getElementById('pwaInstallBtn');
+    if (btn) btn.style.display = 'flex';
+  });
+  function installPWA() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+    }
+  }
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

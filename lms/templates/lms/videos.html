@@ -1,0 +1,114 @@
+{% extends 'lms/base.html' %}
+{% block title %}Видео хичээлүүд – ТТХГ{% endblock %}
+{% block content %}
+
+<div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
+  <div class="d-flex align-items-center gap-2">
+    <i class="bi bi-play-circle-fill fs-4" style="color:#1b3a6b;"></i>
+    <h4 class="fw-bold mb-0" style="color:#1b3a6b;">Видео хичээлүүд</h4>
+  </div>
+  {% if user.is_staff %}
+  <a href="/admin/lms/video/add/" class="btn btn-sm btn-primary">
+    <i class="bi bi-plus-lg me-1"></i>Видео нэмэх
+  </a>
+  {% endif %}
+</div>
+
+{% if videos %}
+<div class="row g-4">
+  {% for v in videos %}
+  <div class="col-12 col-md-6 col-xl-4">
+    <div class="card h-100 shadow-sm border-0" style="border-radius:14px;overflow:hidden;">
+      <!-- Thumbnail / embed toggle -->
+      <div class="ratio ratio-16x9 position-relative video-thumb-wrap" data-id="{{ v.youtube_id }}"
+           style="cursor:pointer;background:#000;">
+        <img src="{{ v.thumbnail_url }}" alt="{{ v.title }}"
+             style="width:100%;height:100%;object-fit:cover;transition:opacity .2s;"
+             class="thumb-img">
+        <!-- Play button overlay -->
+        <div class="position-absolute top-50 start-50 translate-middle play-btn"
+             style="width:60px;height:60px;background:rgba(201,162,39,.92);border-radius:50%;
+                    display:flex;align-items:center;justify-content:center;
+                    box-shadow:0 4px 20px rgba(0,0,0,.4);transition:transform .15s;">
+          <i class="bi bi-play-fill text-white fs-3" style="margin-left:4px;"></i>
+        </div>
+      </div>
+
+      <div class="card-body d-flex flex-column p-3">
+        <h6 class="fw-bold mb-1" style="color:#1b3a6b;font-size:14px;line-height:1.4;">{{ v.title }}</h6>
+        {% if v.description %}
+        <p class="text-muted small mb-0 flex-grow-1" style="font-size:12px;line-height:1.5;">{{ v.description }}</p>
+        {% endif %}
+      </div>
+
+      {% if user.is_staff %}
+      <div class="card-footer bg-transparent border-top-0 pt-0 pb-2 px-3 d-flex gap-2">
+        <a href="/admin/lms/video/{{ v.id }}/change/" class="btn btn-sm btn-outline-secondary" style="font-size:11px;">
+          <i class="bi bi-pencil me-1"></i>Засах
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% else %}
+<div class="card border-0 shadow-sm">
+  <div class="card-body text-center py-5">
+    <i class="bi bi-play-circle fs-1 d-block mb-3 opacity-25" style="color:#1b3a6b;"></i>
+    <p class="fw-semibold text-muted mb-1">Одоогоор видео байхгүй байна.</p>
+    <p class="text-muted small mb-3">Admin хэлтсээр дамжуулан YouTube видео нэмнэ үү.</p>
+    {% if user.is_staff %}
+    <a href="/admin/lms/video/add/" class="btn btn-sm btn-primary">
+      <i class="bi bi-plus-lg me-1"></i>Эхний видео нэмэх
+    </a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+<!-- Modal for full-screen playback -->
+<div class="modal fade" id="videoModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0" style="background:#000;border-radius:14px;overflow:hidden;">
+      <div class="modal-header border-0 pb-0" style="background:#000;">
+        <h6 class="modal-title text-white fw-bold small" id="videoModalTitle"></h6>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-0">
+        <div class="ratio ratio-16x9">
+          <iframe id="videoFrame" src="" frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen style="border-radius:0 0 14px 14px;"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.video-thumb-wrap:hover .play-btn { transform: translate(-50%,-50%) scale(1.12); }
+.video-thumb-wrap:hover .thumb-img { opacity: .85; }
+</style>
+
+<script>
+document.querySelectorAll('.video-thumb-wrap').forEach(function(el) {
+  el.addEventListener('click', function() {
+    var id    = el.dataset.id;
+    var title = el.closest('.card').querySelector('h6').textContent.trim();
+    document.getElementById('videoFrame').src =
+      'https://www.youtube.com/embed/' + id + '?rel=0&modestbranding=1&autoplay=1';
+    document.getElementById('videoModalTitle').textContent = title;
+    var modal = new bootstrap.Modal(document.getElementById('videoModal'));
+    modal.show();
+  });
+});
+
+// Stop video when modal closes
+document.getElementById('videoModal').addEventListener('hidden.bs.modal', function() {
+  document.getElementById('videoFrame').src = '';
+});
+</script>
+
+{% endblock %}

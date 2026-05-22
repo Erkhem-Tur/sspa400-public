@@ -1,0 +1,119 @@
+{% extends 'lms/base.html' %}
+{% block title %}Профайл – ТТХГ{% endblock %}
+{% block content %}
+
+<div class="row g-4">
+  <!-- Profile Form -->
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header d-flex align-items-center gap-2">
+        <i class="bi bi-person-circle" style="color:#1b3a6b;"></i>
+        <span>Профайл засах</span>
+      </div>
+      <div class="card-body p-4">
+        <div class="text-center mb-4">
+          <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
+               style="width:72px;height:72px;background:#1b3a6b;font-size:28px;font-weight:900;color:#fff;">
+            {{ user.username|first|upper }}
+          </div>
+          <div class="fw-bold">{{ user.username }}</div>
+          {% if progress.rank %}<div class="small text-muted">{{ progress.rank }}</div>{% endif %}
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger small">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label"><i class="bi bi-person-vcard me-1"></i>Бүтэн нэр</label>
+            <input type="text" name="full_name" class="form-control" value="{{ progress.full_name|default:'' }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label"><i class="bi bi-award me-1"></i>Цол</label>
+            <select name="rank" class="form-select">
+              {% for val, label in form.rank.field.choices %}
+              <option value="{{ val }}" {% if progress.rank == val %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-4">
+            <label class="form-label"><i class="bi bi-building me-1"></i>Хэлтэс / Тасаг</label>
+            <select name="department" class="form-select">
+              <option value="">-- Сонгоно уу --</option>
+              {% for dept in form.department.field.queryset %}
+              <option value="{{ dept.pk }}" {% if progress.department_id == dept.pk %}selected{% endif %}>{{ dept.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary w-100 fw-bold">
+            <i class="bi bi-check2 me-1"></i>Хадгалах
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats + Results -->
+  <div class="col-lg-8">
+    <div class="row g-3 mb-4">
+      <div class="col-4">
+        <div class="card text-center p-3" style="background:linear-gradient(135deg,#1b3a6b,#0f2744);color:#fff;">
+          <div class="fs-1 fw-black">{{ progress.total_score }}</div>
+          <div class="small opacity-75">Нийт оноо</div>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="card text-center p-3" style="background:linear-gradient(135deg,#c9a227,#a07d10);color:#fff;">
+          <div class="fs-1 fw-black">{{ progress.missions_completed }}</div>
+          <div class="small opacity-75">Mission</div>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="card text-center p-3" style="background:linear-gradient(135deg,#0e7490,#0c5f73);color:#fff;">
+          <div class="fs-1 fw-black">{{ results.count }}</div>
+          <div class="small opacity-75">Оролдлого</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header d-flex align-items-center gap-2">
+        <i class="bi bi-bar-chart" style="color:#1b3a6b;"></i>
+        <span>Бүх үр дүн</span>
+      </div>
+      {% if results %}
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Mission</th>
+              <th class="text-center">Оноо</th>
+              <th class="text-center">%</th>
+              <th class="text-end">Огноо</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in results %}
+            <tr>
+              <td class="fw-semibold">Mission {{ r.batch_index|add:1 }}</td>
+              <td class="text-center"><span class="badge" style="background:#1b3a6b;">{{ r.score }}/{{ r.total }}</span></td>
+              <td class="text-center">
+                <span class="badge rounded-pill {% if r.percentage >= 80 %}bg-success{% elif r.percentage >= 50 %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                  {{ r.percentage }}%
+                </span>
+              </td>
+              <td class="text-end text-muted small">{{ r.taken_at|date:"Y/m/d H:i" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="card-body text-muted small">Одоогоор quiz өгөөгүй байна.</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

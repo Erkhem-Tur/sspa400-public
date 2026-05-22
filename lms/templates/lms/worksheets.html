@@ -1,0 +1,708 @@
+{% extends 'lms/base.html' %}
+{% load static %}
+{% block title %}Worksheets & Test Center – ТТХГ{% endblock %}
+
+{% block extra_head %}
+<meta name="csrf-token" content="{{ csrf_token }}">
+<style>
+  /* ── NAV TABS ── */
+  .ws-nav {
+    position: sticky; top: 56px; z-index: 100;
+    background: #f0f4f8; padding: 10px 0 8px;
+    display: flex; gap: 6px; flex-wrap: wrap;
+    border-bottom: 2px solid #e2e8f0; margin-bottom: 20px;
+  }
+  .ws-nav .wt { border: 1.5px solid #cbd5e1; background: #fff; color: #475569; border-radius: 20px; padding: 5px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s; }
+  .ws-nav .wt.active { background: #1b3a6b; border-color: #1b3a6b; color: #fff; }
+  .ws-nav .wt:hover:not(.active) { background: #f8fafc; border-color: #94a3b8; }
+  .ws-sec { display: none; }
+  .ws-sec.active { display: block; }
+
+  /* ── LEVEL BADGES ── */
+  .lv { display: inline-block; border-radius: 999px; padding: 2px 10px; font-size: 11px; font-weight: 700; }
+  .lv-A1 { background: #dcfce7; color: #166534; }
+  .lv-A2 { background: #dbeafe; color: #1e40af; }
+  .lv-B1 { background: #ede9fe; color: #5b21b6; }
+
+  /* ── SCENARIO BLOCK ── */
+  .sc-block { border-left: 4px solid #c9a227; border-radius: 8px; background: #fffbeb; padding: 12px 16px; margin: 10px 0; }
+
+  /* ── FLASHCARD ── */
+  .ws-fc { perspective: 900px; cursor: pointer; min-height: 180px; }
+  .ws-fc-inner { position: relative; width: 100%; min-height: 180px; transition: transform .45s; transform-style: preserve-3d; }
+  .ws-fc.flipped .ws-fc-inner { transform: rotateY(180deg); }
+  .ws-fc-front, .ws-fc-back {
+    position: absolute; width: 100%; min-height: 180px; backface-visibility: hidden;
+    border-radius: 12px; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; text-align: center; padding: 20px;
+  }
+  .ws-fc-front { background: linear-gradient(135deg,#1b3a6b,#0f2744); color:#fff; }
+  .ws-fc-back  { background: linear-gradient(135deg,#c9a227,#a07d10); color:#fff; transform: rotateY(180deg); }
+
+  /* ── QUIZ OPTIONS ── */
+  .ws-opt { display:block; width:100%; text-align:left; border:1.5px solid #e2e8f0; background:#fff; color:#1e293b; border-radius:10px; padding:10px 14px; margin:5px 0; font-size:13px; font-weight:500; cursor:pointer; transition:all .15s; }
+  .ws-opt:hover { border-color:#1b3a6b; background:#f0f4f8; }
+  .ws-opt.correct { border-color:#16a34a!important; background:#dcfce7!important; color:#166534!important; font-weight:700; }
+  .ws-opt.wrong   { border-color:#dc2626!important; background:#fee2e2!important; color:#991b1b!important; }
+
+  /* ── ANSWER KEY ── */
+  .ws-ak { display:none; margin-top:8px; padding:8px 12px; border-radius:8px; background:#f0fdf4; color:#166534; font-size:12px; }
+  .show-ak .ws-ak { display:block; }
+
+  /* ── SCORE ── */
+  .ws-score { font-size:2.2rem; font-weight:900; text-align:center; padding:16px; }
+  .ws-pass  { color:#16a34a; }
+  .ws-fail  { color:#dc2626; }
+
+  /* ── LIST ITEM ── */
+  .ws-li { display:flex; align-items:center; gap:10px; border:1px solid #e2e8f0; border-radius:10px; background:#fff; padding:9px 12px; margin-bottom:7px; transition:border-color .15s; }
+  .ws-li:hover { border-color:#1b3a6b; }
+
+  /* ── DETAIL ── */
+  .ws-detail { position:sticky; top:120px; max-height:calc(100vh - 140px); overflow-y:auto; }
+  .ws-block { border:1px solid #e8edf4; border-radius:10px; background:#fff; padding:16px; margin-bottom:14px; }
+
+  /* ── PROGRESS STRIP ── */
+  .ws-pbar { height:7px; background:#e2e8f0; border-radius:999px; overflow:hidden; width:180px; display:inline-block; vertical-align:middle; }
+  .ws-pfill { height:100%; background:linear-gradient(90deg,#22c55e,#c9a227); transition:width .3s; }
+
+  @media(max-width:768px){
+    .ws-detail { position:static; max-height:none; }
+    .ws-nav { top:56px; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Header + progress -->
+<div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-1">
+  <div class="d-flex align-items-center gap-2">
+    <i class="bi bi-journal-text fs-4" style="color:#1b3a6b;"></i>
+    <h4 class="fw-bold mb-0" style="color:#1b3a6b;">Worksheet &amp; Test Center</h4>
+    <span class="badge rounded-pill bg-light text-dark border ms-1" style="font-size:11px;">500 worksheets · A1–B1</span>
+  </div>
+  <div class="d-flex align-items-center gap-2">
+    <span class="text-muted small"><span id="wsProgText">0</span>/500 done</span>
+    <div class="ws-pbar"><div id="wsPFill" class="ws-pfill"></div></div>
+  </div>
+</div>
+
+<!-- Module nav -->
+<div class="ws-nav" id="wsNav">
+  <button class="wt active"     onclick="wsShow('home',this)"><i class="bi bi-house me-1"></i>Home</button>
+  <button class="wt"            onclick="wsShow('bank',this)"><i class="bi bi-collection me-1"></i>500 Worksheets</button>
+  <button class="wt"            onclick="wsShow('tests',this)"><i class="bi bi-clipboard-check me-1"></i>Test Center</button>
+  <button class="wt"            onclick="wsShow('terms',this)"><i class="bi bi-book me-1"></i>Vocabulary</button>
+  <button class="wt"            onclick="wsShow('reading',this)"><i class="bi bi-file-text me-1"></i>Reading</button>
+  <button class="wt"            onclick="wsShow('teacher',this)"><i class="bi bi-person-workspace me-1"></i>Teacher Guide</button>
+  <button class="wt ms-auto"    onclick="window.print()"><i class="bi bi-printer me-1"></i>Print</button>
+</div>
+
+<!-- ══ HOME ══ -->
+<div id="home" class="ws-sec active">
+  <div class="row g-3 mb-3">
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header"><i class="bi bi-diagram-3 me-2" style="color:#1b3a6b;"></i>Sentence structure</div>
+        <div class="card-body p-0">
+          <table class="table table-sm mb-0">
+            <thead class="table-light"><tr><th>Form</th><th>Pattern</th><th>SSPA example</th></tr></thead>
+            <tbody>
+              <tr><td class="fw-semibold text-success">Positive</td><td class="text-muted small">Subject + verb + object.</td><td class="small">The officer checks the badge.</td></tr>
+              <tr><td class="fw-semibold text-danger">Negative</td><td class="text-muted small">Subject + aux + not + base verb.</td><td class="small">The officer does not allow access.</td></tr>
+              <tr><td class="fw-semibold text-primary">Question</td><td class="text-muted small">Auxiliary + subject + base verb?</td><td class="small">Does the officer check the badge?</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header"><i class="bi bi-bar-chart-steps me-2" style="color:#1b3a6b;"></i>Level alignment</div>
+        <div class="card-body p-0">
+          <table class="table table-sm mb-0">
+            <thead class="table-light"><tr><th>Level</th><th>Worksheets</th><th>Test</th></tr></thead>
+            <tbody>
+              <tr><td><span class="lv lv-A1">A1</span></td><td class="small">1–170</td><td class="small">Badge check · duty log</td></tr>
+              <tr><td><span class="lv lv-A2">A2</span></td><td class="small">171–340</td><td class="small">Access denial · radio</td></tr>
+              <tr><td><span class="lv lv-B1">B1</span></td><td class="small">341–500</td><td class="small">Policy · diplomatic access</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><i class="bi bi-signpost-2 me-2" style="color:#1b3a6b;"></i>Recommended sequence</div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-6 col-md-3"><div class="sc-block text-center"><div class="fw-bold">1. Learn</div><div class="text-muted small">Vocabulary + structure</div></div></div>
+        <div class="col-6 col-md-3"><div class="sc-block text-center"><div class="fw-bold">2. Practise</div><div class="text-muted small">Worksheet + reading</div></div></div>
+        <div class="col-6 col-md-3"><div class="sc-block text-center"><div class="fw-bold">3. Perform</div><div class="text-muted small">Role-play + writing</div></div></div>
+        <div class="col-6 col-md-3"><div class="sc-block text-center"><div class="fw-bold">4. Test</div><div class="text-muted small">Quiz + checkpoint exam</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ WORKSHEET BANK ══ -->
+<div id="bank" class="ws-sec">
+  <div class="row g-3">
+    <div class="col-md-5">
+      <div class="card">
+        <div class="card-header"><i class="bi bi-collection me-2" style="color:#1b3a6b;"></i>Worksheet list</div>
+        <div class="card-body">
+          <div class="row g-2 mb-2">
+            <div class="col-12">
+              <input type="text" id="wsSearch" class="form-control form-control-sm" placeholder="Search badge, radio, passive, Gate 1…" oninput="wsRenderList()">
+            </div>
+            <div class="col-6">
+              <select id="wsLvlFilter" class="form-select form-select-sm" onchange="wsRenderList()">
+                <option value="">All levels</option>
+                <option>A1</option><option>A2</option><option>B1</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <select id="wsGrFilter" class="form-select form-select-sm" onchange="wsRenderList()">
+                <option value="">All grammar</option>
+              </select>
+            </div>
+          </div>
+          <div id="wsCount" class="text-muted small mb-2"></div>
+          <div id="wsListBox" style="max-height:62vh;overflow-y:auto;padding-right:2px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-7">
+      <div class="card ws-detail">
+        <div class="card-header d-flex align-items-center justify-content-between">
+          <span><i class="bi bi-file-earmark-text me-2" style="color:#1b3a6b;"></i>Worksheet detail</span>
+          <span id="wsDetailBadge" class="text-muted small"></span>
+        </div>
+        <div class="card-body" id="wsDetail">
+          <p class="text-muted">Choose a worksheet from the list.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TEST CENTER ══ -->
+<div id="tests" class="ws-sec">
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header"><i class="bi bi-clipboard-check me-2" style="color:#1b3a6b;"></i>Test Center</div>
+        <div class="card-body">
+          <div class="row g-2 mb-3">
+            <div class="col-6"><button class="btn btn-primary w-100 py-2" onclick="wsStartTest('placement')"><div class="fw-bold small">Placement</div><div class="small opacity-75">30 q</div></button></div>
+            <div class="col-6"><button class="btn btn-primary w-100 py-2" onclick="wsStartTest('a1')"><div class="fw-bold small">A1 Checkpoint</div><div class="small opacity-75">25 q</div></button></div>
+            <div class="col-6"><button class="btn btn-primary w-100 py-2" onclick="wsStartTest('a2')"><div class="fw-bold small">A2 Checkpoint</div><div class="small opacity-75">30 q</div></button></div>
+            <div class="col-6"><button class="btn btn-primary w-100 py-2" onclick="wsStartTest('b1')"><div class="fw-bold small">B1 Final</div><div class="small opacity-75">40 q</div></button></div>
+            <div class="col-6"><button class="btn btn-outline-secondary w-100 py-2" onclick="wsStartTest('random')"><div class="fw-bold small">Random</div><div class="small text-muted">20 q</div></button></div>
+            <div class="col-6"><button class="btn btn-outline-secondary w-100 py-2" onclick="wsShowScores()"><i class="bi bi-trophy me-1"></i><span class="small fw-bold">Scores</span></button></div>
+          </div>
+          <div class="card bg-light border-0">
+            <div class="card-body py-2 px-3">
+              <div class="fw-bold small mb-1" style="color:#1b3a6b;">Passing guide</div>
+              <table class="table table-sm table-borderless mb-0" style="font-size:12px;">
+                <tr><td class="text-success fw-bold pe-2">85–100%</td><td>Operationally ready</td></tr>
+                <tr><td class="text-primary fw-bold">70–84%</td><td>Pass, needs practice</td></tr>
+                <tr><td class="text-warning fw-bold">50–69%</td><td>Needs revision</td></tr>
+                <tr><td class="text-danger fw-bold">&lt;50%</td><td>Needs guided support</td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="card" style="max-height:80vh;overflow:hidden;">
+        <div class="card-header"><i class="bi bi-pencil-square me-2" style="color:#1b3a6b;"></i>Test area</div>
+        <div class="card-body" id="wsTestArea" style="overflow-y:auto;max-height:calc(80vh - 52px);">
+          <p class="text-muted">Choose a test from the left.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ VOCABULARY ══ -->
+<div id="terms" class="ws-sec">
+  <div class="row g-3">
+    <div class="col-md-7">
+      <div class="card">
+        <div class="card-header"><i class="bi bi-book me-2" style="color:#1b3a6b;"></i>Vocabulary groups</div>
+        <div class="card-body" id="wsTermsBox"></div>
+      </div>
+    </div>
+    <div class="col-md-5">
+      <div class="card" style="position:sticky;top:120px;">
+        <div class="card-header"><i class="bi bi-soundwave me-2" style="color:#1b3a6b;"></i>Pronunciation card</div>
+        <div class="card-body text-center">
+          <div class="ws-fc mb-3" id="wsFcOuter" onclick="wsFcFlip()">
+            <div class="ws-fc-inner" id="wsFcInner">
+              <div class="ws-fc-front" id="wsFcFront"></div>
+              <div class="ws-fc-back"  id="wsFcBack"></div>
+            </div>
+          </div>
+          <div class="d-flex gap-2 justify-content-center flex-wrap">
+            <button class="btn btn-sm btn-outline-secondary" onclick="wsFcPrev()"><i class="bi bi-arrow-left"></i> Prev</button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="wsFcNext()">Next <i class="bi bi-arrow-right"></i></button>
+            <button class="btn btn-sm btn-primary" onclick="speak(wsFlashCards[wsFcIdx])"><i class="bi bi-volume-up"></i> Speak</button>
+          </div>
+          <p class="text-muted small mt-2 mb-0">Click card for repeat drill</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ READING ══ -->
+<div id="reading" class="ws-sec">
+  <div class="card">
+    <div class="card-header"><i class="bi bi-file-text me-2" style="color:#1b3a6b;"></i>Reading materials <span class="text-muted small fw-normal ms-1">First 120 passages — all 500 in worksheet bank</span></div>
+    <div class="card-body"><div class="accordion" id="wsReadBox"></div></div>
+  </div>
+</div>
+
+<!-- ══ TEACHER GUIDE ══ -->
+<div id="teacher" class="ws-sec">
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header"><i class="bi bi-person-workspace me-2" style="color:#1b3a6b;"></i>Teacher flow</div>
+        <div class="card-body">
+          <ol style="line-height:2.2;font-size:14px;">
+            <li>Vocabulary pronunciation: 5 words.</li>
+            <li>Sentence structure: positive → negative → question.</li>
+            <li>Worksheet transformation practice.</li>
+            <li>Reading + comprehension.</li>
+            <li>Role-play: officer / visitor / delegate.</li>
+            <li>Writing: duty log, radio note, incident report, memo.</li>
+            <li>Test: 10–20 questions or checkpoint.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header"><i class="bi bi-check2-square me-2" style="color:#1b3a6b;"></i>Scoring rubric</div>
+        <div class="card-body p-0">
+          <table class="table table-sm mb-0">
+            <thead class="table-light"><tr><th>Component</th><th>Evidence</th></tr></thead>
+            <tbody>
+              <tr><td class="fw-semibold">Grammar</td><td class="small">Positive / negative / question forms</td></tr>
+              <tr><td class="fw-semibold">Vocabulary</td><td class="small">SSPA terms used correctly</td></tr>
+              <tr><td class="fw-semibold">Reading</td><td class="small">Comprehension answer accuracy</td></tr>
+              <tr><td class="fw-semibold">Speaking</td><td class="small">Role-play task completion</td></tr>
+              <tr><td class="fw-semibold">Writing</td><td class="small">Duty note / report / email clarity</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* ═══════════════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════════════ */
+const wsGrammarBank=[
+{name:"Verb to be: positive / negative / question",pos:"Subject + am/is/are + complement.",neg:"Subject + am/is/are + not + complement.",ques:"Am/Is/Are + subject + complement?",ex:["The badge is valid.","The badge is not valid.","Is the badge valid?"]},
+{name:"Present simple: routines and duties",pos:"Subject + verb/verb-s + object.",neg:"Subject + do/does not + base verb + object.",ques:"Do/Does + subject + base verb + object?",ex:["The officer checks badges every shift.","The officer does not check media passes.","Does the officer check badges every shift?"]},
+{name:"Present continuous: action happening now",pos:"Subject + am/is/are + verb-ing.",neg:"Subject + am/is/are + not + verb-ing.",ques:"Am/Is/Are + subject + verb-ing?",ex:["The visitor is showing his ID.","The visitor is not entering Zone A.","Is the visitor showing his ID?"]},
+{name:"Simple past: completed incident",pos:"Subject + past verb + object/time/place.",neg:"Subject + did not + base verb + object.",ques:"Did + subject + base verb + object?",ex:["The team escorted the delegate.","The team did not escort the journalist.","Did the team escort the delegate?"]},
+{name:"Past continuous: ongoing past incident",pos:"Subject + was/were + verb-ing.",neg:"Subject + was/were + not + verb-ing.",ques:"Was/Were + subject + verb-ing?",ex:["The officers were screening bags.","The officers were not checking vehicles.","Were the officers screening bags?"]},
+{name:"Modals: must / can / may / should",pos:"Subject + modal + base verb.",neg:"Subject + modal + not + base verb.",ques:"Modal + subject + base verb?",ex:["Visitors must show a valid badge.","Visitors must not enter Zone A.","May I see your badge, please?"]},
+{name:"Present perfect: experience/result",pos:"Subject + have/has + past participle.",neg:"Subject + have/has not + past participle.",ques:"Have/Has + subject + past participle?",ex:["Control has confirmed the route.","Control has not confirmed the route.","Has Control confirmed the route?"]},
+{name:"Passive voice: formal reports",pos:"Subject + am/is/are/was/were + past participle.",neg:"Subject + am/is/are/was/were + not + past participle.",ques:"Am/Is/Are/Was/Were + subject + past participle?",ex:["The badge was checked.","The badge was not accepted.","Was the badge checked?"]},
+{name:"Conditionals: policy and consequence",pos:"If + present simple, subject + will/can/must + base verb.",neg:"If + present simple, subject + will not/cannot/must not + base verb.",ques:"What happens if + subject + present simple?",ex:["If a visitor has no badge, he cannot enter.","If the route is blocked, we will not use it.","What happens if a visitor has no badge?"]},
+{name:"Reported commands: tell / ask someone to",pos:"Subject + told/asked + person + to + base verb.",neg:"Subject + told/asked + person + not to + base verb.",ques:"What did + subject + tell/ask + person + to do?",ex:["Control told Alpha-2 to stand by.","The officer asked the visitor not to enter.","What did Control tell Alpha-2 to do?"]},
+{name:"Relative clauses: who / which / that",pos:"Noun + who/which/that + verb + extra information.",neg:"Noun + who/which/that + does/did not + verb.",ques:"Which/Who + noun + verb?",ex:["The officer who checked the badge reported to Control.","The badge that expired was not accepted.","Which badge was not accepted?"]},
+{name:"Formal connectors: because / however / therefore",pos:"Clause + connector + clause.",neg:"Clause + however + negative consequence.",ques:"Why / What was the result?",ex:["The badge was expired; therefore, access was denied.","The visitor was polite; however, he was not authorized.","Why was access denied?"]}
+];
+const wsScenarios=[["Gate 1 badge inspection","At Gate 1, a visitor shows a badge. The officer checks the name, badge color, and access zone."],["Blue Zone access denial","An unaccredited person approaches the Blue Zone. The officer explains the rule and redirects the person to accreditation."],["VIP escort route","A delegate arrives at the main entrance. The officer escorts the delegate to the holding room using clear route language."],["Radio communication","Alpha-2 reports to Control. The officer confirms post, reports status, and requests backup when needed."],["Suspicious vehicle","A vehicle stops near Gate 3 for several minutes. Officers observe, report, and wait for instructions."],["Media zone control","A journalist attempts to enter a restricted VIP zone. The officer checks the press pass and explains the media route."],["Emergency exit control","A crowd gathers near the emergency exit. Officers give calm commands and move people to a safe area."],["Motorcade arrival","The point car, principal car, escort team, rear vehicle, and ambulance arrive at the venue."],["Equipment checklist","Before the shift, officers check the radio, metal detector, X-ray machine, baskets, and duty log."],["Diplomatic access","A senior delegate claims diplomatic status. The officer verifies credentials and contacts the supervisor."],["Shift handover","The outgoing shift leader briefs the incoming team about incidents, route changes, and persons of interest."],["Hotel security support","SSPA officers support a VIP hotel movement and coordinate with reception and protocol staff."],["Food service protection","A special catering delivery arrives. Officers verify the delivery list, driver, and package seal."],["Airport arrival support","A foreign delegation arrives at the airport. Officers guide them to transport and check credentials."],["Public demonstration","A public gathering forms near the venue. Officers observe behavior and report crowd movement."]];
+const wsVocabBank=["badge","ID","checkpoint","restricted area","accreditation desk","duty log","shift leader","close protection agent","checkpoint protection officer","radio check","roger that","say again","stand by","requesting backup","suspicious vehicle","emergency exit","metal detector","X-ray machine","conveyor belt","basket","screening","pat down","principal car","point car","rear vehicle","protection escort team","diplomatic status","verify credentials","access policy","Your Excellency","holding room","media zone","press pass","incident report","formal memo","de-escalation","route change","all clear","unauthorized person","valid badge","expired badge"];
+const wsTerms={"Core checkpoint phrases":["Please show me your ID.","May I see your badge, please?","Please proceed.","This is a restricted area.","Please go to the accreditation desk.","Please keep your permission exposed."],"Radio phrases":["Radio check.","Roger that.","Say again.","Stand by.","Requesting backup.","Over.","Out.","Read you loud and clear."],"Motorcade":["point car","principal car","protection escort team","pilot vehicle","rear vehicle","counter assault team vehicle","ambulance"],"Equipment":["metal detector","X-ray machine","conveyor belt","basket","radio","handcuffs","bulletproof vest","tactical vest"],"Diplomatic language":["Your Excellency","I am required to verify your credentials.","According to our access policy...","I am not able to make exceptions.","I will contact my supervisor immediately."]};
+const wsSubjects=["The officer","The visitor","Control","The shift leader","The delegate","The team","The journalist","The driver"];
+const wsObjects=["the badge","the ID","the route","the radio message","the access list","the vehicle","the bag","the report"];
+const wsPlaces=["Gate 1","Blue Zone","Gate 3","the holding room","the media zone","the checkpoint"];
+
+function wsMakeWS(i){
+  let level=i<=170?"A1":i<=340?"A2":"B1";
+  let module=level=="A1"?"Module 1 A1":level=="A2"?"Module 2 A2":"Module 3 B1";
+  let g=wsGrammarBank[(i-1)%wsGrammarBank.length],sc=wsScenarios[(i-1)%wsScenarios.length];
+  let subj=wsSubjects[(i-1)%wsSubjects.length],obj=wsObjects[(i+2)%wsObjects.length],place=wsPlaces[(i+3)%wsPlaces.length];
+  let positive,negative,question,gi=(i-1)%wsGrammarBank.length;
+  if(gi==0){positive=`${subj} is at ${place}.`;negative=`${subj} is not at ${place}.`;question=`Is ${subj.toLowerCase()} at ${place}?`;}
+  else if(gi==1){positive=`${subj} checks ${obj} every shift.`;negative=`${subj} does not check ${obj} every shift.`;question=`Does ${subj.toLowerCase()} check ${obj} every shift?`;}
+  else if(gi==2){positive=`${subj} is checking ${obj} now.`;negative=`${subj} is not checking ${obj} now.`;question=`Is ${subj.toLowerCase()} checking ${obj} now?`;}
+  else if(gi==3){positive=`${subj} checked ${obj} at ${place}.`;negative=`${subj} did not check ${obj} at ${place}.`;question=`Did ${subj.toLowerCase()} check ${obj} at ${place}?`;}
+  else if(gi==4){positive=`${subj} was checking ${obj} when Control called.`;negative=`${subj} was not checking ${obj} when Control called.`;question=`Was ${subj.toLowerCase()} checking ${obj} when Control called?`;}
+  else if(gi==5){positive=`${subj} must check ${obj}.`;negative=`${subj} must not ignore ${obj}.`;question=`Must ${subj.toLowerCase()} check ${obj}?`;}
+  else if(gi==6){positive=`${subj} has confirmed ${obj}.`;negative=`${subj} has not confirmed ${obj}.`;question=`Has ${subj.toLowerCase()} confirmed ${obj}?`;}
+  else if(gi==7){positive=`${obj[0].toUpperCase()+obj.slice(1)} was checked at ${place}.`;negative=`${obj[0].toUpperCase()+obj.slice(1)} was not accepted at ${place}.`;question=`Was ${obj} checked at ${place}?`;}
+  else if(gi==8){positive=`If the visitor has a valid badge, the officer can allow access.`;negative=`If the visitor has no badge, the officer cannot allow access.`;question=`What happens if the visitor has no badge?`;}
+  else if(gi==9){positive=`Control told Alpha-2 to stand by.`;negative=`The officer asked the visitor not to enter ${place}.`;question=`What did Control tell Alpha-2 to do?`;}
+  else if(gi==10){positive=`The officer who checked ${obj} reported to Control.`;negative=`The badge that expired was not accepted.`;question=`Which badge was not accepted?`;}
+  else{positive=`The badge was expired; therefore, access was denied.`;negative=`The visitor was polite; however, he was not authorized.`;question=`Why was access denied?`;}
+  let vocab=[0,7,13,19,25,31].map(k=>wsVocabBank[(i+k)%wsVocabBank.length]);
+  let reading=`During the morning shift, officers were assigned to ${place}. The main task was connected to ${sc[0].toLowerCase()}. One visitor asked for assistance, and the officer used professional English to explain the procedure. The officer checked the badge, confirmed the access zone, and reported the result to Control. At the end of the interaction, the officer wrote a short duty note for the shift leader.`;
+  return{id:i,level,module,title:`Worksheet ${i}: ${sc[0]} — ${g.name}`,scenarioTitle:sc[0],scenario:sc[1],grammar:g,vocab,positive,negative,question,reading,
+    comp:[["Where were the officers assigned?",place],["What did the officer check?","The badge and access zone."],["Who received the report?","Control."],["What did the officer write at the end?","A short duty note."]],
+    roleplay:`Student A is an SSPA officer at ${place}. Student B is a visitor/delegate. Use the target grammar and at least three vocabulary words.`,
+    writing:`Write 5–7 sentences about the situation at ${place}. Include one positive sentence, one negative sentence, and one question form.`};
+}
+const wsAll = Array.from({length:500},(_,i)=>wsMakeWS(i+1));
+
+/* ═══════════════════════════════════════════════════
+   AUDIO ENGINE
+═══════════════════════════════════════════════════ */
+let _wsVoice=null, _wsUtt=null, _wsKeepAlive=null, _wsSpeakBtn=null;
+function _wsPick(){
+  const vv=speechSynthesis.getVoices(); if(!vv.length) return;
+  _wsVoice=vv.find(v=>v.name==='Google US English')||vv.find(v=>v.name==='Google UK English Female')||vv.find(v=>/samantha|karen/i.test(v.name))||vv.find(v=>v.lang==='en-US'&&v.localService)||vv.find(v=>v.lang&&v.lang.startsWith('en-US'))||vv.find(v=>v.lang&&v.lang.startsWith('en-GB'))||vv.find(v=>v.lang&&v.lang.startsWith('en'))||vv[0]||null;
+}
+if('speechSynthesis' in window){speechSynthesis.onvoiceschanged=_wsPick;setTimeout(_wsPick,100);setTimeout(_wsPick,700);}
+function _wsSetBtn(btn,on){if(!btn)return;if(on){btn.dataset.orig=btn.innerHTML;btn.innerHTML='<i class="bi bi-stop-fill me-1"></i>Stop';}else{btn.innerHTML=btn.dataset.orig||'<i class="bi bi-volume-up me-1"></i>Speak';}}
+function wsStop(){clearInterval(_wsKeepAlive);_wsKeepAlive=null;if(_wsSpeakBtn){_wsSetBtn(_wsSpeakBtn,false);_wsSpeakBtn=null;}_wsUtt=null;if('speechSynthesis'in window)speechSynthesis.cancel();}
+function speak(text,btn){
+  if(!('speechSynthesis'in window))return;
+  if(btn&&btn===_wsSpeakBtn){wsStop();return;}
+  wsStop();
+  const clean=String(text||'').replace(/_____/g,'blank').replace(/\([^)]*\)/g,'').replace(/[^\w\s'.,!?;:-]/g,' ').replace(/\s+/g,' ').trim().slice(0,300);
+  if(!clean)return;
+  const u=new SpeechSynthesisUtterance(clean);
+  if(_wsVoice){u.voice=_wsVoice;u.lang=_wsVoice.lang||'en-US';}else{u.lang='en-US';}
+  u.rate=0.90;u.pitch=1.0;u.volume=1.0;
+  u.onstart=()=>{if(btn){_wsSpeakBtn=btn;_wsSetBtn(btn,true);}_wsKeepAlive=setInterval(()=>{if(!speechSynthesis.speaking){clearInterval(_wsKeepAlive);return;}speechSynthesis.pause();speechSynthesis.resume();},12000);};
+  u.onend=()=>wsStop();
+  u.onerror=(e)=>{if(e.error!=='interrupted')wsStop();};
+  _wsUtt=u;
+  try{speechSynthesis.speak(u);requestAnimationFrame(()=>{if(speechSynthesis.paused)speechSynthesis.resume();});}catch(e){wsStop();}
+}
+
+/* ═══════════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════════ */
+function wsShow(id,btn){
+  document.querySelectorAll('.ws-sec').forEach(m=>m.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('#wsNav .wt').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ═══════════════════════════════════════════════════
+   UTILITY
+═══════════════════════════════════════════════════ */
+function wsNorm(s){return(s||'').toString().toLowerCase().trim().replace(/['']/g,"'").replace(/\s+/g,' ');}
+function wsEsc(s){return(s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#39;");}
+function getCsrf(){return document.cookie.split(';').map(c=>c.trim()).find(c=>c.startsWith('csrftoken='))?.split('=')[1]||document.querySelector('meta[name="csrf-token"]')?.content||'';}
+
+/* ═══════════════════════════════════════════════════
+   WORKSHEET LIST
+═══════════════════════════════════════════════════ */
+function wsPopGrammar(){const sel=document.getElementById('wsGrFilter');wsGrammarBank.forEach(g=>{const o=document.createElement('option');o.value=g.name;o.textContent=g.name;sel.appendChild(o);});}
+function wsFiltered(){
+  const q=wsNorm(document.getElementById('wsSearch')?.value||'');
+  const lv=document.getElementById('wsLvlFilter')?.value||'';
+  const gr=document.getElementById('wsGrFilter')?.value||'';
+  return wsAll.filter(w=>{
+    const txt=wsNorm([w.id,w.level,w.title,w.scenario,w.grammar.name,w.vocab.join(' '),w.reading].join(' '));
+    return(!q||txt.includes(q))&&(!lv||w.level===lv)&&(!gr||w.grammar.name===gr);
+  });
+}
+function wsRenderList(){
+  const list=wsFiltered(),root=document.getElementById('wsListBox'),saved=JSON.parse(localStorage.getItem('sspaMixDone')||'{}');
+  document.getElementById('wsCount').textContent=list.length+' worksheets found. Showing first 120.';
+  root.innerHTML='';
+  list.slice(0,120).forEach(w=>{
+    const d=document.createElement('div');d.className='ws-li';
+    d.innerHTML=`<span class="lv lv-${w.level} flex-shrink-0">${w.level}</span>
+      <div class="flex-grow-1 overflow-hidden">
+        <div class="fw-semibold small text-truncate">${w.title}</div>
+        <div class="text-muted" style="font-size:11px;">${w.scenarioTitle}</div>
+      </div>
+      <div class="d-flex flex-column align-items-end gap-1 flex-shrink-0">
+        <button class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size:12px;" onclick="wsOpen(${w.id})">Open</button>
+        <label class="d-flex align-items-center gap-1 text-muted" style="font-size:11px;cursor:pointer;">
+          <input type="checkbox" data-id="${w.id}" ${saved[w.id]?'checked':''}> Done
+        </label>
+      </div>`;
+    root.appendChild(d);
+  });
+  root.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.onchange=()=>{
+    const s=JSON.parse(localStorage.getItem('sspaMixDone')||'{}');s[cb.dataset.id]=cb.checked;
+    localStorage.setItem('sspaMixDone',JSON.stringify(s));wsUpdateProg();
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   WORKSHEET DETAIL
+═══════════════════════════════════════════════════ */
+function wsOpen(id){
+  const w=wsAll.find(x=>x.id==id);
+  document.getElementById('wsDetailBadge').innerHTML=`<span class="lv lv-${w.level}">${w.level}</span>`;
+  const vocab=w.vocab.map(v=>`<span class="badge bg-light text-dark border me-1 mb-1" style="font-size:11px;">${v}</span>`).join('');
+  const comp=w.comp.map((c,i)=>`<div class="mb-2"><label class="form-label small mb-1">${i+1}. ${c[0]}</label><input class="form-control form-control-sm" data-ans="${wsEsc(c[1])}" placeholder="answer"></div>`).join('');
+  document.getElementById('wsDetail').innerHTML=`
+    <h6 class="fw-bold mb-1">${w.title}</h6>
+    <p class="text-muted small mb-2">${w.module}</p>
+    <div class="sc-block mb-3"><strong>Scenario:</strong> ${w.scenario}</div>
+    <div class="mb-3"><div class="small fw-bold text-muted text-uppercase mb-1" style="font-size:10px;letter-spacing:.5px;">Vocabulary</div>${vocab}</div>
+
+    <div class="ws-block">
+      <div class="small fw-bold mb-2" style="color:#1b3a6b;">1. Grammar structure</div>
+      <div class="table-responsive">
+        <table class="table table-sm small mb-0">
+          <thead class="table-light"><tr><th>Form</th><th>Pattern</th><th>Example</th></tr></thead>
+          <tbody>
+            <tr><th class="text-success">Positive</th><td>${w.grammar.pos}</td><td>${w.grammar.ex[0]}</td></tr>
+            <tr><th class="text-danger">Negative</th><td>${w.grammar.neg}</td><td>${w.grammar.ex[1]}</td></tr>
+            <tr><th class="text-primary">Question</th><td>${w.grammar.ques}</td><td>${w.grammar.ex[2]}</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="ws-block ws-chk">
+      <div class="small fw-bold mb-2" style="color:#1b3a6b;">2. Transformation practice</div>
+      <p class="small mb-2"><strong>Positive:</strong> ${w.positive}</p>
+      <div class="mb-2"><label class="form-label small mb-1">Write the negative form:</label><input class="form-control form-control-sm" data-ans="${wsEsc(w.negative)}" placeholder="negative sentence"></div>
+      <div class="mb-2"><label class="form-label small mb-1">Write the question form:</label><input class="form-control form-control-sm" data-ans="${wsEsc(w.question)}" placeholder="question form"></div>
+      <div class="d-flex gap-2 mt-2">
+        <button class="btn btn-sm btn-primary" onclick="wsCheck(this.closest('.ws-chk'))">Check</button>
+        <button class="btn btn-sm btn-outline-secondary" onclick="this.closest('.ws-chk').classList.toggle('show-ak')">Show key</button>
+      </div>
+      <div class="ws-fb text-muted small mt-1"></div>
+      <div class="ws-ak"><strong>Negative:</strong> ${w.negative}<br><strong>Question:</strong> ${w.question}</div>
+    </div>
+
+    <div class="ws-block">
+      <div class="small fw-bold mb-2" style="color:#1b3a6b;">3. Build your own sentences</div>
+      <div class="mb-2"><label class="form-label small mb-1">Positive:</label><input class="form-control form-control-sm" placeholder="The officer..."></div>
+      <div class="mb-2"><label class="form-label small mb-1">Negative:</label><input class="form-control form-control-sm" placeholder="The visitor does not..."></div>
+      <div class="mb-2"><label class="form-label small mb-1">Question:</label><input class="form-control form-control-sm" placeholder="Does the officer...?"></div>
+    </div>
+
+    <div class="ws-block ws-chk">
+      <div class="small fw-bold mb-2" style="color:#1b3a6b;">4. Reading + comprehension</div>
+      <p class="small">${w.reading}</p>
+      <div class="small fw-bold mb-2 mt-3">Comprehension</div>
+      ${comp}
+      <div class="d-flex gap-2 mt-2">
+        <button class="btn btn-sm btn-primary" onclick="wsCheck(this.closest('.ws-chk'))">Check</button>
+        <button class="btn btn-sm btn-outline-secondary" onclick="this.closest('.ws-chk').classList.toggle('show-ak')">Show answers</button>
+      </div>
+      <div class="ws-fb text-muted small mt-1"></div>
+      <div class="ws-ak">${w.comp.map((c,i)=>`<div>${i+1}. ${c[1]}</div>`).join('')}</div>
+    </div>
+
+    <div class="ws-block">
+      <div class="small fw-bold mb-2" style="color:#1b3a6b;">5. Role-play</div>
+      <div class="sc-block">${w.roleplay}</div>
+      <div class="small fw-bold mb-2 mt-3" style="color:#1b3a6b;">6. Writing task</div>
+      <textarea class="form-control form-control-sm" rows="4" placeholder="${wsEsc(w.writing)}"></textarea>
+    </div>
+
+    <div class="d-flex gap-2 flex-wrap">
+      <button class="btn btn-sm btn-outline-primary" onclick="speak(${JSON.stringify(w.positive)},this)"><i class="bi bi-volume-up me-1"></i>Positive</button>
+      <button class="btn btn-sm btn-outline-primary" onclick="speak(${JSON.stringify(w.negative)},this)"><i class="bi bi-volume-up me-1"></i>Negative</button>
+      <button class="btn btn-sm btn-outline-primary" onclick="speak(${JSON.stringify(w.question)},this)"><i class="bi bi-volume-up me-1"></i>Question</button>
+    </div>`;
+}
+function wsCheck(box){
+  let total=0,ok=0;
+  box.querySelectorAll('input[data-ans]').forEach(inp=>{
+    total++;
+    if(wsNorm(inp.value)===wsNorm(inp.dataset.ans)){ok++;inp.classList.remove('is-invalid');inp.classList.add('is-valid');}
+    else{inp.classList.remove('is-valid');inp.classList.add('is-invalid');}
+  });
+  const fb=box.querySelector('.ws-fb');
+  if(fb) fb.textContent=`${ok}/${total} correct. `+(ok===total?'Excellent!':'Check the answer key.');
+}
+
+/* ═══════════════════════════════════════════════════
+   VOCABULARY / FLASHCARD
+═══════════════════════════════════════════════════ */
+let wsFlashCards=[];Object.values(wsTerms).forEach(a=>a.forEach(x=>wsFlashCards.push(x)));
+let wsFcIdx=0,wsFcBack=false;
+function wsFcRender(){
+  const t=wsFlashCards[wsFcIdx];
+  document.getElementById('wsFcFront').innerHTML=`<div class="h5 fw-bold mb-1">${t}</div><div class="small opacity-75">Click to drill</div>`;
+  document.getElementById('wsFcBack').innerHTML=`<div class="small fw-bold mb-2 opacity-75">Repeat after me</div><div class="h5 mb-1">${t}</div><div class="small opacity-60">${t} · ${t}</div>`;
+  document.getElementById('wsFcOuter').classList.remove('flipped');wsFcBack=false;
+}
+function wsFcFlip(){wsFcBack=!wsFcBack;document.getElementById('wsFcOuter').classList.toggle('flipped');}
+function wsFcNext(){wsFcIdx=(wsFcIdx+1)%wsFlashCards.length;wsFcRender();}
+function wsFcPrev(){wsFcIdx=(wsFcIdx-1+wsFlashCards.length)%wsFlashCards.length;wsFcRender();}
+
+function wsRenderTerms(){
+  const items=Object.entries(wsTerms).map(([name,arr],idx)=>`
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button small py-2 ${idx>0?'collapsed':''}" type="button" data-bs-toggle="collapse" data-bs-target="#wsTG${idx}">
+          ${name}
+        </button>
+      </h2>
+      <div id="wsTG${idx}" class="accordion-collapse collapse ${idx===0?'show':''}">
+        <div class="accordion-body py-2">
+          ${arr.map(t=>`
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="fw-semibold small">${t}</span>
+              <button class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size:11px;" onclick="speak(${JSON.stringify(t)},this)">
+                <i class="bi bi-volume-up"></i>
+              </button>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>`).join('');
+  document.getElementById('wsTermsBox').innerHTML=`<div class="accordion">${items}</div>`;
+}
+
+/* ═══════════════════════════════════════════════════
+   READING
+═══════════════════════════════════════════════════ */
+function wsRenderReading(){
+  document.getElementById('wsReadBox').innerHTML=wsAll.slice(0,120).map((w,i)=>`
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button small py-2 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#wsRI${i}">
+          <span class="lv lv-${w.level} me-2">${w.level}</span>${w.id}. ${w.scenarioTitle}
+        </button>
+      </h2>
+      <div id="wsRI${i}" class="accordion-collapse collapse">
+        <div class="accordion-body small">
+          <p>${w.reading}</p>
+          <ol>${w.comp.map(c=>`<li class="mb-1">${c[0]} <span class="text-success fw-semibold">→ ${c[1]}</span></li>`).join('')}</ol>
+          <button class="btn btn-sm btn-outline-primary mt-1" onclick="speak(${JSON.stringify(w.reading)},this)"><i class="bi bi-volume-up me-1"></i>Listen</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+/* ═══════════════════════════════════════════════════
+   TESTS
+═══════════════════════════════════════════════════ */
+function wsShuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function wsMakeQs(pool,count){
+  const qs=[];
+  wsShuffle(pool).slice(0,count).forEach(w=>{
+    qs.push({q:`Choose the negative form of: "${w.positive}"`,opts:wsShuffle([w.negative,w.question,w.positive,"Please proceed."]),a:w.negative,exp:`Negative: ${w.negative}`});
+    qs.push({q:`Choose the question form of: "${w.positive}"`,opts:wsShuffle([w.question,w.negative,w.positive,"Roger that."]),a:w.question,exp:`Question: ${w.question}`});
+    qs.push({q:`Scenario: ${w.scenarioTitle}. Which term fits best?`,opts:wsShuffle([w.vocab[0],"banana","football","cinema"]),a:w.vocab[0],exp:`SSPA term: ${w.vocab[0]}`});
+  });
+  return wsShuffle(qs).slice(0,count);
+}
+let wsCurrentTest=[];
+function wsStartTest(kind){
+  let pool=wsAll,count=20,title="Random Practice Test",writing="Write 5 SSPA duty sentences using target grammar.";
+  if(kind==='placement'){count=30;title="Placement Test";}
+  if(kind==='a1'){count=25;title="A1 Checkpoint";pool=wsAll.filter(w=>w.level==='A1');writing="Writing: introduce yourself and write a 3-sentence duty log.";}
+  if(kind==='a2'){count=30;title="A2 Checkpoint";pool=wsAll.filter(w=>w.level==='A2');writing="Writing: write a radio report about a suspicious vehicle and access denial.";}
+  if(kind==='b1'){count=40;title="B1 Final Assessment";pool=wsAll.filter(w=>w.level==='B1');writing="Writing: write a formal incident report using passive voice and professional tone.";}
+  wsCurrentTest=wsMakeQs(pool,Math.ceil(count/3)*3).slice(0,count);
+  let html=`<h6 class="fw-bold mb-1">${title}</h6><p class="text-muted small mb-3">Answer all questions then press Submit. Pass mark: 70%.</p><div id="wsTestQs">`;
+  wsCurrentTest.forEach((q,i)=>{
+    html+=`<div class="card mb-2 ws-qcard" data-a="${wsEsc(q.a)}"><div class="card-body py-2">
+      <div class="small fw-bold mb-2">Q${i+1}. ${q.q}</div>
+      ${q.opts.map(o=>`<button class="ws-opt" onclick="wsSelOpt(this)">${o}</button>`).join('')}
+      <div class="ws-fb text-muted small mt-1"></div>
+      <div class="ws-ak small"><i class="bi bi-lightbulb me-1 text-warning"></i>${q.exp}</div>
+    </div></div>`;
+  });
+  html+=`</div><div class="ws-block mt-2">
+    <div class="small fw-bold mb-1" style="color:#1b3a6b;">Writing task</div>
+    <p class="text-muted small">${writing}</p>
+    <textarea class="form-control form-control-sm" rows="5" placeholder="${writing}"></textarea>
+  </div>
+  <div class="d-flex gap-2 mt-3 flex-wrap">
+    <button class="btn btn-primary" onclick="wsSubmit('${kind}','${title}')">Submit test</button>
+    <button class="btn btn-outline-secondary btn-sm" onclick="document.querySelectorAll('#wsTestArea .ws-qcard').forEach(c=>c.classList.toggle('show-ak'))">Show/hide answers</button>
+  </div>
+  <div id="wsTestResult" class="mt-3"></div>`;
+  document.getElementById('wsTestArea').innerHTML=html;
+}
+function wsSelOpt(btn){
+  const card=btn.closest('.ws-qcard');
+  card.querySelectorAll('.ws-opt').forEach(b=>b.classList.remove('correct','wrong'));
+  btn.dataset.selected=btn.textContent;card.dataset.selected=btn.textContent;btn.classList.add('correct');
+}
+function wsSubmit(kind,title){
+  const cards=[...document.querySelectorAll('#wsTestArea .ws-qcard')];
+  let ok=0;
+  cards.forEach(c=>{
+    const ans=wsNorm(c.dataset.a),sel=wsNorm(c.dataset.selected||'');
+    c.querySelectorAll('.ws-opt').forEach(b=>{if(wsNorm(b.textContent)===ans)b.classList.add('correct');else if(wsNorm(b.textContent)===sel)b.classList.add('wrong');});
+    if(sel===ans)ok++;
+    const fb=c.querySelector('.ws-fb');if(fb)fb.textContent=sel===ans?'✓ Correct.':'✗ Incorrect.';
+  });
+  const pct=Math.round(ok/cards.length*100),pass=pct>=70;
+  document.getElementById('wsTestResult').innerHTML=`<div class="card"><div class="card-body text-center py-3">
+    <div class="ws-score ${pass?'ws-pass':'ws-fail'}">${pct}%</div>
+    <div class="fw-bold fs-5 mb-1 ${pass?'text-success':'text-danger'}">${pass?'PASS — Operationally ready':'NEEDS REVISION'}</div>
+    <div class="text-muted small mb-3">${ok} / ${cards.length} correct</div>
+    <button class="btn btn-sm btn-outline-secondary" onclick="wsSaveScore('${kind}','${title}',${pct},${ok},${cards.length})">
+      <i class="bi bi-floppy me-1"></i>Save score
+    </button>
+  </div></div>`;
+  // Post to Django progress API
+  fetch('/api/quiz/submit/',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':getCsrf()},body:JSON.stringify({lesson_id:1,batch_index:0,score:ok,total:cards.length})}).catch(()=>{});
+}
+function wsSaveScore(kind,title,pct,ok,total){
+  const s=JSON.parse(localStorage.getItem('sspaTestScores')||'[]');
+  s.push({date:new Date().toLocaleString(),kind,title,pct,ok,total});
+  localStorage.setItem('sspaTestScores',JSON.stringify(s));wsShowScores();
+}
+function wsShowScores(){
+  const s=JSON.parse(localStorage.getItem('sspaTestScores')||'[]');
+  const rows=s.length?s.map(x=>`<tr>
+    <td class="small">${x.date}</td><td class="small">${x.title}</td>
+    <td class="text-center small">${x.ok}/${x.total}</td>
+    <td class="text-center fw-bold ${x.pct>=70?'text-success':'text-danger'}">${x.pct}%</td>
+    <td class="text-center"><span class="badge ${x.pct>=70?'bg-success':'bg-danger'}">${x.pct>=70?'PASS':'REVISION'}</span></td>
+  </tr>`).join(''):'<tr><td colspan="5" class="text-muted text-center py-3">No saved scores yet.</td></tr>';
+  document.getElementById('wsTestArea').innerHTML=`<h6 class="fw-bold">Saved Scores</h6>
+    <div class="table-responsive"><table class="table table-sm">
+      <thead class="table-light"><tr><th>Date</th><th>Test</th><th class="text-center">Score</th><th class="text-center">%</th><th class="text-center">Status</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+    <button class="btn btn-sm btn-outline-danger" onclick="localStorage.removeItem('sspaTestScores');wsShowScores()"><i class="bi bi-trash me-1"></i>Clear</button>`;
+}
+
+/* ═══════════════════════════════════════════════════
+   PROGRESS
+═══════════════════════════════════════════════════ */
+function wsUpdateProg(){
+  const s=JSON.parse(localStorage.getItem('sspaMixDone')||'{}');
+  const done=wsAll.filter(w=>s[w.id]).length;
+  document.getElementById('wsProgText').textContent=done;
+  document.getElementById('wsPFill').style.width=Math.round(done/500*100)+'%';
+}
+
+/* ═══════════════════════════════════════════════════
+   STUDY TIME TRACKING
+═══════════════════════════════════════════════════ */
+let _wsT0=Date.now();
+function _wsSendTime(){
+  const mins=Math.round((Date.now()-_wsT0)/60000);if(mins<1)return;
+  fetch('/api/study/time/',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':getCsrf()},body:JSON.stringify({minutes:mins}),keepalive:true}).catch(()=>{});
+  _wsT0=Date.now();
+}
+setInterval(_wsSendTime,5*60*1000);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)_wsSendTime();});
+window.addEventListener('beforeunload',_wsSendTime);
+
+/* ═══════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════ */
+wsPopGrammar();wsRenderList();wsRenderTerms();wsRenderReading();wsFcRender();wsOpen(1);wsUpdateProg();
+</script>
+{% endblock %}

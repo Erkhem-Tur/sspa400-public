@@ -38,12 +38,32 @@
   </div>
 </div>
 
+<!-- Monthly summary chips -->
+{% if monthly %}
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <a href="{% url 'logbook_admin' %}" class="btn btn-sm {% if not month_filter and not date_filter %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+    Бүгд <span class="badge bg-white text-dark ms-1">{{ total_count }}</span>
+  </a>
+  {% for m in monthly %}
+  <a href="?month={{ m.month|date:'Y-m' }}{% if dept_filter %}&dept={{ dept_filter }}{% endif %}"
+     class="btn btn-sm {% if month_filter == m.month|date:'Y-m' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+    {{ m.month|date:"Y/m" }}
+    <span class="badge ms-1 {% if month_filter == m.month|date:'Y-m' %}bg-white text-primary{% else %}bg-primary text-white{% endif %}">{{ m.cnt }}</span>
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+
 <!-- Filter -->
 <div class="card border-0 shadow-sm mb-3" style="border-radius:12px;">
   <div class="card-body py-2">
     <form method="get" class="d-flex flex-wrap gap-2 align-items-end">
       <div>
-        <label class="form-label small fw-semibold mb-1">Огноо</label>
+        <label class="form-label small fw-semibold mb-1">Сар</label>
+        <input type="month" name="month" class="form-control form-control-sm" value="{{ month_filter }}" style="min-width:150px;">
+      </div>
+      <div>
+        <label class="form-label small fw-semibold mb-1">Өдөр</label>
         <input type="date" name="date" class="form-control form-control-sm" value="{{ date_filter }}" style="min-width:150px;">
       </div>
       <div>
@@ -56,7 +76,7 @@
         </select>
       </div>
       <button type="submit" class="btn btn-primary btn-sm px-4">Хайх</button>
-      {% if date_filter or dept_filter %}
+      {% if date_filter or month_filter or dept_filter %}
       <a href="{% url 'logbook_admin' %}" class="btn btn-outline-secondary btn-sm">Цэвэрлэх</a>
       {% endif %}
     </form>

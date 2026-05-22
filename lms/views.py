@@ -149,17 +149,27 @@ def logbook_view(request):
 @user_passes_test(lambda u: u.is_staff)
 def logbook_admin_view(request):
     from django.utils import timezone
-    date_str = request.GET.get('date', '')
-    dept_id  = request.GET.get('dept', '')
+    from datetime import date
+
+    date_str  = request.GET.get('date', '')
+    month_str = request.GET.get('month', '')   # YYYY-MM
+    dept_id   = request.GET.get('dept', '')
 
     entries = LogEntry.objects.select_related('department').all()
+
     if date_str:
         try:
-            from datetime import date
             d = date.fromisoformat(date_str)
             entries = entries.filter(logged_at__date=d)
         except ValueError:
             pass
+    elif month_str:
+        try:
+            year, mon = month_str.split('-')
+            entries = entries.filter(logged_at__year=int(year), logged_at__month=int(mon))
+        except (ValueError, AttributeError):
+            pass
+
     if dept_id:
         entries = entries.filter(department_id=dept_id)
 
@@ -168,13 +178,24 @@ def logbook_admin_view(request):
     today_count = LogEntry.objects.filter(logged_at__date=today).count()
     total_count = LogEntry.objects.count()
 
+    # Monthly summary (last 6 months)
+    from django.db.models.functions import TruncMonth
+    from django.db.models import Count
+    monthly = (LogEntry.objects
+               .annotate(month=TruncMonth('logged_at'))
+               .values('month')
+               .annotate(cnt=Count('id'))
+               .order_by('-month')[:6])
+
     return render(request, 'lms/logbook_admin.html', {
         'entries': entries,
         'departments': Department.objects.all(),
         'today_count': today_count,
         'total_count': total_count,
         'date_filter': date_str,
+        'month_filter': month_str,
         'dept_filter': dept_id,
+        'monthly': monthly,
     })
 
 

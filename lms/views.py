@@ -102,20 +102,32 @@ def logbook_view(request):
     error = None
 
     if request.method == 'POST':
-        full_name = request.POST.get('full_name', '').strip()
-        rank      = request.POST.get('rank', '').strip()
-        dept_id   = request.POST.get('department', '').strip()
-        note      = request.POST.get('note', '').strip()
+        full_name   = request.POST.get('full_name', '').strip()
+        rank        = request.POST.get('rank', '').strip()
+        dept_id     = request.POST.get('department', '').strip()
+        tl_english  = request.POST.get('tl_english', '').strip()
+        tl_mongolian = request.POST.get('tl_mongolian', '').strip()
+        note        = request.POST.get('note', '').strip()
 
         if not full_name:
             error = 'Нэрээ оруулна уу.'
         else:
+            # Merge translanguaging fields into note
+            parts = []
+            if tl_english:
+                parts.append(f'[EN] {tl_english}')
+            if tl_mongolian:
+                parts.append(f'[MN] {tl_mongolian}')
+            if note:
+                parts.append(note)
+            combined_note = ' | '.join(parts)
+
             dept = Department.objects.filter(pk=dept_id).first() if dept_id else None
-            ip   = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0].strip() \
-                   or request.META.get('REMOTE_ADDR')
+            ip   = (request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0].strip()
+                    or request.META.get('REMOTE_ADDR'))
             LogEntry.objects.create(
                 full_name=full_name, rank=rank,
-                department=dept, note=note, ip=ip or None,
+                department=dept, note=combined_note, ip=ip or None,
             )
             success = True
 

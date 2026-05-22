@@ -18,4 +18,6 @@ urlpatterns = [
     path('videos/', views.videos_view, name='videos'),
     path('dept-manage/', views.dept_manage_view, name='dept_manage'),
     path('dept-manage/<int:dept_id>/edit/', views.dept_edit_view, name='dept_edit'),
+    path('logbook/', views.logbook_view, name='logbook'),
+    path('logbook/admin/', views.logbook_admin_view, name='logbook_admin'),
 ]

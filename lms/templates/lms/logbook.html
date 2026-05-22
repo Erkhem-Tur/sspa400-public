@@ -1,0 +1,134 @@
+{% extends 'lms/base.html' %}
+{% block title %}Ирцийн бүртгэл – ТТХГ{% endblock %}
+{% block content %}
+
+<div class="d-flex align-items-center gap-2 mb-4">
+  <i class="bi bi-journal-check fs-4" style="color:#1b3a6b;"></i>
+  <h4 class="fw-bold mb-0" style="color:#1b3a6b;">Ирцийн бүртгэл</h4>
+</div>
+
+<div class="row g-4">
+
+  <!-- Form -->
+  <div class="col-12 col-lg-5">
+    <div class="card border-0 shadow-sm" style="border-radius:14px;">
+      <div class="card-header fw-bold" style="background:linear-gradient(135deg,#0f2744,#1b3a6b);color:#fff;border-radius:14px 14px 0 0;">
+        <i class="bi bi-pencil-square me-2"></i>Бүртгүүлэх
+      </div>
+      <div class="card-body p-4">
+
+        {% if success %}
+        <div class="alert border-0 mb-4 text-center py-4" style="background:#f0fdf4;border-radius:10px;">
+          <i class="bi bi-check-circle-fill fs-1 d-block mb-2" style="color:#16a34a;"></i>
+          <div class="fw-bold" style="color:#15803d;">Амжилттай бүртгэгдлээ!</div>
+          <div class="text-muted small mt-1">Таны ирц хадгалагдлаа.</div>
+          <a href="{% url 'logbook' %}" class="btn btn-sm btn-outline-success mt-3">Дахин бүртгэх</a>
+        </div>
+        {% else %}
+
+        {% if error %}
+        <div class="alert alert-danger py-2 px-3 mb-3" style="font-size:13px;">
+          <i class="bi bi-exclamation-triangle me-1"></i>{{ error }}
+        </div>
+        {% endif %}
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">Нэр <span class="text-danger">*</span></label>
+            <input type="text" name="full_name" class="form-control" placeholder="Бүтэн нэрээ оруулна уу" autofocus required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">Цол</label>
+            <select name="rank" class="form-select">
+              <option value="">-- Цол сонгох --</option>
+              {% for val, label in RANK_CHOICES %}
+              <option value="{{ val }}">{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">Хэлтэс</label>
+            <select name="department" class="form-select">
+              <option value="">-- Хэлтэс сонгох --</option>
+              {% for d in departments %}
+              <option value="{{ d.id }}">{{ d.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-semibold small">Тэмдэглэл <span class="text-muted">(заавал биш)</span></label>
+            <textarea name="note" class="form-control" rows="2" placeholder="Өнөөдөр юу судаллаа..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
+            <i class="bi bi-check2 me-2"></i>Бүртгүүлэх
+          </button>
+        </form>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Today's list -->
+  <div class="col-12 col-lg-7">
+    <div class="card border-0 shadow-sm" style="border-radius:14px;">
+      <div class="card-header d-flex align-items-center justify-content-between"
+           style="border-radius:14px 14px 0 0;">
+        <span style="color:#1b3a6b;font-weight:700;">
+          <i class="bi bi-calendar-check me-2"></i>Өнөөдрийн ирц
+        </span>
+        <span class="badge rounded-pill" style="background:#1b3a6b;font-size:12px;">
+          {{ today_entries|length }} хүн
+        </span>
+      </div>
+
+      {% if today_entries %}
+      <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle" style="font-size:13px;">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Нэр</th>
+              <th>Цол</th>
+              <th>Хэлтэс</th>
+              <th>Цаг</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for e in today_entries %}
+            <tr>
+              <td class="text-muted">{{ forloop.counter }}</td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                       style="width:30px;height:30px;background:#1b3a6b;color:#fff;font-size:11px;font-weight:800;">
+                    {{ e.full_name|first|upper }}
+                  </div>
+                  <span class="fw-semibold">{{ e.full_name }}</span>
+                </div>
+              </td>
+              <td>
+                {% if e.rank %}
+                <span class="badge rounded-pill" style="background:#e8f4fd;color:#1b3a6b;font-size:10px;white-space:normal;">{{ e.rank }}</span>
+                {% else %}<span class="text-muted">—</span>{% endif %}
+              </td>
+              <td class="text-muted small">{{ e.department.name|default:"—" }}</td>
+              <td class="text-muted small">{{ e.logged_at|date:"H:i" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="card-body text-center py-5">
+        <i class="bi bi-journal-x fs-1 d-block mb-3 opacity-25" style="color:#1b3a6b;"></i>
+        <p class="text-muted mb-0">Өнөөдөр бүртгэл байхгүй байна.</p>
+        <p class="text-muted small">Эхлээд бүртгүүлсэн хүн энд харагдана.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

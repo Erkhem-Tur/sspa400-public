@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Department, Lesson, QuizResult, UserProgress, Video
+from .models import Department, Lesson, QuizResult, UserProgress, Video, LogEntry
 
 
 @admin.register(Department)
@@ -41,3 +41,12 @@ class VideoAdmin(admin.ModelAdmin):
             'fields': ('title', 'description', 'youtube_id', 'order', 'is_published'),
         }),
     )
+
+
+@admin.register(LogEntry)
+class LogEntryAdmin(admin.ModelAdmin):
+    list_display  = ('full_name', 'rank', 'department', 'note', 'logged_at', 'ip')
+    list_filter   = ('department', 'logged_at')
+    search_fields = ('full_name', 'note')
+    ordering      = ('-logged_at',)
+    date_hierarchy = 'logged_at'

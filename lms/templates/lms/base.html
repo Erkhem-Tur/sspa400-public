@@ -172,8 +172,14 @@
     <a href="{% url 'videos' %}" class="{% if request.resolver_match.url_name == 'videos' %}active{% endif %}">
       <i class="bi bi-play-circle"></i> Видео хичээлүүд
     </a>
+    <a href="{% url 'logbook' %}" class="{% if request.resolver_match.url_name == 'logbook' %}active{% endif %}">
+      <i class="bi bi-journal-check"></i> Ирцийн бүртгэл
+    </a>
     {% if user.is_authenticated and user.is_staff %}
     <div class="sidebar-title">Удирдлага</div>
+    <a href="{% url 'logbook_admin' %}" class="{% if request.resolver_match.url_name == 'logbook_admin' %}active{% endif %}">
+      <i class="bi bi-clipboard-data"></i> Бүртгэлийн жагсаалт
+    </a>
     <a href="{% url 'dept_manage' %}" class="{% if request.resolver_match.url_name == 'dept_manage' or request.resolver_match.url_name == 'dept_edit' %}active{% endif %}">
       <i class="bi bi-building-gear"></i> Хэлтэс удирдах
     </a>

@@ -109,3 +109,21 @@ class Video(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class LogEntry(models.Model):
+    full_name  = models.CharField(max_length=200, verbose_name='Нэр')
+    rank       = models.CharField(max_length=100, blank=True, choices=RANK_CHOICES, verbose_name='Цол')
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True,
+                                   verbose_name='Хэлтэс')
+    note       = models.TextField(blank=True, verbose_name='Тэмдэглэл')
+    logged_at  = models.DateTimeField(auto_now_add=True)
+    ip         = models.GenericIPAddressField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-logged_at']
+        verbose_name = 'Бүртгэл'
+        verbose_name_plural = 'Ирцийн бүртгэл'
+
+    def __str__(self):
+        return f"{self.full_name} – {self.logged_at.strftime('%Y-%m-%d %H:%M')}"

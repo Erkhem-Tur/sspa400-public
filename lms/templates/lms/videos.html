@@ -6,9 +6,12 @@
   <div class="d-flex align-items-center gap-2">
     <i class="bi bi-play-circle-fill fs-4" style="color:#1b3a6b;"></i>
     <h4 class="fw-bold mb-0" style="color:#1b3a6b;">Видео хичээлүүд</h4>
+    {% if videos %}
+    <span class="badge rounded-pill ms-1" style="background:#e8f4fd;color:#1b3a6b;font-size:12px;">{{ videos|length }}</span>
+    {% endif %}
   </div>
   {% if user.is_staff %}
-  <a href="/admin/lms/video/add/" class="btn btn-sm btn-primary">
+  <a href="/admin/lms/video/add/" class="btn btn-sm btn-primary" style="border-radius:20px;">
     <i class="bi bi-plus-lg me-1"></i>Видео нэмэх
   </a>
   {% endif %}
@@ -18,19 +21,22 @@
 <div class="row g-4">
   {% for v in videos %}
   <div class="col-12 col-md-6 col-xl-4">
-    <div class="card h-100 shadow-sm border-0" style="border-radius:14px;overflow:hidden;">
-      <!-- Thumbnail / embed toggle -->
+    <div class="card h-100 border-0 shadow-sm video-card" style="border-radius:14px;overflow:hidden;">
+
+      <!-- Thumbnail -->
       <div class="ratio ratio-16x9 position-relative video-thumb-wrap" data-id="{{ v.youtube_id }}"
-           style="cursor:pointer;background:#000;">
+           style="cursor:pointer;background:#0f2744;">
         <img src="{{ v.thumbnail_url }}" alt="{{ v.title }}"
-             style="width:100%;height:100%;object-fit:cover;transition:opacity .2s;"
-             class="thumb-img">
-        <!-- Play button overlay -->
+             class="thumb-img"
+             style="width:100%;height:100%;object-fit:cover;transition:opacity .2s;display:block;">
+        <!-- Play overlay -->
+        <div class="position-absolute top-0 start-0 w-100 h-100 play-overlay"
+             style="background:rgba(15,39,68,.25);transition:background .2s;"></div>
         <div class="position-absolute top-50 start-50 translate-middle play-btn"
-             style="width:60px;height:60px;background:rgba(201,162,39,.92);border-radius:50%;
+             style="width:64px;height:64px;background:rgba(201,162,39,.95);border-radius:50%;
                     display:flex;align-items:center;justify-content:center;
-                    box-shadow:0 4px 20px rgba(0,0,0,.4);transition:transform .15s;">
-          <i class="bi bi-play-fill text-white fs-3" style="margin-left:4px;"></i>
+                    box-shadow:0 4px 20px rgba(0,0,0,.45);transition:transform .18s,box-shadow .18s;">
+          <i class="bi bi-play-fill text-white" style="font-size:28px;margin-left:5px;"></i>
         </div>
       </div>
 
@@ -39,11 +45,18 @@
         {% if v.description %}
         <p class="text-muted small mb-0 flex-grow-1" style="font-size:12px;line-height:1.5;">{{ v.description }}</p>
         {% endif %}
+        <div class="mt-2 pt-2 border-top d-flex align-items-center gap-1" style="border-color:#f1f5f9 !important;">
+          <i class="bi bi-youtube text-danger" style="font-size:14px;"></i>
+          <span class="text-muted" style="font-size:11px;">YouTube</span>
+          <span class="ms-auto text-muted" style="font-size:11px;">
+            <i class="bi bi-play-circle me-1"></i>Үзэх
+          </span>
+        </div>
       </div>
 
       {% if user.is_staff %}
-      <div class="card-footer bg-transparent border-top-0 pt-0 pb-2 px-3 d-flex gap-2">
-        <a href="/admin/lms/video/{{ v.id }}/change/" class="btn btn-sm btn-outline-secondary" style="font-size:11px;">
+      <div class="card-footer bg-transparent border-top px-3 py-2" style="border-color:#f1f5f9 !important;">
+        <a href="/admin/lms/video/{{ v.id }}/change/" class="btn btn-sm btn-outline-secondary" style="font-size:11px;border-radius:6px;">
           <i class="bi bi-pencil me-1"></i>Засах
         </a>
       </div>
@@ -54,13 +67,16 @@
 </div>
 
 {% else %}
-<div class="card border-0 shadow-sm">
+<div class="card border-0 shadow-sm" style="border-radius:14px;">
   <div class="card-body text-center py-5">
-    <i class="bi bi-play-circle fs-1 d-block mb-3 opacity-25" style="color:#1b3a6b;"></i>
+    <div class="mb-3 mx-auto d-flex align-items-center justify-content-center"
+         style="width:80px;height:80px;background:#f8fafc;border-radius:50%;">
+      <i class="bi bi-play-circle" style="font-size:40px;color:#1b3a6b;opacity:.25;"></i>
+    </div>
     <p class="fw-semibold text-muted mb-1">Одоогоор видео байхгүй байна.</p>
     <p class="text-muted small mb-3">Admin хэлтсээр дамжуулан YouTube видео нэмнэ үү.</p>
     {% if user.is_staff %}
-    <a href="/admin/lms/video/add/" class="btn btn-sm btn-primary">
+    <a href="/admin/lms/video/add/" class="btn btn-sm btn-primary" style="border-radius:20px;">
       <i class="bi bi-plus-lg me-1"></i>Эхний видео нэмэх
     </a>
     {% endif %}
@@ -71,16 +87,16 @@
 <!-- Modal for full-screen playback -->
 <div class="modal fade" id="videoModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content border-0" style="background:#000;border-radius:14px;overflow:hidden;">
-      <div class="modal-header border-0 pb-0" style="background:#000;">
-        <h6 class="modal-title text-white fw-bold small" id="videoModalTitle"></h6>
+    <div class="modal-content border-0" style="background:#000;border-radius:16px;overflow:hidden;">
+      <div class="modal-header border-0 px-4 py-3" style="background:linear-gradient(135deg,#0f2744,#1b3a6b);">
+        <h6 class="modal-title text-white fw-bold" id="videoModalTitle" style="font-size:14px;"></h6>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body p-0">
         <div class="ratio ratio-16x9">
           <iframe id="videoFrame" src="" frameborder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowfullscreen style="border-radius:0 0 14px 14px;"></iframe>
+                  allowfullscreen></iframe>
         </div>
       </div>
     </div>
@@ -88,8 +104,11 @@
 </div>
 
 <style>
-.video-thumb-wrap:hover .play-btn { transform: translate(-50%,-50%) scale(1.12); }
-.video-thumb-wrap:hover .thumb-img { opacity: .85; }
+.video-card { transition: transform .18s, box-shadow .18s; }
+.video-card:hover { transform: translateY(-4px); box-shadow: 0 10px 28px rgba(27,58,107,.18) !important; }
+.video-thumb-wrap:hover .play-btn { transform: translate(-50%,-50%) scale(1.1); box-shadow: 0 6px 28px rgba(0,0,0,.5); }
+.video-thumb-wrap:hover .play-overlay { background: rgba(15,39,68,.15); }
+.video-thumb-wrap:hover .thumb-img { opacity: .88; }
 </style>
 
 <script>
@@ -105,7 +124,6 @@ document.querySelectorAll('.video-thumb-wrap').forEach(function(el) {
   });
 });
 
-// Stop video when modal closes
 document.getElementById('videoModal').addEventListener('hidden.bs.modal', function() {
   document.getElementById('videoFrame').src = '';
 });

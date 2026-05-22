@@ -116,6 +116,7 @@ class LogEntry(models.Model):
     rank       = models.CharField(max_length=100, blank=True, choices=RANK_CHOICES, verbose_name='Цол')
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True,
                                    verbose_name='Хэлтэс')
+    tasag      = models.CharField(max_length=200, blank=True, verbose_name='Тасаг')
     note       = models.TextField(blank=True, verbose_name='Тэмдэглэл')
     logged_at  = models.DateTimeField(auto_now_add=True)
     ip         = models.GenericIPAddressField(null=True, blank=True)

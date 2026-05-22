@@ -78,6 +78,7 @@
           <th>Нэр</th>
           <th>Цол</th>
           <th>Хэлтэс</th>
+          <th>Тасаг</th>
           <th>Тэмдэглэл</th>
           <th class="text-end">Огноо / Цаг</th>
         </tr>
@@ -101,7 +102,8 @@
             {% else %}<span class="text-muted">—</span>{% endif %}
           </td>
           <td class="text-muted small">{{ e.department.name|default:"—" }}</td>
-          <td class="text-muted small" style="max-width:200px;">{{ e.note|default:"—"|truncatechars:60 }}</td>
+          <td class="text-muted small">{{ e.tasag|default:"—" }}</td>
+          <td class="text-muted small" style="max-width:180px;">{{ e.note|default:"—"|truncatechars:50 }}</td>
           <td class="text-end text-muted small">{{ e.logged_at|date:"Y/m/d H:i" }}</td>
         </tr>
         {% endfor %}

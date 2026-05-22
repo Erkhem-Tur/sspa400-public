@@ -45,7 +45,7 @@ class VideoAdmin(admin.ModelAdmin):
 
 @admin.register(LogEntry)
 class LogEntryAdmin(admin.ModelAdmin):
-    list_display  = ('full_name', 'rank', 'department', 'note', 'logged_at', 'ip')
+    list_display  = ('full_name', 'rank', 'department', 'tasag', 'note', 'logged_at', 'ip')
     list_filter   = ('department', 'logged_at')
     search_fields = ('full_name', 'note')
     ordering      = ('-logged_at',)

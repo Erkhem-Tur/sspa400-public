@@ -61,7 +61,7 @@
                     {% endfor %}
                   </select>
                 </div>
-                <div class="mb-0">
+                <div class="mb-3">
                   <label class="form-label fw-semibold small">Хэлтэс</label>
                   <select name="department" class="form-select form-select-sm">
                     <option value="">-- Хэлтэс сонгох --</option>
@@ -69,6 +69,11 @@
                     <option value="{{ d.id }}">{{ d.name }}</option>
                     {% endfor %}
                   </select>
+                </div>
+                <div class="mb-0">
+                  <label class="form-label fw-semibold small">Тасаг</label>
+                  <input type="text" name="tasag" class="form-control form-control-sm"
+                         placeholder="жишээ: 1-р тасаг">
                 </div>
               </div>
             </div>
@@ -136,7 +141,8 @@
             <tr>
               <th>#</th>
               <th>Нэр</th>
-              <th>Цол / Хэлтэс</th>
+              <th>Цол</th>
+              <th>Хэлтэс / Тасаг</th>
               <th class="text-end">Цаг</th>
             </tr>
           </thead>
@@ -154,11 +160,14 @@
                 </div>
               </td>
               <td>
-                <div>
-                  {% if e.rank %}<span class="badge rounded-pill" style="background:#e8f4fd;color:#1b3a6b;font-size:10px;">{{ e.rank }}</span>{% endif %}
-                  {% if e.department %}<div class="text-muted" style="font-size:11px;">{{ e.department.name }}</div>{% endif %}
-                  {% if not e.rank and not e.department %}<span class="text-muted">—</span>{% endif %}
-                </div>
+                {% if e.rank %}
+                <span class="badge rounded-pill" style="background:#e8f4fd;color:#1b3a6b;font-size:10px;white-space:normal;">{{ e.rank }}</span>
+                {% else %}<span class="text-muted">—</span>{% endif %}
+              </td>
+              <td class="text-muted small">
+                {% if e.department %}{{ e.department.name }}{% endif %}
+                {% if e.tasag %}<div style="font-size:11px;color:#94a3b8;">{{ e.tasag }}</div>{% endif %}
+                {% if not e.department and not e.tasag %}—{% endif %}
               </td>
               <td class="text-end text-muted small">{{ e.logged_at|date:"H:i" }}</td>
             </tr>

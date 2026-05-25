@@ -1,0 +1,724 @@
+{% extends 'lms/base.html' %}
+{% block title %}Present Simple Tense – ТТХГ{% endblock %}
+{% block content %}
+
+<div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
+  <div class="d-flex align-items-center gap-2">
+    <i class="bi bi-calendar2-check-fill fs-4" style="color:#1b3a6b;"></i>
+    <div>
+      <h4 class="fw-bold mb-0" style="color:#1b3a6b;">Present Simple Tense</h4>
+      <div class="text-muted small">A1–A2 · SSPA English Language Training · Одоогийн энгийн цаг</div>
+    </div>
+  </div>
+  <div class="d-flex gap-2 align-items-center">
+    <span class="badge rounded-pill" style="background:#e8f4fd;color:#1b3a6b;font-size:12px;">
+      <i class="bi bi-clock me-1"></i>90 мин
+    </span>
+    <button class="btn btn-sm btn-outline-secondary" onclick="resetAll()">
+      <i class="bi bi-arrow-counterclockwise me-1"></i>Дахин эхлэх
+    </button>
+  </div>
+</div>
+
+<!-- Overall score bar -->
+<div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+  <div class="card-body py-2 px-4">
+    <div class="d-flex align-items-center gap-3">
+      <span class="fw-semibold small" style="color:#1b3a6b;white-space:nowrap;">Нийт оноо:</span>
+      <div class="flex-grow-1" style="height:10px;background:#e2e8f0;border-radius:6px;overflow:hidden;">
+        <div id="totalBar" style="height:100%;width:0%;background:linear-gradient(90deg,#1b3a6b,#c9a227);border-radius:6px;transition:width .4s;"></div>
+      </div>
+      <span id="totalScore" class="fw-bold" style="color:#1b3a6b;font-size:14px;white-space:nowrap;">0 / 0</span>
+    </div>
+  </div>
+</div>
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-4" id="lessonTabs">
+  <li class="nav-item">
+    <button class="nav-link active fw-semibold" data-bs-toggle="tab" data-bs-target="#grammar">
+      <i class="bi bi-book me-1"></i>Grammar
+    </button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link fw-semibold" data-bs-toggle="tab" data-bs-target="#sgt">
+      <i class="bi bi-person-badge me-1"></i>Sergeant Bat
+    </button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link fw-semibold" data-bs-toggle="tab" data-bs-target="#checkpoint">
+      <i class="bi bi-shield-check me-1"></i>Checkpoint Practice
+    </button>
+  </li>
+</ul>
+
+<div class="tab-content">
+
+<!-- ══════════ GRAMMAR TAB ══════════ -->
+<div class="tab-pane fade show active" id="grammar">
+
+  <!-- Translanguaging Banner -->
+  <div class="alert border-0 mb-4" style="background:linear-gradient(135deg,#fff8ec,#fff3cd);border-left:4px solid #c9a227!important;border-radius:12px;">
+    <div class="fw-bold mb-1" style="color:#7a5c00;"><i class="bi bi-translate me-2"></i>Translanguaging — Хэл хоорондын холбоо</div>
+    <div style="font-size:13px;color:#5a4000;">
+      <strong>[EN]</strong> Present Simple describes habits, routines, and facts that are always true. We use it for duty schedules and regular procedures.<br>
+      <strong>[MN]</strong> Одоогийн энгийн цаг нь дадал зуршил, хуваарь, үргэлж үнэн зүйлийг илэрхийлнэ. Ажлын хуваарь, журмыг тайлбарлахад хэрэглэнэ.
+    </div>
+  </div>
+
+  <!-- Grammar Reference -->
+  <div class="accordion mb-4" id="grammarRef">
+
+    <!-- Form -->
+    <div class="accordion-item border-0 shadow-sm mb-2" style="border-radius:12px;overflow:hidden;">
+      <h2 class="accordion-header">
+        <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#formBody"
+                style="background:#e8f4fd;color:#1b3a6b;border-radius:12px;">
+          📐 Үйл үгийн хэлбэр — Verb Form Rules
+        </button>
+      </h2>
+      <div id="formBody" class="accordion-collapse collapse show">
+        <div class="accordion-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="p-3 rounded-3" style="background:#f0f8ff;border-left:4px solid #1b3a6b;">
+                <div class="fw-bold mb-2" style="color:#1b3a6b;">✅ Affirmative (Тийм хэлбэр)</div>
+                <table class="table table-sm mb-0" style="font-size:13px;">
+                  <thead><tr><th>Subject</th><th>Verb</th><th>Example</th></tr></thead>
+                  <tbody>
+                    <tr><td>I / You / We / They</td><td><span class="badge bg-primary">V₁</span></td><td><em>check, arrive, write</em></td></tr>
+                    <tr><td>He / She / It</td><td><span class="badge bg-warning text-dark">V₁ + s/es</span></td><td><em>checks, arrives, writes</em></td></tr>
+                  </tbody>
+                </table>
+                <div class="mt-2 p-2 rounded" style="background:#fff3cd;font-size:12px;">
+                  <strong>⚠️ Анхаар:</strong> He/She/It-д <strong>–s</strong> нэмнэ!<br>
+                  <em>Sergeant Bat check<strong>s</strong> his equipment every day.</em>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="p-3 rounded-3" style="background:#fff0f0;border-left:4px solid #dc3545;">
+                <div class="fw-bold mb-2 text-danger">❌ Negative (Үгүйсгэх хэлбэр)</div>
+                <table class="table table-sm mb-0" style="font-size:13px;">
+                  <thead><tr><th>Subject</th><th>Form</th><th>Example</th></tr></thead>
+                  <tbody>
+                    <tr><td>I / You / We / They</td><td><span class="badge bg-danger">don't + V₁</span></td><td><em>don't carry</em></td></tr>
+                    <tr><td>He / She / It</td><td><span class="badge bg-danger">doesn't + V₁</span></td><td><em>doesn't carry</em></td></tr>
+                  </tbody>
+                </table>
+                <div class="mt-2 p-2 rounded" style="background:#ffe0e0;font-size:12px;">
+                  <em>Visitors <strong>don't enter</strong> without a badge.<br>
+                  He <strong>doesn't allow</strong> unauthorized access.</em>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="p-3 rounded-3" style="background:#f0fff4;border-left:4px solid #198754;">
+                <div class="fw-bold mb-2 text-success">❓ Question (Асуух хэлбэр)</div>
+                <table class="table table-sm mb-0" style="font-size:13px;">
+                  <thead><tr><th>Subject</th><th>Form</th></tr></thead>
+                  <tbody>
+                    <tr><td>I / You / We / They</td><td><span class="badge bg-success">Do + subject + V₁?</span></td></tr>
+                    <tr><td>He / She / It</td><td><span class="badge bg-success">Does + subject + V₁?</span></td></tr>
+                  </tbody>
+                </table>
+                <div class="mt-2 p-2 rounded" style="background:#d4edda;font-size:12px;">
+                  <em><strong>Do</strong> you have an appointment?<br>
+                  <strong>Does</strong> he carry a radio?</em>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="p-3 rounded-3" style="background:#fff8ec;border-left:4px solid #c9a227;">
+                <div class="fw-bold mb-2" style="color:#7a5c00;">🕐 Дохио үг — Signal Words</div>
+                <div style="font-size:13px;">
+                  <span class="badge me-1 mb-1" style="background:#c9a227;">every day / morning / week</span>
+                  <span class="badge me-1 mb-1" style="background:#c9a227;">always</span>
+                  <span class="badge me-1 mb-1" style="background:#c9a227;">usually</span>
+                  <span class="badge me-1 mb-1" style="background:#c9a227;">often</span>
+                  <span class="badge me-1 mb-1" style="background:#c9a227;">sometimes</span>
+                  <span class="badge me-1 mb-1" style="background:#c9a227;">never</span>
+                  <span class="badge me-1 mb-1" style="background:#c9a227;">regularly</span>
+                </div>
+                <div class="mt-2 p-2 rounded" style="background:#fff3cd;font-size:12px;">
+                  <strong>[MN]</strong> Эдгээр үг байвал ихэвчлэн Present Simple хэрэглэнэ.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Spelling rules -->
+    <div class="accordion-item border-0 shadow-sm mb-2" style="border-radius:12px;overflow:hidden;">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#spellBody"
+                style="background:#f0f8ff;color:#1b3a6b;border-radius:12px;">
+          📝 –s / –es / –ies Дүрмүүд — Spelling Rules
+        </button>
+      </h2>
+      <div id="spellBody" class="accordion-collapse collapse">
+        <div class="accordion-body">
+          <table class="table table-bordered" style="font-size:13px;">
+            <thead style="background:#e8f4fd;"><tr><th>Нөхцөл</th><th>Дүрэм</th><th>Жишээ</th></tr></thead>
+            <tbody>
+              <tr><td>Most verbs</td><td>+ <strong>–s</strong></td><td>check → check<strong>s</strong>, arrive → arrive<strong>s</strong></td></tr>
+              <tr><td>End in <strong>–o, –ch, –sh, –ss, –x</strong></td><td>+ <strong>–es</strong></td><td>go → go<strong>es</strong>, watch → watch<strong>es</strong></td></tr>
+              <tr><td>End in <strong>consonant + y</strong></td><td>y → <strong>–ies</strong></td><td>carry → carr<strong>ies</strong>, study → stud<strong>ies</strong></td></tr>
+              <tr><td>Irregular</td><td>memorize</td><td>have → <strong>has</strong>, be → <strong>is</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SSPA uses -->
+    <div class="accordion-item border-0 shadow-sm mb-2" style="border-radius:12px;overflow:hidden;">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#sspaUse"
+                style="background:#fff8ec;color:#7a5c00;border-radius:12px;">
+          🛡️ SSPA дахь хэрэглээ — Uses in Duty Context
+        </button>
+      </h2>
+      <div id="sspaUse" class="accordion-collapse collapse">
+        <div class="accordion-body">
+          <div class="row g-2">
+            <div class="col-md-6">
+              <div class="p-2 rounded" style="background:#f8f9fa;font-size:13px;border-left:3px solid #1b3a6b;">
+                <strong>Routines / Ажлын дадал:</strong><br>
+                <em>"The officer <strong>checks</strong> all badges every morning."</em><br>
+                <span style="color:#5a4000;">"Ажилтан өглөө бүр бүх бэйджийг <strong>шалгадаг</strong>."</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="p-2 rounded" style="background:#f8f9fa;font-size:13px;border-left:3px solid #c9a227;">
+                <strong>Facts / Байнгын үнэн:</strong><br>
+                <em>"This <strong>is</strong> a restricted area."</em><br>
+                <span style="color:#5a4000;">"Энэ бол хязгаарлагдсан бүс."</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="p-2 rounded" style="background:#f8f9fa;font-size:13px;border-left:3px solid #198754;">
+                <strong>Procedures / Журам:</strong><br>
+                <em>"Visitors <strong>show</strong> their ID at the gate."</em><br>
+                <span style="color:#5a4000;">"Зочид хаалган дээр бичиг баримтаа <strong>үзүүлдэг</strong>."</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="p-2 rounded" style="background:#f8f9fa;font-size:13px;border-left:3px solid #dc3545;">
+                <strong>Instructions / Заавар:</strong><br>
+                <em>"The officer <strong>does not allow</strong> entry without a badge."</em><br>
+                <span style="color:#5a4000;">"Ажилтан бэйджгүйгээр <strong>нэвтрүүлдэггүй</strong>."</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end accordion -->
+
+  <!-- Verb Table -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#e8f4fd;color:#1b3a6b;border-radius:12px 12px 0 0;">
+      📋 Checkpoint Verb Table — Ажлын үйл үгс
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-sm mb-0" style="font-size:13px;">
+          <thead style="background:#f8fafc;">
+            <tr><th>Base form</th><th>He/She/It</th><th>Mongolian / Монгол</th><th>Example sentence</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>check</td><td><strong>checks</strong></td><td>шалгадаг</td><td>He <em>checks</em> all IDs at the gate.</td></tr>
+            <tr><td>arrive</td><td><strong>arrives</strong></td><td>ирдэг</td><td>The shift leader <em>arrives</em> at 06:30.</td></tr>
+            <tr><td>greet</td><td><strong>greets</strong></td><td>мэндчилдэг</td><td>She <em>greets</em> every visitor politely.</td></tr>
+            <tr><td>wear</td><td><strong>wears</strong></td><td>өмсдөг</td><td>He <em>wears</em> his uniform on duty.</td></tr>
+            <tr><td>carry</td><td><strong>carries</strong></td><td>авч явдаг</td><td>She <em>carries</em> a radio at all times.</td></tr>
+            <tr><td>go</td><td><strong>goes</strong></td><td>явдаг</td><td>The officer <em>goes</em> on patrol every hour.</td></tr>
+            <tr><td>watch</td><td><strong>watches</strong></td><td>ажигладаг</td><td>He <em>watches</em> the entrance constantly.</td></tr>
+            <tr><td>write</td><td><strong>writes</strong></td><td>бичдэг</td><td>She <em>writes</em> a report after each shift.</td></tr>
+            <tr><td>follow</td><td><strong>follows</strong></td><td>дагадаг</td><td>He <em>follows</em> checkpoint procedures.</td></tr>
+            <tr><td>report</td><td><strong>reports</strong></td><td>тайлагнадаг</td><td>She <em>reports</em> to the shift leader every morning.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task 1: Choose the form -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#e8f4fd;color:#1b3a6b;border-radius:12px 12px 0 0;">
+      ✏️ Task 1 — Choose the correct form <span class="text-muted fw-normal small ms-1">(Зөв хэлбэрийг сонгоорой)</span>
+      <span id="t1score" class="badge float-end" style="background:#1b3a6b;">0 / 6</span>
+    </div>
+    <div class="card-body">
+      <div class="mb-3" id="t1q1">
+        <p class="mb-2 fw-semibold">1. Sergeant Bat <u>___</u> up at 05:30 every morning. <span class="text-muted small">(wake / wakes)</span></p>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-primary px-3" onclick="pickOpt('t1q1',this,'wakes',1)">wake</button>
+          <button class="btn btn-sm btn-outline-primary px-3" onclick="pickOpt('t1q1',this,'wakes',1)">wakes</button>
+        </div>
+        <div class="feedback mt-1" id="t1q1fb"></div>
+      </div>
+      <div class="mb-3" id="t1q2">
+        <p class="mb-2 fw-semibold">2. Officers <u>___</u> their equipment before leaving home. <span class="text-muted small">(check / checks)</span></p>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-primary px-3" onclick="pickOpt('t1q2',this,'check',1)">check</button>
+          <button class="btn btn-sm btn-outline-primary px-3" onclick="pickOpt('t1q2',this,'check',1)">checks</button>
+        </div>
+        <div class="feedback mt-1" id="t1q2fb"></div>
+      </div>
+      <div class="mb-3" id="t1q3">
+        <p class="mb-2 fw-semibold">3. The shift leader <u>___</u> the daily briefing every morning. <span class="text-muted small">(read / reads)</span></p>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-primary px-3" onclick="pickOpt('t1q3',this,'reads',1)">read</button>
+          <button class="btn btn-sm btn-outline-primary px-3" onclick="pickOpt('t1q3',this,'reads',1)">reads</button>
+        </div>
+        <div class="feedback mt-1" id="t1q3fb"></div>
+      </div>
+      <div class="mb-3" id="t1q4">
+        <p class="mb-2 fw-semibold">4. Visitors <u>___</u> show their ID at the gate. <span class="text-muted small">(don't / doesn't)</span></p>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-primary px-3" onclick="pickOpt('t1q4',this,'don\'t',1)">don't</button>
+          <button class="btn btn-sm btn-outline-primary px-3" onclick="pickOpt('t1q4',this,'don\'t',1)">doesn't</button>
+        </div>
+        <div class="feedback mt-1" id="t1q4fb"></div>
+      </div>
+      <div class="mb-3" id="t1q5">
+        <p class="mb-2 fw-semibold">5. <u>___</u> the sergeant carry a radio on duty? <span class="text-muted small">(Do / Does)</span></p>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-primary px-3" onclick="pickOpt('t1q5',this,'Does',1)">Do</button>
+          <button class="btn btn-sm btn-outline-primary px-3" onclick="pickOpt('t1q5',this,'Does',1)">Does</button>
+        </div>
+        <div class="feedback mt-1" id="t1q5fb"></div>
+      </div>
+      <div class="mb-3" id="t1q6">
+        <p class="mb-2 fw-semibold">6. The journalist <u>___</u> enter the restricted area. <span class="text-muted small">(don't / doesn't)</span></p>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-primary px-3" onclick="pickOpt('t1q6',this,'doesn\'t',1)">don't</button>
+          <button class="btn btn-sm btn-outline-primary px-3" onclick="pickOpt('t1q6',this,'doesn\'t',1)">doesn't</button>
+        </div>
+        <div class="feedback mt-1" id="t1q6fb"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end grammar tab -->
+
+<!-- ══════════ SERGEANT BAT TAB ══════════ -->
+<div class="tab-pane fade" id="sgt">
+
+  <!-- Translanguaging -->
+  <div class="alert border-0 mb-4" style="background:linear-gradient(135deg,#f0fff4,#d4edda);border-left:4px solid #198754!important;border-radius:12px;">
+    <div class="fw-bold mb-1 text-success"><i class="bi bi-person-badge me-2"></i>Story Focus — Түүхийн зорилго</div>
+    <div style="font-size:13px;color:#155724;">
+      <strong>[EN]</strong> Read about Sergeant Bat's daily routine. Notice how Present Simple describes what he <em>always</em> does on duty.<br>
+      <strong>[MN]</strong> Ахлагч Батын өдрийн хуваарийг уншаарай. Тэрээр ажил дээрээ <em>үргэлж</em> юу хийдгийг тайлбарлахад Present Simple хэрхэн хэрэглэгдэж байгааг ажиглаарай.
+    </div>
+  </div>
+
+  <!-- Story -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#1b3a6b;color:#fff;border-radius:12px 12px 0 0;">
+      📖 Sergeant Bat's Daily Routine — Ахлагч Батын өдрийн хуваарь
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="p-3 rounded-3 mb-2" style="background:#f0f8ff;border-left:4px solid #1b3a6b;">
+            <span class="badge mb-2" style="background:#1b3a6b;">05:30</span>
+            <p class="mb-1" style="font-size:15px;">Sergeant Bat <strong>wakes up</strong> early every morning. He <strong>gets dressed</strong> in his uniform and <strong>checks</strong> his equipment before leaving home.</p>
+            <p class="mb-0" style="font-size:13px;color:#5a7a8a;font-style:italic;">Ахлагч Бат өглөө бүр эрт <strong>босдог</strong>. Тэр дүрэмт хувцсаа <strong>өмсдөг</strong> ба гэрээсээ гарахаасаа өмнө тоног төхөөрөмжөө <strong>шалгадаг</strong>.</p>
+          </div>
+          <div class="p-3 rounded-3 mb-2" style="background:#f0f8ff;border-left:4px solid #1b3a6b;">
+            <span class="badge mb-2" style="background:#1b3a6b;">06:15</span>
+            <p class="mb-1" style="font-size:15px;">He <strong>arrives</strong> at the checkpoint. He <strong>greets</strong> his team and <strong>reads</strong> the daily briefing.</p>
+            <p class="mb-0" style="font-size:13px;color:#5a7a8a;font-style:italic;">Тэр шалган нэвтрүүлэх цэгт <strong>ирдэг</strong>. Багийнхантайгаа <strong>мэндчилдэг</strong> ба өдрийн товч мэдээллийг <strong>уншдаг</strong>.</p>
+          </div>
+          <div class="p-3 rounded-3 mb-2" style="background:#f0f8ff;border-left:4px solid #c9a227;">
+            <span class="badge mb-2" style="background:#c9a227;color:#000;">07:00</span>
+            <p class="mb-1" style="font-size:15px;">His shift <strong>starts</strong>. The first visitor <strong>arrives</strong>. Sergeant Bat <strong>stands</strong> straight and <strong>says</strong> clearly: <em>"Please show me your ID."</em></p>
+            <p class="mb-0" style="font-size:13px;color:#5a7a8a;font-style:italic;">Түүний ээлж <strong>эхэлдэг</strong>. Эхний зочин <strong>ирдэг</strong>. Ахлагч Бат шулуун <strong>зогсдог</strong> ба тод хэлдэг: <em>"Бичиг баримтаа үзүүлнэ үү."</em></p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="p-3 rounded-3 mb-2" style="background:#f0f8ff;border-left:4px solid #1b3a6b;">
+            <span class="badge mb-2" style="background:#1b3a6b;">09:30</span>
+            <p class="mb-1" style="font-size:15px;">A foreign visitor <strong>approaches</strong> the gate. Sergeant Bat <strong>asks</strong>: <em>"What is your purpose here?"</em></p>
+            <p class="mb-0" style="font-size:13px;color:#5a7a8a;font-style:italic;">Гадаадын зочин хаалган дээр <strong>ирдэг</strong>. Ахлагч Бат <strong>асуудаг</strong>: <em>"Таны зорилго юу вэ?"</em></p>
+          </div>
+          <div class="p-3 rounded-3 mb-2" style="background:#f0f8ff;border-left:4px solid #1b3a6b;">
+            <span class="badge mb-2" style="background:#1b3a6b;">12:00</span>
+            <p class="mb-1" style="font-size:15px;">Sergeant Bat <strong>takes</strong> a short break. He <strong>reviews</strong> English phrases on his phone.</p>
+            <p class="mb-0" style="font-size:13px;color:#5a7a8a;font-style:italic;">Ахлагч Бат богино завсарлага <strong>авдаг</strong>. Тэр утсан дээрээ англи хэллэгүүдийг <strong>давтдаг</strong>.</p>
+          </div>
+          <div class="p-3 rounded-3 mb-2" style="background:#f0f8ff;border-left:4px solid #198754;">
+            <span class="badge mb-2" style="background:#198754;">18:00</span>
+            <p class="mb-1" style="font-size:15px;">His shift <strong>ends</strong>. He <strong>writes</strong> a short report and <strong>hands over</strong> to the next officer.</p>
+            <p class="mb-0" style="font-size:13px;color:#5a7a8a;font-style:italic;">Түүний ээлж <strong>дуусдаг</strong>. Тэр товч тайлан <strong>бичдэг</strong> ба дараагийн ажилтанд <strong>хүлээлгэн өгдөг</strong>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task 2: True / False -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#e8f4fd;color:#1b3a6b;border-radius:12px 12px 0 0;">
+      ✅ Task 2 — True or False? <span class="text-muted fw-normal small ms-1">(Үнэн эсэх?)</span>
+      <span id="t2score" class="badge float-end" style="background:#1b3a6b;">0 / 5</span>
+    </div>
+    <div class="card-body">
+      {% for item in tf2 %}{% endfor %}
+      <div id="t2" style="font-size:14px;">
+        <div class="mb-3 d-flex align-items-start gap-2" id="t2r1">
+          <span class="mt-1">1.</span>
+          <div>
+            <p class="mb-1">Sergeant Bat wakes up at 06:30 every morning.</p>
+            <div class="d-flex gap-2">
+              <button class="btn btn-sm btn-outline-success" onclick="tf('t2r1','F','F',2)">True</button>
+              <button class="btn btn-sm btn-outline-danger" onclick="tf('t2r1','F','F',2)">False</button>
+            </div>
+            <div class="feedback" id="t2r1fb" style="font-size:13px;margin-top:4px;"></div>
+          </div>
+        </div>
+        <div class="mb-3 d-flex align-items-start gap-2" id="t2r2">
+          <span class="mt-1">2.</span>
+          <div>
+            <p class="mb-1">He arrives at the checkpoint at 06:15.</p>
+            <div class="d-flex gap-2">
+              <button class="btn btn-sm btn-outline-success" onclick="tf('t2r2','T','T',2)">True</button>
+              <button class="btn btn-sm btn-outline-danger" onclick="tf('t2r2','T','T',2)">False</button>
+            </div>
+            <div class="feedback" id="t2r2fb" style="font-size:13px;margin-top:4px;"></div>
+          </div>
+        </div>
+        <div class="mb-3 d-flex align-items-start gap-2" id="t2r3">
+          <span class="mt-1">3.</span>
+          <div>
+            <p class="mb-1">Sergeant Bat asks: "Do you have an appointment?" at 07:00.</p>
+            <div class="d-flex gap-2">
+              <button class="btn btn-sm btn-outline-success" onclick="tf('t2r3','F','F',2)">True</button>
+              <button class="btn btn-sm btn-outline-danger" onclick="tf('t2r3','F','F',2)">False</button>
+            </div>
+            <div class="feedback" id="t2r3fb" style="font-size:13px;margin-top:4px;"></div>
+          </div>
+        </div>
+        <div class="mb-3 d-flex align-items-start gap-2" id="t2r4">
+          <span class="mt-1">4.</span>
+          <div>
+            <p class="mb-1">He takes a break at 12:00 and reviews English phrases.</p>
+            <div class="d-flex gap-2">
+              <button class="btn btn-sm btn-outline-success" onclick="tf('t2r4','T','T',2)">True</button>
+              <button class="btn btn-sm btn-outline-danger" onclick="tf('t2r4','T','T',2)">False</button>
+            </div>
+            <div class="feedback" id="t2r4fb" style="font-size:13px;margin-top:4px;"></div>
+          </div>
+        </div>
+        <div class="mb-3 d-flex align-items-start gap-2" id="t2r5">
+          <span class="mt-1">5.</span>
+          <div>
+            <p class="mb-1">At the end of his shift he writes a report and hands over to the next officer.</p>
+            <div class="d-flex gap-2">
+              <button class="btn btn-sm btn-outline-success" onclick="tf('t2r5','T','T',2)">True</button>
+              <button class="btn btn-sm btn-outline-danger" onclick="tf('t2r5','T','T',2)">False</button>
+            </div>
+            <div class="feedback" id="t2r5fb" style="font-size:13px;margin-top:4px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task 3: Fill blanks from story -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#e8f4fd;color:#1b3a6b;border-radius:12px 12px 0 0;">
+      ✏️ Task 3 — Fill in the blanks <span class="text-muted fw-normal small ms-1">(Цоорхойг нөхөөрөй)</span>
+      <span id="t3score" class="badge float-end" style="background:#1b3a6b;">0 / 6</span>
+    </div>
+    <div class="card-body">
+      <p class="text-muted small mb-3">Use the correct <strong>Present Simple</strong> form of the verb in brackets. <em>(Хаалтан доторх үйл үгийг зөв хэлбэрт оруулаарай.)</em></p>
+      <ol style="font-size:14px;">
+        <li class="mb-3">Sergeant Bat _______ (wake) up at 05:30 every morning.<br>
+          <input class="form-control mt-1" id="t3a1" placeholder="write the verb…" style="max-width:220px;font-size:14px;">
+          <div class="feedback" id="t3a1fb" style="font-size:13px;margin-top:4px;"></div>
+        </li>
+        <li class="mb-3">He _______ (get) dressed in his uniform before leaving home.<br>
+          <input class="form-control mt-1" id="t3a2" placeholder="write the verb…" style="max-width:220px;font-size:14px;">
+          <div class="feedback" id="t3a2fb" style="font-size:13px;margin-top:4px;"></div>
+        </li>
+        <li class="mb-3">He _______ (greet) his team and _______ (read) the daily briefing.<br>
+          <div class="d-flex gap-2 mt-1 flex-wrap">
+            <input class="form-control" id="t3a3" placeholder="greet →" style="max-width:180px;font-size:14px;">
+            <input class="form-control" id="t3a4" placeholder="read →" style="max-width:180px;font-size:14px;">
+          </div>
+          <div class="feedback" id="t3a3fb" style="font-size:13px;margin-top:4px;"></div>
+        </li>
+        <li class="mb-3">A foreign visitor _______ (approach) the gate at 09:30.<br>
+          <input class="form-control mt-1" id="t3a5" placeholder="write the verb…" style="max-width:220px;font-size:14px;">
+          <div class="feedback" id="t3a5fb" style="font-size:13px;margin-top:4px;"></div>
+        </li>
+        <li class="mb-3">At the end of his shift, he _______ (write) a short report.<br>
+          <input class="form-control mt-1" id="t3a6" placeholder="write the verb…" style="max-width:220px;font-size:14px;">
+          <div class="feedback" id="t3a6fb" style="font-size:13px;margin-top:4px;"></div>
+        </li>
+      </ol>
+      <button class="btn btn-primary btn-sm mt-2" onclick="checkT3()"><i class="bi bi-check2-circle me-1"></i>Шалгах — Check</button>
+    </div>
+  </div>
+
+</div><!-- end sgt tab -->
+
+<!-- ══════════ CHECKPOINT PRACTICE TAB ══════════ -->
+<div class="tab-pane fade" id="checkpoint">
+
+  <!-- Translanguaging -->
+  <div class="alert border-0 mb-4" style="background:linear-gradient(135deg,#fff8ec,#fff3cd);border-left:4px solid #c9a227!important;border-radius:12px;">
+    <div class="fw-bold mb-1" style="color:#7a5c00;"><i class="bi bi-shield-fill me-2"></i>SSPA Operational English — Мэргэжлийн хэллэг</div>
+    <div style="font-size:13px;color:#5a4000;">
+      <strong>[EN]</strong> Security officers use Present Simple to give instructions, state facts, and describe standard procedures at checkpoints.<br>
+      <strong>[MN]</strong> Аюулгүй байдлын ажилтнууд шалган нэвтрүүлэх цэгт заавар өгөх, баримт хэлэх, стандарт журмыг тайлбарлахад Present Simple хэрэглэдэг.
+    </div>
+  </div>
+
+  <!-- Task 4: Gap fill checkpoint phrases -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#e8f4fd;color:#1b3a6b;border-radius:12px 12px 0 0;">
+      🛡️ Task 4 — Complete the checkpoint phrases <span class="text-muted fw-normal small ms-1">(Хэллэгийг гүйцээгээрэй)</span>
+      <span id="t4score" class="badge float-end" style="background:#1b3a6b;">0 / 6</span>
+    </div>
+    <div class="card-body">
+      <p class="text-muted small mb-3">Type the missing word. <em>(Дутуу үгийг бичнэ үү.)</em></p>
+      <ol style="font-size:14px;">
+        <li class="mb-3">
+          Please <span class="text-muted">[show]</span> me your <input class="d-inline" id="t4a1" placeholder="___" style="width:120px;border:none;border-bottom:2px solid #1b3a6b;outline:none;font-size:14px;"> .
+          <span class="text-muted small ms-2">— Бичиг баримтаа үзүүлнэ үү.</span>
+          <div class="feedback" id="t4a1fb" style="font-size:12px;"></div>
+        </li>
+        <li class="mb-3">
+          This <input class="d-inline" id="t4a2" placeholder="___" style="width:100px;border:none;border-bottom:2px solid #1b3a6b;outline:none;font-size:14px;"> a restricted area.
+          <span class="text-muted small ms-2">— Энэ хязгаарлагдсан бүс юм.</span>
+          <div class="feedback" id="t4a2fb" style="font-size:12px;"></div>
+        </li>
+        <li class="mb-3">
+          Do you have an <input class="d-inline" id="t4a3" placeholder="___" style="width:160px;border:none;border-bottom:2px solid #1b3a6b;outline:none;font-size:14px;"> ?
+          <span class="text-muted small ms-2">— Та уулзалтын цаг авсан уу?</span>
+          <div class="feedback" id="t4a3fb" style="font-size:12px;"></div>
+        </li>
+        <li class="mb-3">
+          Please <input class="d-inline" id="t4a4" placeholder="___" style="width:100px;border:none;border-bottom:2px solid #1b3a6b;outline:none;font-size:14px;"> back.
+          <span class="text-muted small ms-2">— Ухарна уу.</span>
+          <div class="feedback" id="t4a4fb" style="font-size:12px;"></div>
+        </li>
+        <li class="mb-3">
+          You cannot <input class="d-inline" id="t4a5" placeholder="___" style="width:100px;border:none;border-bottom:2px solid #1b3a6b;outline:none;font-size:14px;"> into the State Palace.
+          <span class="text-muted small ms-2">— Та Төрийн ордонд авч орж болохгүй.</span>
+          <div class="feedback" id="t4a5fb" style="font-size:12px;"></div>
+        </li>
+        <li class="mb-3">
+          Please <input class="d-inline" id="t4a6" placeholder="___" style="width:130px;border:none;border-bottom:2px solid #1b3a6b;outline:none;font-size:14px;"> here.
+          <span class="text-muted small ms-2">— Та энд хүлээнэ үү.</span>
+          <div class="feedback" id="t4a6fb" style="font-size:12px;"></div>
+        </li>
+      </ol>
+      <button class="btn btn-primary btn-sm mt-2" onclick="checkT4()"><i class="bi bi-check2-circle me-1"></i>Шалгах — Check</button>
+    </div>
+  </div>
+
+  <!-- Task 5: Quiz -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#e8f4fd;color:#1b3a6b;border-radius:12px 12px 0 0;">
+      ❓ Task 5 — Grammar Quiz <span class="text-muted fw-normal small ms-1">(Дүрмийн асуулт)</span>
+      <span id="t5score" class="badge float-end" style="background:#1b3a6b;">0 / 4</span>
+    </div>
+    <div class="card-body">
+      <div class="mb-4" id="t5q1">
+        <p class="fw-semibold mb-2">1. Which sentence is correct?</p>
+        <div class="d-flex flex-column gap-2">
+          <button class="btn btn-outline-secondary text-start" onclick="quiz5('t5q1',this,false)">A. He don't check the badge every day.</button>
+          <button class="btn btn-outline-secondary text-start" onclick="quiz5('t5q1',this,true)">B. He doesn't check the badge every day.</button>
+          <button class="btn btn-outline-secondary text-start" onclick="quiz5('t5q1',this,false)">C. He not checks the badge every day.</button>
+        </div>
+        <div class="feedback mt-2" id="t5q1fb" style="font-size:13px;"></div>
+      </div>
+      <div class="mb-4" id="t5q2">
+        <p class="fw-semibold mb-2">2. "Тэр шуудан бичиг баримтаа шалгадаг уу?" — Which translation is correct?</p>
+        <div class="d-flex flex-column gap-2">
+          <button class="btn btn-outline-secondary text-start" onclick="quiz5('t5q2',this,false)">A. Is he checking the documents?</button>
+          <button class="btn btn-outline-secondary text-start" onclick="quiz5('t5q2',this,true)">B. Does he check the documents?</button>
+          <button class="btn btn-outline-secondary text-start" onclick="quiz5('t5q2',this,false)">C. Do he checks the documents?</button>
+        </div>
+        <div class="feedback mt-2" id="t5q2fb" style="font-size:13px;"></div>
+      </div>
+      <div class="mb-4" id="t5q3">
+        <p class="fw-semibold mb-2">3. Signal word: "She <u>always</u> reports to the supervisor." What tense should this sentence use?</p>
+        <div class="d-flex flex-column gap-2">
+          <button class="btn btn-outline-secondary text-start" onclick="quiz5('t5q3',this,true)">A. Present Simple</button>
+          <button class="btn btn-outline-secondary text-start" onclick="quiz5('t5q3',this,false)">B. Past Simple</button>
+          <button class="btn btn-outline-secondary text-start" onclick="quiz5('t5q3',this,false)">C. Present Continuous</button>
+        </div>
+        <div class="feedback mt-2" id="t5q3fb" style="font-size:13px;"></div>
+      </div>
+      <div class="mb-4" id="t5q4">
+        <p class="fw-semibold mb-2">4. Choose the correct verb form: "The officer _______ a patrol every hour." (go)</p>
+        <div class="d-flex flex-column gap-2">
+          <button class="btn btn-outline-secondary text-start" onclick="quiz5('t5q4',this,false)">A. go</button>
+          <button class="btn btn-outline-secondary text-start" onclick="quiz5('t5q4',this,true)">B. goes</button>
+          <button class="btn btn-outline-secondary text-start" onclick="quiz5('t5q4',this,false)">C. is going</button>
+        </div>
+        <div class="feedback mt-2" id="t5q4fb" style="font-size:13px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task 6: Self-Assessment -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#fff8ec;color:#7a5c00;border-radius:12px 12px 0 0;">
+      🌟 Task 6 — Write Your Duty Routine <span class="text-muted fw-normal small ms-1">(Өөрийн ажлын хуваарийг бичнэ үү)</span>
+    </div>
+    <div class="card-body">
+      <div class="alert" style="background:#fff3cd;border-radius:8px;font-size:13px;">
+        <strong>[EN]</strong> Write 5 sentences about your daily duty routine using Present Simple.<br>
+        <strong>[MN]</strong> Present Simple ашиглан өөрийн өдрийн ажлын хуваарийн талаар 5 өгүүлбэр бичнэ үү.
+        <br><br><em>Example: I arrive at the checkpoint at 07:00. / I check visitor IDs every morning.</em>
+      </div>
+      <textarea class="form-control" rows="6" placeholder="Write your 5 sentences here…&#10;1. I wake up at ___...&#10;2. I arrive at ___...&#10;3. I check ___...&#10;4. I always ___...&#10;5. At the end of my shift, I ___..." style="font-size:14px;"></textarea>
+      <div class="mt-3">
+        <div class="fw-semibold small mb-2" style="color:#1b3a6b;">Self-check / Өөрийн үнэлгээ:</div>
+        <div class="form-check mb-1"><input class="form-check-input" type="checkbox"> <label class="form-check-label small">He/She/It-д –s/-es нэмсэн.</label></div>
+        <div class="form-check mb-1"><input class="form-check-input" type="checkbox"> <label class="form-check-label small">Дохио үг (every, always, usually) хэрэглэсэн.</label></div>
+        <div class="form-check mb-1"><input class="form-check-input" type="checkbox"> <label class="form-check-label small">Хугацааны тэмдэглэл (at 07:00, every morning) оруулсан.</label></div>
+        <div class="form-check"><input class="form-check-input" type="checkbox"> <label class="form-check-label small">SSPA-ийн мэргэжлийн үйл үг хэрэглэсэн.</label></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end checkpoint tab -->
+</div><!-- end tab-content -->
+
+<style>
+.feedback.correct { color:#198754; font-weight:600; }
+.feedback.wrong   { color:#dc3545; font-weight:600; }
+.btn-opt-correct  { background:#d4edda!important; border-color:#198754!important; color:#155724!important; }
+.btn-opt-wrong    { background:#f8d7da!important; border-color:#dc3545!important; color:#721c24!important; }
+</style>
+
+<script>
+// Score tracker
+const scores = {1:0,2:0,3:0,4:0,5:0};
+const maxes  = {1:6,2:5,3:6,4:6,5:4};
+
+function updateTotal() {
+  const got   = Object.values(scores).reduce((a,b)=>a+b,0);
+  const total = Object.values(maxes).reduce((a,b)=>a+b,0);
+  document.getElementById('totalScore').textContent = got + ' / ' + total;
+  document.getElementById('totalBar').style.width = (total ? got/total*100 : 0) + '%';
+}
+function scoreEl(task) {
+  document.getElementById('t'+task+'score').textContent = scores[task] + ' / ' + maxes[task];
+  updateTotal();
+}
+
+// Task 1: pick option buttons
+const t1ans = {t1q1:'wakes',t1q2:'check',t1q3:'reads',t1q4:"don't",t1q5:'Does',t1q6:"doesn't"};
+const t1done = {};
+function pickOpt(qid, btn, correct, task) {
+  if (t1done[qid]) return;
+  const div = document.getElementById(qid);
+  const btns = div.querySelectorAll('button');
+  const chosen = btn.textContent.trim();
+  const isCorrect = chosen === correct;
+  btns.forEach(b => {
+    b.disabled = true;
+    if (b.textContent.trim() === correct) b.classList.add('btn-opt-correct');
+  });
+  if (!isCorrect) btn.classList.add('btn-opt-wrong');
+  const fb = document.getElementById(qid + 'fb');
+  fb.className = 'feedback ' + (isCorrect ? 'correct' : 'wrong');
+  fb.textContent = isCorrect ? '✅ Correct! Зөв байна.' : '❌ The correct answer is: ' + correct;
+  if (isCorrect && !t1done[qid]) { scores[1]++; scoreEl(1); }
+  t1done[qid] = true;
+}
+
+// Task 2: True / False
+const t2done = {};
+function tf(rowId, chosen, correct, task) {
+  if (t2done[rowId]) return;
+  t2done[rowId] = true;
+  const div = document.getElementById(rowId);
+  const btns = div.querySelectorAll('button');
+  const isTrue = chosen === 'T';
+  const isCorrect = chosen === correct;
+  btns.forEach(b => {
+    b.disabled = true;
+    if ((b.textContent==='True' && correct==='T')||(b.textContent==='False' && correct==='F')) b.classList.add('btn-opt-correct');
+  });
+  if (!isCorrect) { btns.forEach(b => { if (b.textContent === (isTrue?'True':'False')) b.classList.add('btn-opt-wrong'); }); }
+  const fb = document.getElementById(rowId + 'fb');
+  fb.className = 'feedback ' + (isCorrect ? 'correct' : 'wrong');
+  fb.textContent = isCorrect ? '✅ Correct!' : '❌ ' + (correct==='T' ? 'True — Үнэн.' : 'False — Худал.');
+  if (isCorrect) { scores[task]++; scoreEl(task); }
+}
+
+// Task 3: Fill blanks
+const t3answers = {t3a1:'wakes up|wakes',t3a2:'gets',t3a3:'greets',t3a4:'reads',t3a5:'approaches',t3a6:'writes'};
+function checkT3() {
+  let got = 0;
+  Object.entries(t3answers).forEach(([id, ans]) => {
+    const inp = document.getElementById(id);
+    const fb  = document.getElementById(id + 'fb');
+    const val = inp.value.trim().toLowerCase();
+    const accepted = ans.toLowerCase().split('|');
+    if (accepted.includes(val)) {
+      fb.className = 'feedback correct'; fb.textContent = '✅ Correct!'; inp.style.borderBottomColor='#198754'; got++;
+    } else {
+      fb.className = 'feedback wrong'; fb.textContent = '❌ Expected: ' + ans.split('|')[0]; inp.style.borderBottomColor='#dc3545';
+    }
+  });
+  scores[3] = got; scoreEl(3);
+}
+
+// Task 4: Checkpoint phrases
+const t4answers = {t4a1:'ID',t4a2:'is',t4a3:'appointment',t4a4:'step',t4a5:'carry',t4a6:'wait'};
+function checkT4() {
+  let got = 0;
+  Object.entries(t4answers).forEach(([id, ans]) => {
+    const inp = document.getElementById(id);
+    const fb  = document.getElementById(id + 'fb');
+    const val = inp.value.trim().toLowerCase();
+    if (val === ans.toLowerCase()) {
+      fb.className = 'feedback correct'; fb.textContent = '✅ Correct!'; got++;
+    } else {
+      fb.className = 'feedback wrong'; fb.textContent = '❌ Expected: ' + ans;
+    }
+  });
+  scores[4] = got; scoreEl(4);
+}
+
+// Task 5: Quiz buttons
+const t5done = {};
+function quiz5(qid, btn, isCorrect) {
+  if (t5done[qid]) return;
+  t5done[qid] = true;
+  const div = document.getElementById(qid);
+  div.querySelectorAll('button').forEach(b => b.disabled = true);
+  btn.classList.add(isCorrect ? 'btn-opt-correct' : 'btn-opt-wrong');
+  if (!isCorrect) div.querySelectorAll('button').forEach(b => { if (b.dataset.correct) b.classList.add('btn-opt-correct'); });
+  const fb = document.getElementById(qid + 'fb');
+  fb.className = 'feedback ' + (isCorrect ? 'correct' : 'wrong');
+  fb.textContent = isCorrect ? '✅ Correct! Зөв байна.' : '❌ Not quite. Дахиад нэг удаа уншаарай.';
+  if (isCorrect) { scores[5]++; scoreEl(5); }
+}
+// mark correct buttons
+document.querySelectorAll('#t5q1 button').forEach((b,i)=>{ if(i===1) b.dataset.correct='yes'; });
+document.querySelectorAll('#t5q2 button').forEach((b,i)=>{ if(i===1) b.dataset.correct='yes'; });
+document.querySelectorAll('#t5q3 button').forEach((b,i)=>{ if(i===0) b.dataset.correct='yes'; });
+document.querySelectorAll('#t5q4 button').forEach((b,i)=>{ if(i===1) b.dataset.correct='yes'; });
+
+function resetAll() { location.reload(); }
+updateTotal();
+</script>
+
+{% endblock %}

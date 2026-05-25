@@ -32,6 +32,14 @@ def past_tense_view(request):
     return render(request, 'lms/past_tense.html')
 
 
+def present_simple_view(request):
+    return render(request, 'lms/present_simple.html')
+
+
+def past_continuous_view(request):
+    return render(request, 'lms/past_continuous.html')
+
+
 def videos_view(request):
     videos = Video.objects.filter(is_published=True)
     return render(request, 'lms/videos.html', {'videos': videos})

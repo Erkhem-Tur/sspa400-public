@@ -175,8 +175,15 @@
     <a href="{% url 'logbook' %}" class="{% if request.resolver_match.url_name == 'logbook' %}active{% endif %}">
       <i class="bi bi-journal-check"></i> Ирцийн бүртгэл
     </a>
+    <div class="sidebar-title" style="margin-top:8px;">Grammar Lessons</div>
+    <a href="{% url 'present_simple' %}" class="{% if request.resolver_match.url_name == 'present_simple' %}active{% endif %}">
+      <i class="bi bi-calendar2-check-fill"></i> Present Simple
+    </a>
     <a href="{% url 'past_tense' %}" class="{% if request.resolver_match.url_name == 'past_tense' %}active{% endif %}">
-      <i class="bi bi-journal-bookmark-fill"></i> Past Tense Lesson
+      <i class="bi bi-journal-bookmark-fill"></i> Past Simple
+    </a>
+    <a href="{% url 'past_continuous' %}" class="{% if request.resolver_match.url_name == 'past_continuous' %}active{% endif %}">
+      <i class="bi bi-clock-history"></i> Past Continuous
     </a>
     {% if user.is_authenticated and user.is_staff %}
     <div class="sidebar-title">Удирдлага</div>

@@ -1,0 +1,745 @@
+{% extends 'lms/base.html' %}
+{% block title %}Past Continuous Tense – ТТХГ{% endblock %}
+{% block content %}
+
+<div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
+  <div class="d-flex align-items-center gap-2">
+    <i class="bi bi-clock-history fs-4" style="color:#1b3a6b;"></i>
+    <div>
+      <h4 class="fw-bold mb-0" style="color:#1b3a6b;">Past Continuous Tense</h4>
+      <div class="text-muted small">A2 · SSPA English Language Training · Өнгөрсөн үргэлжлэх цаг</div>
+    </div>
+  </div>
+  <div class="d-flex gap-2 align-items-center">
+    <span class="badge rounded-pill" style="background:#e8f4fd;color:#1b3a6b;font-size:12px;">
+      <i class="bi bi-clock me-1"></i>90 мин
+    </span>
+    <button class="btn btn-sm btn-outline-secondary" onclick="resetAll()">
+      <i class="bi bi-arrow-counterclockwise me-1"></i>Дахин эхлэх
+    </button>
+  </div>
+</div>
+
+<!-- Overall score bar -->
+<div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+  <div class="card-body py-2 px-4">
+    <div class="d-flex align-items-center gap-3">
+      <span class="fw-semibold small" style="color:#1b3a6b;white-space:nowrap;">Нийт оноо:</span>
+      <div class="flex-grow-1" style="height:10px;background:#e2e8f0;border-radius:6px;overflow:hidden;">
+        <div id="totalBar" style="height:100%;width:0%;background:linear-gradient(90deg,#1b3a6b,#c9a227);border-radius:6px;transition:width .4s;"></div>
+      </div>
+      <span id="totalScore" class="fw-bold" style="color:#1b3a6b;font-size:14px;white-space:nowrap;">0 / 0</span>
+    </div>
+  </div>
+</div>
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-4" id="lessonTabs">
+  <li class="nav-item">
+    <button class="nav-link active fw-semibold" data-bs-toggle="tab" data-bs-target="#grammar">
+      <i class="bi bi-book me-1"></i>Grammar
+    </button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link fw-semibold" data-bs-toggle="tab" data-bs-target="#incident">
+      <i class="bi bi-exclamation-triangle me-1"></i>Incident Report
+    </button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link fw-semibold" data-bs-toggle="tab" data-bs-target="#radio">
+      <i class="bi bi-broadcast me-1"></i>Radio & Practice
+    </button>
+  </li>
+</ul>
+
+<div class="tab-content">
+
+<!-- ══════════ GRAMMAR TAB ══════════ -->
+<div class="tab-pane fade show active" id="grammar">
+
+  <!-- Translanguaging Banner -->
+  <div class="alert border-0 mb-4" style="background:linear-gradient(135deg,#fff8ec,#fff3cd);border-left:4px solid #c9a227!important;border-radius:12px;">
+    <div class="fw-bold mb-1" style="color:#7a5c00;"><i class="bi bi-translate me-2"></i>Translanguaging — Хэл хоорондын холбоо</div>
+    <div style="font-size:13px;color:#5a4000;">
+      <strong>[EN]</strong> Past Continuous describes an action that was IN PROGRESS at a specific moment in the past. It is often interrupted by another action (Past Simple).<br>
+      <strong>[MN]</strong> Өнгөрсөн үргэлжлэх цаг нь өнгөрсөн тодорхой мөчид <em>явагдаж байсан</em> үйлдлийг илэрхийлнэ. Ихэвчлэн өөр үйлдэлд таслагддаг (Past Simple-тэй хослуулж хэрэглэнэ).
+    </div>
+  </div>
+
+  <!-- Grammar Reference Accordion -->
+  <div class="accordion mb-4">
+
+    <!-- Form -->
+    <div class="accordion-item border-0 shadow-sm mb-2" style="border-radius:12px;overflow:hidden;">
+      <h2 class="accordion-header">
+        <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#formPC"
+                style="background:#e8f4fd;color:#1b3a6b;border-radius:12px;">
+          📐 Үйл үгийн хэлбэр — Verb Form Rules
+        </button>
+      </h2>
+      <div id="formPC" class="accordion-collapse collapse show">
+        <div class="accordion-body">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="p-3 rounded-3" style="background:#f0f8ff;border-left:4px solid #1b3a6b;">
+                <div class="fw-bold mb-2" style="color:#1b3a6b;">✅ Affirmative</div>
+                <div class="p-2 rounded mb-2" style="background:#e8f4fd;font-size:13px;text-align:center;">
+                  <strong>was / were + V-ing</strong>
+                </div>
+                <div style="font-size:13px;">
+                  <span class="badge bg-primary me-1">I / He / She / It</span> <strong>was</strong> checking<br>
+                  <span class="badge bg-secondary me-1">You / We / They</span> <strong>were</strong> checking
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="p-3 rounded-3" style="background:#fff0f0;border-left:4px solid #dc3545;">
+                <div class="fw-bold mb-2 text-danger">❌ Negative</div>
+                <div class="p-2 rounded mb-2" style="background:#ffe0e0;font-size:13px;text-align:center;">
+                  <strong>wasn't / weren't + V-ing</strong>
+                </div>
+                <div style="font-size:13px;">
+                  <em>He <strong>wasn't watching</strong> the gate.<br>
+                  They <strong>weren't checking</strong> the IDs.</em>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="p-3 rounded-3" style="background:#f0fff4;border-left:4px solid #198754;">
+                <div class="fw-bold mb-2 text-success">❓ Question</div>
+                <div class="p-2 rounded mb-2" style="background:#d4edda;font-size:13px;text-align:center;">
+                  <strong>Was / Were + subject + V-ing?</strong>
+                </div>
+                <div style="font-size:13px;">
+                  <em><strong>Was</strong> he standing at Gate 1?<br>
+                  <strong>Were</strong> they moving the vehicle?</em>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-3 p-3 rounded-3" style="background:#fff8ec;border-left:4px solid #c9a227;">
+            <div class="fw-bold mb-2" style="color:#7a5c00;">📝 –ing spelling rules / –ing дүрмүүд</div>
+            <div class="row" style="font-size:13px;">
+              <div class="col-md-4">Most verbs: + <strong>-ing</strong> <br><em>check → check<strong>ing</strong></em></div>
+              <div class="col-md-4">Short vowel + consonant: double + <strong>-ing</strong><br><em>sit → si<strong>tting</strong>, run → ru<strong>nning</strong></em></div>
+              <div class="col-md-4">End in –e: drop e + <strong>-ing</strong><br><em>write → wri<strong>ting</strong>, move → mo<strong>ving</strong></em></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Uses -->
+    <div class="accordion-item border-0 shadow-sm mb-2" style="border-radius:12px;overflow:hidden;">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#usesPC"
+                style="background:#f0f8ff;color:#1b3a6b;border-radius:12px;">
+          🎯 Хэзээ хэрэглэх вэ? — When do we use it?
+        </button>
+      </h2>
+      <div id="usesPC" class="accordion-collapse collapse">
+        <div class="accordion-body">
+          <div class="row g-3" style="font-size:14px;">
+            <div class="col-md-6">
+              <div class="p-3 rounded-3" style="background:#f0f8ff;border-left:4px solid #1b3a6b;">
+                <strong style="color:#1b3a6b;">1. Action in progress at a past time</strong>
+                <p class="mt-1 mb-1 text-muted small">Өнгөрсөн тодорхой үед явагдаж байсан үйлдэл</p>
+                <em>"At 14:00, officers <strong>were screening</strong> bags at Gate 1."</em><br>
+                <span style="color:#5a4000;font-size:13px;">"14:00 цагт ажилтнууд 1-р хаалган дээр цүнх <strong>шалгаж байсан</strong>."</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="p-3 rounded-3" style="background:#fff8ec;border-left:4px solid #c9a227;">
+                <strong style="color:#7a5c00;">2. Interrupted action (with Past Simple)</strong>
+                <p class="mt-1 mb-1 text-muted small">Таслагдсан үйлдэл (Past Simple-тэй хамт)</p>
+                <em>"The officer <strong>was checking</strong> the badge <strong>when</strong> the alarm <strong>went off</strong>."</em><br>
+                <span style="color:#5a4000;font-size:13px;">"Ажилтан бэйдж <strong>шалгаж байхад</strong> дохиолол <strong>дуугарсан</strong>."</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="p-3 rounded-3" style="background:#f0fff4;border-left:4px solid #198754;">
+                <strong style="color:#198754;">3. Two parallel past actions</strong>
+                <p class="mt-1 mb-1 text-muted small">Зэрэг явагдаж байсан хоёр үйлдэл</p>
+                <em>"<strong>While</strong> one officer <strong>was watching</strong> the gate, another <strong>was checking</strong> IDs."</em><br>
+                <span style="color:#5a4000;font-size:13px;">"Нэг ажилтан хаалга <strong>харж байхад</strong>, нөгөө нь бичиг баримт <strong>шалгаж байсан</strong>."</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="p-3 rounded-3" style="background:#fff0f0;border-left:4px solid #dc3545;">
+                <strong class="text-danger">⚠️ Past Simple vs Past Continuous</strong>
+                <p class="mt-1 mb-1 text-muted small">Ялгааг санаарай</p>
+                <table style="font-size:12px;width:100%;">
+                  <tr><th>Past Simple</th><th>Past Continuous</th></tr>
+                  <tr><td>completed action<br><em>He checked the ID.</em></td><td>in-progress action<br><em>He was checking the ID.</em></td></tr>
+                  <tr><td style="color:#5a4000;">Дууссан үйлдэл</td><td style="color:#5a4000;">Явагдаж байсан үйлдэл</td></tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Signal words -->
+    <div class="accordion-item border-0 shadow-sm mb-2" style="border-radius:12px;overflow:hidden;">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#sigPC"
+                style="background:#fff8ec;color:#7a5c00;border-radius:12px;">
+          🕐 Дохио үгс — Signal Words & Time Phrases
+        </button>
+      </h2>
+      <div id="sigPC" class="accordion-collapse collapse">
+        <div class="accordion-body">
+          <div class="row g-2" style="font-size:13px;">
+            <div class="col-md-6">
+              <div class="p-2 rounded" style="background:#fff3cd;">
+                <strong style="color:#7a5c00;">At + time (тодорхой цагт):</strong><br>
+                <span class="badge me-1 mb-1" style="background:#c9a227;">at 14:00</span>
+                <span class="badge me-1 mb-1" style="background:#c9a227;">at that moment</span>
+                <span class="badge me-1 mb-1" style="background:#c9a227;">at the time</span><br>
+                <em>"At 14:00, she <strong>was standing</strong> at the gate."</em>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="p-2 rounded" style="background:#fff3cd;">
+                <strong style="color:#7a5c00;">When / While (үед / байхад):</strong><br>
+                <span class="badge me-1 mb-1" style="background:#c9a227;">when</span>
+                <span class="badge me-1 mb-1" style="background:#c9a227;">while</span>
+                <span class="badge me-1 mb-1" style="background:#c9a227;">as</span><br>
+                <em>"<strong>While</strong> he <strong>was talking</strong>, the visitor left."</em>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end accordion -->
+
+  <!-- Task 1: Choose was/were -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#e8f4fd;color:#1b3a6b;border-radius:12px 12px 0 0;">
+      ✏️ Task 1 — was or were? <span class="text-muted fw-normal small ms-1">(was эсвэл were?)</span>
+      <span id="t1score" class="badge float-end" style="background:#1b3a6b;">0 / 6</span>
+    </div>
+    <div class="card-body">
+      <p class="text-muted small mb-3">Choose the correct auxiliary verb. <em>(Зөв туслах үйл үгийг сонгоорой.)</em></p>
+      {% for i in "123456" %}{% endfor %}
+      <div class="mb-3" id="t1q1">
+        <p class="mb-2 fw-semibold">1. At 07:00, Sergeant Bat <u>___</u> checking badges at Gate 1.</p>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-primary px-4" onclick="pickOpt('t1q1',this,'was',1)">was</button>
+          <button class="btn btn-sm btn-outline-primary px-4" onclick="pickOpt('t1q1',this,'was',1)">were</button>
+        </div>
+        <div class="feedback mt-1" id="t1q1fb"></div>
+      </div>
+      <div class="mb-3" id="t1q2">
+        <p class="mb-2 fw-semibold">2. The officers <u>___</u> screening bags when the alarm went off.</p>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-primary px-4" onclick="pickOpt('t1q2',this,'were',1)">was</button>
+          <button class="btn btn-sm btn-outline-primary px-4" onclick="pickOpt('t1q2',this,'were',1)">were</button>
+        </div>
+        <div class="feedback mt-1" id="t1q2fb"></div>
+      </div>
+      <div class="mb-3" id="t1q3">
+        <p class="mb-2 fw-semibold">3. The principal car <u>___</u> moving toward the entrance at 15:00.</p>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-primary px-4" onclick="pickOpt('t1q3',this,'was',1)">was</button>
+          <button class="btn btn-sm btn-outline-primary px-4" onclick="pickOpt('t1q3',this,'was',1)">were</button>
+        </div>
+        <div class="feedback mt-1" id="t1q3fb"></div>
+      </div>
+      <div class="mb-3" id="t1q4">
+        <p class="mb-2 fw-semibold">4. Two visitors <u>___</u> standing in the wrong queue.</p>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-primary px-4" onclick="pickOpt('t1q4',this,'were',1)">was</button>
+          <button class="btn btn-sm btn-outline-primary px-4" onclick="pickOpt('t1q4',this,'were',1)">were</button>
+        </div>
+        <div class="feedback mt-1" id="t1q4fb"></div>
+      </div>
+      <div class="mb-3" id="t1q5">
+        <p class="mb-2 fw-semibold">5. The radio <u>___</u> working during the incident.</p>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-primary px-4" onclick="pickOpt('t1q5',this,'was',1)">was</button>
+          <button class="btn btn-sm btn-outline-primary px-4" onclick="pickOpt('t1q5',this,'was',1)">were</button>
+        </div>
+        <div class="feedback mt-1" id="t1q5fb"></div>
+      </div>
+      <div class="mb-3" id="t1q6">
+        <p class="mb-2 fw-semibold">6. The delegate <u>___</u> speaking with protocol staff at that moment.</p>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-primary px-4" onclick="pickOpt('t1q6',this,'was',1)">was</button>
+          <button class="btn btn-sm btn-outline-primary px-4" onclick="pickOpt('t1q6',this,'was',1)">were</button>
+        </div>
+        <div class="feedback mt-1" id="t1q6fb"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end grammar tab -->
+
+<!-- ══════════ INCIDENT REPORT TAB ══════════ -->
+<div class="tab-pane fade" id="incident">
+
+  <!-- Translanguaging -->
+  <div class="alert border-0 mb-4" style="background:linear-gradient(135deg,#fff0f0,#f8d7da);border-left:4px solid #dc3545!important;border-radius:12px;">
+    <div class="fw-bold mb-1 text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Incident Context — Осол / Тохиолдол</div>
+    <div style="font-size:13px;color:#491217;">
+      <strong>[EN]</strong> In security work, when writing incident reports, we use Past Continuous to describe what was happening at the time of an incident, and Past Simple for the incident itself.<br>
+      <strong>[MN]</strong> Аюулгүй байдлын ажилд осол болох үеийн нөхцөл байдлыг тайлбарлахад Past Continuous, харин осол болсон үйлдлийг Past Simple-ээр бичдэг.
+    </div>
+  </div>
+
+  <!-- Incident Story -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#1b3a6b;color:#fff;border-radius:12px 12px 0 0;">
+      📋 Incident Report — Осол дахь тохиолдол
+    </div>
+    <div class="card-body">
+      <div class="alert mb-3" style="background:#fff3cd;border-radius:8px;font-size:13px;border:1px solid #c9a227;">
+        <strong>Date / Огноо:</strong> 2026-05-15 &nbsp;|&nbsp; <strong>Time / Цаг:</strong> 14:30 &nbsp;|&nbsp; <strong>Location / Байршил:</strong> Gate 3, State Palace
+      </div>
+      <div class="p-3 rounded-3 mb-3" style="background:#f8f9fa;border-left:4px solid #1b3a6b;font-size:15px;line-height:1.8;">
+        <p>At 14:30, Officers Bat and Saran <strong style="color:#1b3a6b;">were checking</strong> visitor IDs at Gate 3. A suspicious vehicle <strong style="color:#dc3545;">was standing</strong> near the entrance. Two journalists <strong style="color:#1b3a6b;">were trying</strong> to enter Zone B without press passes.</p>
+        <p>While Officer Bat <strong style="color:#1b3a6b;">was talking</strong> to the journalists, the vehicle <strong style="color:#dc3545;">moved</strong> away quickly. At the same time, Control <strong style="color:#1b3a6b;">was monitoring</strong> the cameras.</p>
+        <p>Officer Saran <strong style="color:#dc3545;">called</strong> for backup. The team <strong style="color:#dc3545;">arrived</strong> within two minutes. The journalists <strong style="color:#dc3545;">showed</strong> their passes and the situation <strong style="color:#dc3545;">ended</strong> without incident.</p>
+      </div>
+      <div class="p-3 rounded-3" style="background:#f0fff4;font-size:13px;border-left:4px solid #198754;">
+        <strong>[MN]</strong> 14:30 цагт Бат ба Сарангуа нар Гурав дахь хаалган дээр зочдын бичиг баримт <strong>шалгаж байсан</strong>. Нэг сэжигтэй машин оролтын ойролцоо <strong>зогсож байсан</strong>. Хоёр сэтгүүлч хэвлэлийн нэвтрэх үнэмлэхгүйгээр Б бүсэд орохыг <strong>оролдож байсан</strong>.<br>
+        Бат ажилтан сэтгүүлчидтэй <strong>ярьж байхад</strong> машин хурдан <strong>явсан</strong>. Мэдэглэл: Past Continuous (байсан) = тухайн үед явагдаж байсан; Past Simple (явсан) = дууссан үйлдэл.
+      </div>
+    </div>
+  </div>
+
+  <!-- Task 2: T/F -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#e8f4fd;color:#1b3a6b;border-radius:12px 12px 0 0;">
+      ✅ Task 2 — True or False? <span class="text-muted fw-normal small ms-1">(Үнэн эсэх?)</span>
+      <span id="t2score" class="badge float-end" style="background:#1b3a6b;">0 / 5</span>
+    </div>
+    <div class="card-body" style="font-size:14px;">
+      <div class="mb-3 d-flex align-items-start gap-2" id="t2r1">
+        <span class="mt-1">1.</span>
+        <div>
+          <p class="mb-1">Officers Bat and Saran were checking IDs at Gate 3 at 14:30.</p>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-success" onclick="tf('t2r1','T','T',2)">True</button>
+            <button class="btn btn-sm btn-outline-danger" onclick="tf('t2r1','T','T',2)">False</button>
+          </div>
+          <div class="feedback" id="t2r1fb" style="font-size:13px;margin-top:4px;"></div>
+        </div>
+      </div>
+      <div class="mb-3 d-flex align-items-start gap-2" id="t2r2">
+        <span class="mt-1">2.</span>
+        <div>
+          <p class="mb-1">The journalists had valid press passes when they arrived.</p>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-success" onclick="tf('t2r2','F','F',2)">True</button>
+            <button class="btn btn-sm btn-outline-danger" onclick="tf('t2r2','F','F',2)">False</button>
+          </div>
+          <div class="feedback" id="t2r2fb" style="font-size:13px;margin-top:4px;"></div>
+        </div>
+      </div>
+      <div class="mb-3 d-flex align-items-start gap-2" id="t2r3">
+        <span class="mt-1">3.</span>
+        <div>
+          <p class="mb-1">While Officer Bat was talking, the suspicious vehicle moved away.</p>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-success" onclick="tf('t2r3','T','T',2)">True</button>
+            <button class="btn btn-sm btn-outline-danger" onclick="tf('t2r3','T','T',2)">False</button>
+          </div>
+          <div class="feedback" id="t2r3fb" style="font-size:13px;margin-top:4px;"></div>
+        </div>
+      </div>
+      <div class="mb-3 d-flex align-items-start gap-2" id="t2r4">
+        <span class="mt-1">4.</span>
+        <div>
+          <p class="mb-1">Officer Bat called for backup.</p>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-success" onclick="tf('t2r4','F','F',2)">True</button>
+            <button class="btn btn-sm btn-outline-danger" onclick="tf('t2r4','F','F',2)">False</button>
+          </div>
+          <div class="feedback" id="t2r4fb" style="font-size:13px;margin-top:4px;"></div>
+        </div>
+      </div>
+      <div class="mb-3 d-flex align-items-start gap-2" id="t2r5">
+        <span class="mt-1">5.</span>
+        <div>
+          <p class="mb-1">Backup arrived within two minutes and the situation ended peacefully.</p>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-success" onclick="tf('t2r5','T','T',2)">True</button>
+            <button class="btn btn-sm btn-outline-danger" onclick="tf('t2r5','T','T',2)">False</button>
+          </div>
+          <div class="feedback" id="t2r5fb" style="font-size:13px;margin-top:4px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task 3: Fill blanks (was/were + -ing) -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#e8f4fd;color:#1b3a6b;border-radius:12px 12px 0 0;">
+      ✏️ Task 3 — Fill in the blanks <span class="text-muted fw-normal small ms-1">(was/were + -ing хэлбэр)</span>
+      <span id="t3score" class="badge float-end" style="background:#1b3a6b;">0 / 5</span>
+    </div>
+    <div class="card-body">
+      <p class="text-muted small mb-3">Use the Past Continuous form of the verb in brackets. <em>(Хаалтан доторх үйл үгийг Past Continuous хэлбэрт оруулаарай.)</em></p>
+      <ol style="font-size:14px;">
+        <li class="mb-3">At 14:30, the officers _______ (check) visitor IDs at Gate 3.<br>
+          <input class="form-control mt-1" id="t3a1" placeholder="were checking…" style="max-width:260px;font-size:14px;">
+          <div class="feedback" id="t3a1fb" style="font-size:13px;margin-top:4px;"></div>
+        </li>
+        <li class="mb-3">A suspicious vehicle _______ (stand) near the entrance.<br>
+          <input class="form-control mt-1" id="t3a2" placeholder="was standing…" style="max-width:260px;font-size:14px;">
+          <div class="feedback" id="t3a2fb" style="font-size:13px;margin-top:4px;"></div>
+        </li>
+        <li class="mb-3">While Officer Bat _______ (talk) to the journalists, the vehicle moved away.<br>
+          <input class="form-control mt-1" id="t3a3" placeholder="was talking…" style="max-width:260px;font-size:14px;">
+          <div class="feedback" id="t3a3fb" style="font-size:13px;margin-top:4px;"></div>
+        </li>
+        <li class="mb-3">Control _______ (monitor) the cameras at the same time.<br>
+          <input class="form-control mt-1" id="t3a4" placeholder="was monitoring…" style="max-width:260px;font-size:14px;">
+          <div class="feedback" id="t3a4fb" style="font-size:13px;margin-top:4px;"></div>
+        </li>
+        <li class="mb-3">The journalists _______ (try) to enter Zone B without press passes.<br>
+          <input class="form-control mt-1" id="t3a5" placeholder="were trying…" style="max-width:260px;font-size:14px;">
+          <div class="feedback" id="t3a5fb" style="font-size:13px;margin-top:4px;"></div>
+        </li>
+      </ol>
+      <button class="btn btn-primary btn-sm mt-2" onclick="checkT3()"><i class="bi bi-check2-circle me-1"></i>Шалгах — Check</button>
+    </div>
+  </div>
+
+  <!-- Task 4: Combine with WHEN -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#e8f4fd;color:#1b3a6b;border-radius:12px 12px 0 0;">
+      🔗 Task 4 — Combine sentences using WHEN <span class="text-muted fw-normal small ms-1">(WHEN ашиглан нэгтгэх)</span>
+      <span id="t4score" class="badge float-end" style="background:#1b3a6b;">0 / 4</span>
+    </div>
+    <div class="card-body">
+      <div class="alert" style="background:#e8f4fd;border-radius:8px;font-size:13px;">
+        <strong>[EN]</strong> Pattern: Subject + <em>was/were</em> + V-ing + <em>when</em> + subject + Past Simple verb.<br>
+        <strong>[MN]</strong> Загвар: Нэр үг + <em>was/were</em> + үйл үг-ing + <em>when</em> + нэр үг + Past Simple үйл үг.
+      </div>
+      <ol style="font-size:14px;">
+        <li class="mb-3">
+          <p class="mb-1 text-muted">A: The officer checked the badge. B: The alarm went off.</p>
+          <p class="fw-semibold">The officer _______ (check) the badge when the alarm _______ (go) off.</p>
+          <div class="d-flex gap-2 flex-wrap mt-1">
+            <input class="form-control" id="t4a1a" placeholder="was checking" style="max-width:200px;font-size:14px;">
+            <input class="form-control" id="t4a1b" placeholder="went" style="max-width:200px;font-size:14px;">
+          </div>
+          <div class="feedback" id="t4a1fb" style="font-size:13px;margin-top:4px;"></div>
+        </li>
+        <li class="mb-3">
+          <p class="mb-1 text-muted">A: Officers screened the bags. B: A visitor ran away.</p>
+          <p class="fw-semibold">Officers _______ (screen) the bags when a visitor _______ (run) away.</p>
+          <div class="d-flex gap-2 flex-wrap mt-1">
+            <input class="form-control" id="t4a2a" placeholder="were screening" style="max-width:200px;font-size:14px;">
+            <input class="form-control" id="t4a2b" placeholder="ran" style="max-width:200px;font-size:14px;">
+          </div>
+          <div class="feedback" id="t4a2fb" style="font-size:13px;margin-top:4px;"></div>
+        </li>
+        <li class="mb-3">
+          <p class="mb-1 text-muted">A: Sergeant Bat wrote his report. B: The shift leader called him.</p>
+          <p class="fw-semibold">Sergeant Bat _______ (write) his report when the shift leader _______ (call).</p>
+          <div class="d-flex gap-2 flex-wrap mt-1">
+            <input class="form-control" id="t4a3a" placeholder="was writing" style="max-width:200px;font-size:14px;">
+            <input class="form-control" id="t4a3b" placeholder="called" style="max-width:200px;font-size:14px;">
+          </div>
+          <div class="feedback" id="t4a3fb" style="font-size:13px;margin-top:4px;"></div>
+        </li>
+        <li class="mb-3">
+          <p class="mb-1 text-muted">A: The delegate waited at the gate. B: A journalist approached.</p>
+          <p class="fw-semibold">The delegate _______ (wait) at the gate when a journalist _______ (approach).</p>
+          <div class="d-flex gap-2 flex-wrap mt-1">
+            <input class="form-control" id="t4a4a" placeholder="was waiting" style="max-width:200px;font-size:14px;">
+            <input class="form-control" id="t4a4b" placeholder="approached" style="max-width:200px;font-size:14px;">
+          </div>
+          <div class="feedback" id="t4a4fb" style="font-size:13px;margin-top:4px;"></div>
+        </li>
+      </ol>
+      <button class="btn btn-primary btn-sm mt-2" onclick="checkT4()"><i class="bi bi-check2-circle me-1"></i>Шалгах — Check</button>
+    </div>
+  </div>
+
+</div><!-- end incident tab -->
+
+<!-- ══════════ RADIO & PRACTICE TAB ══════════ -->
+<div class="tab-pane fade" id="radio">
+
+  <!-- Translanguaging -->
+  <div class="alert border-0 mb-4" style="background:linear-gradient(135deg,#f0fff4,#d4edda);border-left:4px solid #198754!important;border-radius:12px;">
+    <div class="fw-bold mb-1 text-success"><i class="bi bi-broadcast me-2"></i>Radio Reports — Радио мэдэгдэл</div>
+    <div style="font-size:13px;color:#155724;">
+      <strong>[EN]</strong> In radio reports, officers use Past Continuous to describe the ongoing situation and Past Simple for specific completed events.<br>
+      <strong>[MN]</strong> Радио мэдэгдэлд ажилтнууд үргэлжилж байсан нөхцөл байдлыг Past Continuous-ээр, тодорхой дууссан үйлдлийг Past Simple-ээр илэрхийлдэг.
+    </div>
+  </div>
+
+  <!-- Radio vocabulary -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#1b3a6b;color:#fff;border-radius:12px 12px 0 0;">
+      📻 Radio Vocabulary — Радио холбооны үгс
+    </div>
+    <div class="card-body">
+      <div class="row g-2">
+        <div class="col-6 col-md-3">
+          <div class="p-2 text-center rounded" style="background:#f0f8ff;border:1px solid #1b3a6b;font-size:13px;">
+            <div class="fw-bold text-primary">Roger that</div>
+            <div class="text-muted">Мэдээ хүлээн авлаа</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="p-2 text-center rounded" style="background:#f0f8ff;border:1px solid #1b3a6b;font-size:13px;">
+            <div class="fw-bold text-primary">Say again</div>
+            <div class="text-muted">Давтана уу</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="p-2 text-center rounded" style="background:#f0f8ff;border:1px solid #1b3a6b;font-size:13px;">
+            <div class="fw-bold text-primary">Stand by</div>
+            <div class="text-muted">Хүлээж бай</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="p-2 text-center rounded" style="background:#f0f8ff;border:1px solid #1b3a6b;font-size:13px;">
+            <div class="fw-bold text-primary">All clear</div>
+            <div class="text-muted">Бүгд цэвэр/Аюул байхгүй</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="p-2 text-center rounded" style="background:#f0f8ff;border:1px solid #1b3a6b;font-size:13px;">
+            <div class="fw-bold text-primary">Requesting backup</div>
+            <div class="text-muted">Нэмэлт дэмжлэг хүссэн</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="p-2 text-center rounded" style="background:#f0f8ff;border:1px solid #1b3a6b;font-size:13px;">
+            <div class="fw-bold text-primary">Wilco</div>
+            <div class="text-muted">Гүйцэтгэнэ</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="p-2 text-center rounded" style="background:#f0f8ff;border:1px solid #1b3a6b;font-size:13px;">
+            <div class="fw-bold text-primary">Over</div>
+            <div class="text-muted">Хариу хүлээе</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="p-2 text-center rounded" style="background:#f0f8ff;border:1px solid #1b3a6b;font-size:13px;">
+            <div class="fw-bold text-primary">Out</div>
+            <div class="text-muted">Холбоо хаалаа</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task 5: Grammar Quiz -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#e8f4fd;color:#1b3a6b;border-radius:12px 12px 0 0;">
+      ❓ Task 5 — Grammar Quiz <span class="text-muted fw-normal small ms-1">(Дүрмийн асуулт)</span>
+      <span id="t5score" class="badge float-end" style="background:#1b3a6b;">0 / 4</span>
+    </div>
+    <div class="card-body">
+      <div class="mb-4" id="t5q1">
+        <p class="fw-semibold mb-2">1. "Тэд 14:00 цагт хаалга харж байсан." — Which sentence is correct?</p>
+        <div class="d-flex flex-column gap-2">
+          <button class="btn btn-outline-secondary text-start" onclick="quiz5('t5q1',this,false)">A. They watched the gate at 14:00.</button>
+          <button class="btn btn-outline-secondary text-start" onclick="quiz5('t5q1',this,true)">B. They were watching the gate at 14:00.</button>
+          <button class="btn btn-outline-secondary text-start" onclick="quiz5('t5q1',this,false)">C. They are watching the gate at 14:00.</button>
+        </div>
+        <div class="feedback mt-2" id="t5q1fb" style="font-size:13px;"></div>
+      </div>
+      <div class="mb-4" id="t5q2">
+        <p class="fw-semibold mb-2">2. Which sentence uses "when" correctly with Past Continuous + Past Simple?</p>
+        <div class="d-flex flex-column gap-2">
+          <button class="btn btn-outline-secondary text-start" onclick="quiz5('t5q2',this,false)">A. He checked the badge when the alarm was going off.</button>
+          <button class="btn btn-outline-secondary text-start" onclick="quiz5('t5q2',this,true)">B. He was checking the badge when the alarm went off.</button>
+          <button class="btn btn-outline-secondary text-start" onclick="quiz5('t5q2',this,false)">C. He was checking the badge when the alarm was went off.</button>
+        </div>
+        <div class="feedback mt-2" id="t5q2fb" style="font-size:13px;"></div>
+      </div>
+      <div class="mb-4" id="t5q3">
+        <p class="fw-semibold mb-2">3. "run" — What is the correct -ing form?</p>
+        <div class="d-flex flex-column gap-2">
+          <button class="btn btn-outline-secondary text-start" onclick="quiz5('t5q3',this,false)">A. runing</button>
+          <button class="btn btn-outline-secondary text-start" onclick="quiz5('t5q3',this,true)">B. running</button>
+          <button class="btn btn-outline-secondary text-start" onclick="quiz5('t5q3',this,false)">C. runned</button>
+        </div>
+        <div class="feedback mt-2" id="t5q3fb" style="font-size:13px;"></div>
+      </div>
+      <div class="mb-4" id="t5q4">
+        <p class="fw-semibold mb-2">4. "I and my partner _______ the gate when the VIP arrived." (watch)</p>
+        <div class="d-flex flex-column gap-2">
+          <button class="btn btn-outline-secondary text-start" onclick="quiz5('t5q4',this,false)">A. was watching</button>
+          <button class="btn btn-outline-secondary text-start" onclick="quiz5('t5q4',this,true)">B. were watching</button>
+          <button class="btn btn-outline-secondary text-start" onclick="quiz5('t5q4',this,false)">C. watched</button>
+        </div>
+        <div class="feedback mt-2" id="t5q4fb" style="font-size:13px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task 6: Write radio report -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#fff8ec;color:#7a5c00;border-radius:12px 12px 0 0;">
+      📻 Task 6 — Write a Radio Incident Report <span class="text-muted fw-normal small ms-1">(Радио мэдэгдэл бичнэ үү)</span>
+    </div>
+    <div class="card-body">
+      <div class="alert" style="background:#fff3cd;border-radius:8px;font-size:13px;">
+        <strong>[EN]</strong> Use Past Continuous + Past Simple. Describe what was happening and what action was taken.<br>
+        <strong>[MN]</strong> Past Continuous + Past Simple хэрэглэнэ үү. Юу болж байсан, ямар арга хэмжээ авсаныг тайлбарлаарай.
+        <br><br>
+        <strong>Starter sentences / Эхлэлийн өгүүлбэрүүд:</strong><br>
+        <em>At [time], I was [verb-ing] at [location] when [subject] [past simple verb]...</em><br>
+        <em>At that moment, [subject] was/were [verb-ing]...</em><br>
+        <em>I [action taken]... Over.</em>
+      </div>
+      <textarea class="form-control" rows="7" placeholder="Write your radio incident report here…&#10;&#10;Alpha-2 to Control. At 15:30, I was...&#10;&#10;Over." style="font-size:14px;"></textarea>
+      <div class="mt-3">
+        <div class="fw-semibold small mb-2" style="color:#1b3a6b;">Self-check / Өөрийн үнэлгээ:</div>
+        <div class="form-check mb-1"><input class="form-check-input" type="checkbox"> <label class="form-check-label small">Past Continuous (was/were + -ing) хэрэглэсэн.</label></div>
+        <div class="form-check mb-1"><input class="form-check-input" type="checkbox"> <label class="form-check-label small">Past Simple (таслагдсан үйлдэл) хэрэглэсэн.</label></div>
+        <div class="form-check mb-1"><input class="form-check-input" type="checkbox"> <label class="form-check-label small">When / While / At that moment дохио үгс хэрэглэсэн.</label></div>
+        <div class="form-check"><input class="form-check-input" type="checkbox"> <label class="form-check-label small">Радио хэллэг (Roger, Over, Out) оруулсан.</label></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end radio tab -->
+</div><!-- end tab-content -->
+
+<style>
+.feedback.correct { color:#198754; font-weight:600; }
+.feedback.wrong   { color:#dc3545; font-weight:600; }
+.btn-opt-correct  { background:#d4edda!important; border-color:#198754!important; color:#155724!important; }
+.btn-opt-wrong    { background:#f8d7da!important; border-color:#dc3545!important; color:#721c24!important; }
+</style>
+
+<script>
+const scores = {1:0,2:0,3:0,4:0,5:0};
+const maxes  = {1:6,2:5,3:5,4:4,5:4};
+
+function updateTotal() {
+  const got   = Object.values(scores).reduce((a,b)=>a+b,0);
+  const total = Object.values(maxes).reduce((a,b)=>a+b,0);
+  document.getElementById('totalScore').textContent = got + ' / ' + total;
+  document.getElementById('totalBar').style.width = (total ? got/total*100 : 0) + '%';
+}
+function scoreEl(task) {
+  document.getElementById('t'+task+'score').textContent = scores[task] + ' / ' + maxes[task];
+  updateTotal();
+}
+
+// Task 1: was/were
+const t1correct = {t1q1:'was',t1q2:'were',t1q3:'was',t1q4:'were',t1q5:'was',t1q6:'was'};
+const t1done = {};
+function pickOpt(qid, btn, correct, task) {
+  if (t1done[qid]) return;
+  const div = document.getElementById(qid);
+  const btns = div.querySelectorAll('button');
+  const chosen = btn.textContent.trim();
+  const isCorrect = chosen === correct;
+  btns.forEach(b => {
+    b.disabled = true;
+    if (b.textContent.trim() === correct) b.classList.add('btn-opt-correct');
+  });
+  if (!isCorrect) btn.classList.add('btn-opt-wrong');
+  const fb = document.getElementById(qid + 'fb');
+  fb.className = 'feedback ' + (isCorrect ? 'correct' : 'wrong');
+  fb.textContent = isCorrect ? '✅ Correct! Зөв байна.' : '❌ The correct answer is: ' + correct;
+  if (isCorrect) { scores[1]++; scoreEl(1); }
+  t1done[qid] = true;
+}
+
+// Task 2: T/F
+const t2done = {};
+function tf(rowId, chosen, correct, task) {
+  if (t2done[rowId]) return;
+  t2done[rowId] = true;
+  const div = document.getElementById(rowId);
+  const btns = div.querySelectorAll('button');
+  const isCorrect = chosen === correct;
+  btns.forEach(b => {
+    b.disabled = true;
+    if ((b.textContent==='True' && correct==='T')||(b.textContent==='False' && correct==='F')) b.classList.add('btn-opt-correct');
+  });
+  if (!isCorrect) { btns.forEach(b => { if(b.textContent===(chosen==='T'?'True':'False')) b.classList.add('btn-opt-wrong'); }); }
+  const fb = document.getElementById(rowId + 'fb');
+  fb.className = 'feedback ' + (isCorrect ? 'correct' : 'wrong');
+  fb.textContent = isCorrect ? '✅ Correct!' : '❌ ' + (correct==='T' ? 'True — Үнэн.' : 'False — Худал.');
+  if (isCorrect) { scores[task]++; scoreEl(task); }
+}
+
+// Task 3: Fill blanks
+const t3ans = {
+  t3a1:'were checking',
+  t3a2:'was standing',
+  t3a3:'was talking',
+  t3a4:'was monitoring',
+  t3a5:'were trying'
+};
+function checkT3() {
+  let got = 0;
+  Object.entries(t3ans).forEach(([id, ans]) => {
+    const inp = document.getElementById(id);
+    const fb  = document.getElementById(id + 'fb');
+    const val = inp.value.trim().toLowerCase();
+    if (val === ans.toLowerCase()) {
+      fb.className='feedback correct'; fb.textContent='✅ Correct! — '+ans; inp.style.borderColor='#198754'; got++;
+    } else {
+      fb.className='feedback wrong'; fb.textContent='❌ Expected: '+ans; inp.style.borderColor='#dc3545';
+    }
+  });
+  scores[3] = got; scoreEl(3);
+}
+
+// Task 4: Combine
+const t4ans = {
+  t4a1a:'was checking', t4a1b:'went',
+  t4a2a:'were screening', t4a2b:'ran',
+  t4a3a:'was writing', t4a3b:'called',
+  t4a4a:'was waiting', t4a4b:'approached'
+};
+function checkT4() {
+  let got = 0; let pairs = 0;
+  const keys = ['t4a1','t4a2','t4a3','t4a4'];
+  keys.forEach(k => {
+    const va = (document.getElementById(k+'a')||{}).value||'';
+    const vb = (document.getElementById(k+'b')||{}).value||'';
+    const aOk = va.trim().toLowerCase() === t4ans[k+'a'].toLowerCase();
+    const bOk = vb.trim().toLowerCase() === t4ans[k+'b'].toLowerCase();
+    const fb = document.getElementById(k+'fb');
+    if (!fb) return;
+    if (aOk && bOk) {
+      fb.className='feedback correct'; fb.textContent='✅ Both correct!'; got++;
+    } else {
+      fb.className='feedback wrong';
+      fb.textContent='❌ Expected: ' + t4ans[k+'a'] + ' … ' + t4ans[k+'b'];
+    }
+    pairs++;
+  });
+  scores[4] = got; scoreEl(4);
+}
+
+// Task 5: Quiz
+const t5done = {};
+function quiz5(qid, btn, isCorrect) {
+  if (t5done[qid]) return;
+  t5done[qid] = true;
+  const div = document.getElementById(qid);
+  div.querySelectorAll('button').forEach(b => b.disabled = true);
+  btn.classList.add(isCorrect ? 'btn-opt-correct' : 'btn-opt-wrong');
+  const fb = document.getElementById(qid + 'fb');
+  fb.className = 'feedback ' + (isCorrect ? 'correct' : 'wrong');
+  fb.textContent = isCorrect ? '✅ Correct! Зөв байна.' : '❌ Not quite. Дахиад уншаарай.';
+  if (isCorrect) { scores[5]++; scoreEl(5); }
+}
+
+function resetAll() { location.reload(); }
+updateTotal();
+</script>
+
+{% endblock %}

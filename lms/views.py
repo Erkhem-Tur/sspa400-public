@@ -7,7 +7,7 @@ from django.views.decorators.http import require_POST
 from django.db.models import Avg, Sum
 from django.utils import timezone
 
-from .models import Lesson, QuizResult, UserProgress, Department, Video, LogEntry
+from .models import Lesson, QuizResult, UserProgress, Department, Video, LogEntry, TlOverride
 
 
 # ── Public views (no login required) ────────────────────────────────────────
@@ -26,6 +26,32 @@ def lesson_view(request, lesson_id):
 
 def worksheets_view(request):
     return render(request, 'lms/worksheets.html')
+
+
+def tl_fetch(request):
+    """Return all translation overrides for a given URL path as JSON."""
+    path = request.GET.get('path', '')
+    data = {o.key: o.text for o in TlOverride.objects.filter(path=path)}
+    return JsonResponse(data)
+
+
+@require_POST
+@user_passes_test(lambda u: u.is_staff, login_url='/admin/login/')
+def tl_save(request):
+    """Save a single translation override (staff only)."""
+    try:
+        body = json.loads(request.body)
+        path = body.get('path', '').strip()
+        key  = body.get('key', '').strip()
+        text = body.get('text', '').strip()
+        if path and key and text:
+            TlOverride.objects.update_or_create(
+                path=path, key=key,
+                defaults={'text': text}
+            )
+        return JsonResponse({'ok': True})
+    except Exception as e:
+        return JsonResponse({'ok': False, 'error': str(e)}, status=400)
 
 
 def past_tense_view(request):

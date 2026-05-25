@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Department, Lesson, QuizResult, UserProgress, Video, LogEntry
+from .models import Department, Lesson, QuizResult, UserProgress, Video, LogEntry, TlOverride
 
 
 @admin.register(Department)
@@ -41,6 +41,14 @@ class VideoAdmin(admin.ModelAdmin):
             'fields': ('title', 'description', 'youtube_id', 'order', 'is_published'),
         }),
     )
+
+
+@admin.register(TlOverride)
+class TlOverrideAdmin(admin.ModelAdmin):
+    list_display  = ('path', 'key', 'text', 'updated_at')
+    list_filter   = ('path',)
+    search_fields = ('key', 'text')
+    ordering      = ('path', 'key')
 
 
 @admin.register(LogEntry)

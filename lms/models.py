@@ -128,3 +128,20 @@ class LogEntry(models.Model):
 
     def __str__(self):
         return f"{self.full_name} – {self.logged_at.strftime('%Y-%m-%d %H:%M')}"
+
+
+class TlOverride(models.Model):
+    """Inline-editable Mongolian translation overrides for lesson pages."""
+    path       = models.CharField(max_length=200, verbose_name='Хуудасны зам')
+    key        = models.CharField(max_length=100, verbose_name='Түлхүүр')
+    text       = models.TextField(verbose_name='Монгол орчуулга')
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('path', 'key')
+        ordering = ['path', 'key']
+        verbose_name = 'Орчуулгын засвар'
+        verbose_name_plural = 'Орчуулгын засварууд'
+
+    def __str__(self):
+        return f'{self.path} | {self.key}'

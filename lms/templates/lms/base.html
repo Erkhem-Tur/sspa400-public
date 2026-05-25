@@ -248,5 +248,124 @@
   }
 </script>
 {% block extra_js %}{% endblock %}
+
+<!-- Translation override loader (all users) + inline editor (staff only) -->
+<script>
+(function () {
+  const PAGE_PATH = window.location.pathname;
+  const CACHE_KEY = 'tl__' + PAGE_PATH;
+
+  function applyOverrides(data) {
+    document.querySelectorAll('[data-tl-key]').forEach(function (el) {
+      var v = data[el.dataset.tlKey];
+      if (v) el.textContent = v;
+    });
+  }
+
+  // Load overrides: try sessionStorage cache first
+  var cached = sessionStorage.getItem(CACHE_KEY);
+  if (cached) {
+    try { applyOverrides(JSON.parse(cached)); } catch (e) {}
+  } else {
+    fetch('/api/tl/fetch/?path=' + encodeURIComponent(PAGE_PATH))
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        sessionStorage.setItem(CACHE_KEY, JSON.stringify(data));
+        applyOverrides(data);
+      })
+      .catch(function () {});
+  }
+
+  {% if user.is_authenticated and user.is_staff %}
+  // ── Staff inline-edit UI ─────────────────────────────────────────────
+  var editMode = false;
+
+  // Floating 🌐 button
+  var fab = document.createElement('button');
+  fab.id = 'tlFab';
+  fab.title = 'Орчуулга засах (Admin)';
+  fab.innerHTML = '🌐';
+  fab.style.cssText = [
+    'position:fixed', 'bottom:76px', 'right:18px', 'z-index:9999',
+    'width:46px', 'height:46px', 'border-radius:50%', 'border:none',
+    'background:#c9a227', 'color:#fff', 'font-size:20px', 'cursor:pointer',
+    'box-shadow:0 3px 10px rgba(0,0,0,.35)', 'transition:background .2s',
+    'display:flex', 'align-items:center', 'justify-content:center'
+  ].join(';');
+  document.body.appendChild(fab);
+
+  // Toast
+  var toast = document.createElement('div');
+  toast.style.cssText = [
+    'position:fixed', 'bottom:132px', 'right:18px', 'z-index:9999',
+    'background:#198754', 'color:#fff', 'padding:8px 16px',
+    'border-radius:10px', 'font-size:13px', 'font-weight:600',
+    'display:none', 'box-shadow:0 2px 8px rgba(0,0,0,.25)'
+  ].join(';');
+  toast.textContent = '✓ Хадгалагдлаа';
+  document.body.appendChild(toast);
+
+  function showToast() {
+    toast.style.display = 'block';
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function () { toast.style.display = 'none'; }, 1600);
+  }
+
+  function getCookie(name) {
+    var m = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+    return m ? m[2] : '';
+  }
+
+  function saveTl(key, text) {
+    sessionStorage.removeItem(CACHE_KEY); // invalidate cache
+    fetch('/api/tl/save/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')
+      },
+      body: JSON.stringify({ path: PAGE_PATH, key: key, text: text })
+    }).then(function (r) { return r.json(); })
+      .then(function (d) { if (d.ok) showToast(); });
+  }
+
+  function toggleEditMode() {
+    editMode = !editMode;
+    fab.style.background = editMode ? '#198754' : '#c9a227';
+    fab.title = editMode ? 'Засах горим идэвхтэй — дарж унтраана уу' : 'Орчуулга засах (Admin)';
+
+    document.querySelectorAll('[data-tl-key]').forEach(function (el) {
+      el.contentEditable = editMode ? 'true' : 'false';
+      el.style.outline   = editMode ? '2px dashed #c9a227' : 'none';
+      el.style.borderRadius = editMode ? '4px' : '';
+      el.style.padding   = editMode ? '2px 4px' : '';
+      el.style.cursor    = editMode ? 'text' : '';
+      el.style.minWidth  = editMode ? '40px' : '';
+
+      if (editMode) {
+        el.onblur = function () {
+          var newText = el.textContent.trim();
+          if (newText) saveTl(el.dataset.tlKey, newText);
+        };
+      } else {
+        el.onblur = null;
+      }
+    });
+
+    // Show helper hint on first activate
+    if (editMode) {
+      var count = document.querySelectorAll('[data-tl-key]').length;
+      if (count === 0) {
+        alert('Энэ хуудсанд засах орчуулгын блок олдсонгүй.');
+        editMode = false;
+        fab.style.background = '#c9a227';
+      }
+    }
+  }
+
+  fab.addEventListener('click', toggleEditMode);
+  {% endif %}
+})();
+</script>
 </body>
 </html>

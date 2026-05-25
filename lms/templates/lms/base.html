@@ -189,6 +189,9 @@
     <a href="{% url 'usss_report' %}" class="{% if request.resolver_match.url_name == 'usss_report' %}active{% endif %}">
       <i class="bi bi-file-earmark-text"></i> USSS GAO Report
     </a>
+    <a href="{% url 'gspr_article' %}" class="{% if request.resolver_match.url_name == 'gspr_article' %}active{% endif %}">
+      <i class="bi bi-shield-shaded"></i> 🇫🇷 GSPR Agent
+    </a>
     {% if user.is_authenticated and user.is_staff %}
     <div class="sidebar-title">Удирдлага</div>
     <a href="{% url 'logbook_admin' %}" class="{% if request.resolver_match.url_name == 'logbook_admin' %}active{% endif %}">

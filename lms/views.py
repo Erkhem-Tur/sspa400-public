@@ -70,6 +70,10 @@ def usss_report_view(request):
     return render(request, 'lms/usss_report.html')
 
 
+def gspr_article_view(request):
+    return render(request, 'lms/gspr_article.html')
+
+
 def videos_view(request):
     videos = Video.objects.filter(is_published=True)
     return render(request, 'lms/videos.html', {'videos': videos})

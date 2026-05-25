@@ -1,0 +1,660 @@
+{% extends 'lms/base.html' %}
+{% block title %}GSPR — French Presidential Protection Unit{% endblock %}
+{% block extra_head %}
+<style>
+.highlight-term { background:#fff3cd; border-bottom:2px solid #c9a227; cursor:help; border-radius:2px; padding:0 2px; }
+.highlight-term:hover { background:#ffe69c; }
+.reading-body { font-size:15.5px; line-height:1.9; color:#1e293b; }
+.reading-body p { margin-bottom:1.1rem; }
+.para-label { font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px; }
+.gloss-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:14px 16px; margin-bottom:10px; transition:box-shadow .15s; }
+.gloss-card:hover { box-shadow:0 4px 12px rgba(0,0,0,.08); }
+.gloss-en { font-size:15px; font-weight:700; color:#1b3a6b; }
+.gloss-fr { font-size:12px; color:#6366f1; font-style:italic; margin-left:6px; }
+.gloss-pos { font-size:11px; color:#94a3b8; font-style:italic; margin-left:6px; }
+.gloss-def { font-size:13px; color:#475569; margin:4px 0; }
+.gloss-mn { font-size:13px; color:#7a5c00; background:#fff8ec; border-radius:6px; padding:4px 8px; margin:4px 0; }
+.gloss-ex { font-size:12px; color:#64748b; font-style:italic; border-left:3px solid #e2e8f0; padding-left:8px; margin-top:6px; }
+.paraphrase-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
+@media(max-width:640px){ .paraphrase-row{ grid-template-columns:1fr; } }
+.para-orig { background:#f0f8ff; border:1px solid #bfdbfe; border-radius:8px; padding:12px; font-size:13px; }
+.para-simple { background:#f0fff4; border:1px solid #bbf7d0; border-radius:8px; padding:12px; font-size:13px; }
+.category-badge { display:inline-block; font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; margin-bottom:8px; text-transform:uppercase; letter-spacing:.5px; }
+.cat-protection { background:#dbeafe; color:#1e40af; }
+.cat-workforce  { background:#dcfce7; color:#166534; }
+.cat-selection  { background:#ede9fe; color:#5b21b6; }
+.cat-institution{ background:#fef9c3; color:#854d0e; }
+.cat-fr         { background:#fce7f3; color:#9d174d; }
+.fill-input { border:none; border-bottom:2px solid #1b3a6b; background:transparent; font-size:14px; outline:none; padding:1px 4px; min-width:120px; }
+.fill-input.correct { border-bottom-color:#198754; color:#198754; }
+.fill-input.wrong   { border-bottom-color:#dc3545; color:#dc3545; }
+.feedback { font-size:12px; font-weight:600; margin-left:4px; }
+.feedback.c { color:#198754; }
+.feedback.w { color:#dc3545; }
+.q-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:16px; margin-bottom:12px; }
+.opt-btn { display:block; width:100%; text-align:left; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px 14px; margin:6px 0; cursor:pointer; font-size:14px; transition:all .15s; }
+.opt-btn:hover:not(:disabled) { border-color:#1b3a6b; background:#f0f8ff; }
+.opt-correct { background:#d4edda!important; border-color:#198754!important; color:#155724!important; }
+.opt-wrong   { background:#f8d7da!important; border-color:#dc3545!important; color:#721c24!important; }
+.flag-fr { font-size:18px; margin-right:4px; }
+.compare-box { background:linear-gradient(135deg,#f8f9ff,#eef2ff); border:1px solid #c7d2fe; border-radius:10px; padding:14px 16px; margin-bottom:10px; }
+</style>
+{% endblock %}
+{% block content %}
+
+<!-- Header -->
+<div class="d-flex align-items-start justify-content-between flex-wrap gap-2 mb-4">
+  <div class="d-flex align-items-center gap-3">
+    <div style="width:48px;height:48px;background:linear-gradient(135deg,#002395,#ED2939);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px;">
+      🇫🇷
+    </div>
+    <div>
+      <h4 class="fw-bold mb-0" style="color:#1b3a6b;">GSPR — French Presidential Protection Unit</h4>
+      <div class="text-muted small">Adapted Article Reading · B2–C1 Upper Intermediate–Advanced · Comparative Protection Studies</div>
+      <div class="mt-1">
+        <span class="badge me-1" style="background:#dbeafe;color:#1e40af;">Close Protection</span>
+        <span class="badge me-1" style="background:#ede9fe;color:#5b21b6;">Elite Recruitment</span>
+        <span class="badge" style="background:#fce7f3;color:#9d174d;">French Police</span>
+      </div>
+    </div>
+  </div>
+  <button class="btn btn-sm btn-outline-secondary mt-1" onclick="resetAll()">
+    <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
+  </button>
+</div>
+
+<!-- Score bar -->
+<div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+  <div class="card-body py-2 px-4">
+    <div class="d-flex align-items-center gap-3">
+      <span class="fw-semibold small" style="color:#1b3a6b;white-space:nowrap;">Worksheet Score:</span>
+      <div class="flex-grow-1" style="height:10px;background:#e2e8f0;border-radius:6px;overflow:hidden;">
+        <div id="totalBar" style="height:100%;width:0%;background:linear-gradient(90deg,#002395,#ED2939);border-radius:6px;transition:width .4s;"></div>
+      </div>
+      <span id="totalScore" class="fw-bold" style="color:#1b3a6b;font-size:14px;white-space:nowrap;">0 / 0</span>
+    </div>
+  </div>
+</div>
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-4" id="gsprTabs">
+  <li class="nav-item"><button class="nav-link active fw-semibold" data-bs-toggle="tab" data-bs-target="#reading"><i class="bi bi-book me-1"></i>Reading</button></li>
+  <li class="nav-item"><button class="nav-link fw-semibold" data-bs-toggle="tab" data-bs-target="#glossary"><i class="bi bi-journal-text me-1"></i>Glossary</button></li>
+  <li class="nav-item"><button class="nav-link fw-semibold" data-bs-toggle="tab" data-bs-target="#worksheet"><i class="bi bi-pencil-square me-1"></i>Worksheet</button></li>
+  <li class="nav-item"><button class="nav-link fw-semibold" data-bs-toggle="tab" data-bs-target="#compare"><i class="bi bi-arrow-left-right me-1"></i>Compare &amp; Reflect</button></li>
+</ul>
+
+<div class="tab-content">
+
+<!-- ══════════════════ READING TAB ══════════════════ -->
+<div class="tab-pane fade show active" id="reading">
+
+  <!-- Translanguaging banner -->
+  <div class="alert border-0 mb-4" style="background:linear-gradient(135deg,#fff8ec,#fff3cd);border-left:4px solid #c9a227!important;border-radius:12px;">
+    <div class="fw-bold mb-1" style="color:#7a5c00;"><i class="bi bi-translate me-2"></i>Reading Strategy / Уншлагын стратеги</div>
+    <div style="font-size:13px;color:#5a4000;">
+      <strong>[EN]</strong> This is an adapted English translation of a French article about the GSPR — the presidential protection unit of France. As you read, notice how their mission, structure, and selection process compare to your own agency's practices.<br>
+      <strong>[MN]</strong> Энэ нь Францын ерөнхийлөгчийн хамгаалалтын нэгж болох GSPR-ийн тухай Францын нийтлэлийг англи хэл дээр дасан тохируулан орчуулсан материал юм. Уншихдаа тэдний эрхэм зорилго, бүтэц, сонгон шалгаруулалтын үйл явцыг өөрийн байгууллагын практиктай харьцуулж ажигла.
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#002395;color:#fff;border-radius:12px 12px 0 0;">
+      <span class="flag-fr">🇫🇷</span>
+      The GSPR Agent: France's Presidential Bodyguard
+      <span class="badge ms-2" style="background:rgba(255,255,255,.2);font-size:11px;">Adapted Translation — Educational Use</span>
+    </div>
+    <div class="card-body p-4 reading-body">
+
+      <div class="para-label">Background / Танилцуулга</div>
+      <p>
+        The <span class="highlight-term" title="Ерөнхийлөгчийн хамгаалалтын бүлэг — Францын ерөнхийлөгчийн хувийн хамгаалалтын нэгж">GSPR</span>
+        (<em>Groupe de Sécurité de la Présidence de la République</em> — Presidential Security Group) is the elite unit responsible for the
+        <span class="highlight-term" title="ойрын хамгаалалт — хамгаалагдагч этгээдтэй биечлэн ойрхон байж хамгаалах">close protection</span>
+        of the
+        <span class="highlight-term" title="Францын ерөнхийлөгч — GSPR-ийн гол хамгаалагдагч этгээд">President of the French Republic</span>
+        and his or her family. Their entire professional life is organised around the
+        <span class="highlight-term" title="Елисейн ордон — Францын ерөнхийлөгчийн оршин суух газар">Élysée Palace</span>
+        and the
+        <span class="highlight-term" title="ерөнхийлөгчийн хуваарь, цагийн хуваарь">schedule</span>
+        of the head of state — every deployment, every operation, every shift begins and ends with what the President requires.
+      </p>
+
+      <div class="para-label mt-3">Mission &amp; Daily Operations / Эрхэм зорилго ба өдөр тутмын ажиллагаа</div>
+      <p>
+        Before any public appearance or official visit, GSPR agents conduct thorough
+        <span class="highlight-term" title="урьдчилсан шалгалт — хамгаалалтын ажиллагааны өмнөх бэлтгэл">advance reconnaissance</span>.
+        They visit the location in advance to assess potential threats and decide on protective measures: entry and exit routes,
+        <span class="highlight-term" title="нүүлгэн шилжүүлэх зам — аюулын үед хамгаалагдагч этгээдийг эх орны гаргах дамжлага">exfiltration routes</span>,
+        crowd management zones, and emergency contingencies.
+      </p>
+      <p>
+        During transport, the President travels in a
+        <span class="highlight-term" title="машины цуваа — хамгаалалтын олон тооны машинаас бүрдсэн жагсаал">motorcade</span>
+        — a coordinated convoy of multiple vehicles. Routes are varied for security reasons, and crucially, only the
+        <span class="highlight-term" title="аюулгүй байдлын дарга — цуваанд хэрэглэгдэх замыг мэддэг хүн">security chief</span>
+        knows in advance which route will actually be used. This prevents any possibility of a predetermined ambush.
+      </p>
+      <p>
+        At public events and
+        <span class="highlight-term" title="олон нийтийн гадаа үйл ажиллагаа">open-air appearances</span>,
+        agents form a tight
+        <span class="highlight-term" title="хамгаалалтын тойрог — хамгаалагдагч этгээдийг тойрсон бүрэлдэхүүн">protective perimeter</span>
+        around the President, continuously scanning for threats. Throughout all operations, teams maintain
+        <span class="highlight-term" title="тасралтгүй дохиолол — байнгын холбоо барилт">constant real-time communication</span>
+        to adapt instantly to changing situations and coordinate potential
+        <span class="highlight-term" title="нүүлгэн шилжүүлэлт — ерөнхийлөгчийг аюулгүй газарт яаралтай гаргах ажиллагаа">extractions</span>
+        if needed.
+      </p>
+
+      <div class="para-label mt-3">Team Structure &amp; Staffing / Багийн бүтэц ба бүрэлдэхүүн</div>
+      <p>
+        The GSPR consists of exactly
+        <span class="highlight-term" title="78 ажилтан — 39 цагдаа, 39 жандарм">78 agents</span>
+        — 39 from the
+        <span class="highlight-term" title="Үндэсний цагдаагийн алба — Францын иргэний хаалттай хотын цагдаа">Police Nationale</span>
+        (National Police) and 39 from the
+        <span class="highlight-term" title="Цэргийн цагдаа — Франц дахь цэргийн хуулийн сахиулах байгууллага">Gendarmerie Nationale</span>
+        (Military Police). This deliberate 50/50 balance ensures that two institutional cultures — civilian policing and military discipline — are permanently represented in the unit.
+      </p>
+      <p>
+        Candidates are drawn exclusively from two elite
+        <span class="highlight-term" title="тусгай нэгжүүд — онцгой сонгон шалгаруулалт шаарддаг тусгай бүлэг">feeder units</span>:
+        the
+        <span class="highlight-term" title="Үндэсний жандармерийн хөндлөн оролцооны бүлэг — Францын элит цагдаагийн онцгой нэгж">GIGN</span>
+        (<em>Groupe d'Intervention de la Gendarmerie Nationale</em>) for gendarmes, and the
+        <span class="highlight-term" title="Хамгаалалт, дэмжлэгийн алба — цагдаагийн тусгай хамгаалалтын нэгж">SDLP</span>
+        (<em>Service de la Défense et de la Protection</em>) for police officers.
+      </p>
+
+      <div class="para-label mt-3">Key Competencies / Гол чадамж</div>
+      <p>
+        GSPR agents must demonstrate four core professional qualities at all times:
+      </p>
+      <ul style="font-size:15px;line-height:2.1;">
+        <li><span class="highlight-term" title="дарамтыг удирдах — өндөр эрсдэлт нөхцөлд тайван байх чадвар">Stress and pressure management</span> — maintaining composure in high-risk situations</li>
+        <li><span class="highlight-term" title="хариу урвал — хурдан шийдвэр гаргах чадвар">Reactivity</span> — rapid, decisive response to unexpected events</li>
+        <li><span class="highlight-term" title="нууцлал — мэдээлэл задруулахгүй байх мэргэжлийн шаардлага">Discretion</span> — absolute confidentiality regarding the protectee's movements and security measures</li>
+        <li><span class="highlight-term" title="бие бялдрын өндөр нөхцөл — ажлын шаардлагыг биелүүлэхэд шаардлагатай бие бялдрын стандарт">Excellent physical condition</span> — meeting demanding fitness standards throughout service</li>
+      </ul>
+
+      <div class="para-label mt-3">Recruitment &amp; Selection / Элсэлт ба сонгон шалгаруулалт</div>
+      <p>
+        Entry into the GSPR follows two distinct career tracks, both of which are exceptionally demanding.
+      </p>
+      <p>
+        <strong>Police Track:</strong> Candidates first join the Police Nationale by passing a competitive
+        <span class="highlight-term" title="конкурс — Францын засгийн газрын албанд орох нийтийн сонгон шалгаруулалт">concours</span>
+        (civil service examination) at either the
+        <em>Gardien de la Paix</em> level (
+        <span class="highlight-term" title="BAC — Францын бүрэн дунд боловсролын диплом">BAC</span>
+        qualification required) or the
+        <em>Officier de Police</em> level (BAC+3 required). After completing police academy training and gaining at least two years of
+        <span class="highlight-term" title="хэрэглэгдэх туршлага — ажлын байрнаас олж авсан практик дадлага">operational experience</span>,
+        officers may apply for selection into the SDLP protection service. SDLP selection tests cover sports performance,
+        <span class="highlight-term" title="галт зэвсгийн нарийвчлал — буудлагын шалгалт">marksmanship</span>,
+        <span class="highlight-term" title="сэтгэл зүйн чадварын тест — мэдлэг чадварыг хэмжих стандартчилсан тест">psychotechnical assessments</span>,
+        driving evaluation, professional knowledge, language and IT testing, and a jury interview.
+      </p>
+      <p>
+        <strong>Gendarmerie Track:</strong> Candidates pass the gendarmerie
+        <em>concours</em>
+        and complete academy training of 12–24 months. They must then meet the demanding
+        <span class="highlight-term" title="GIGN-д элсэх шаардлагууд — нас, цол, туршлагын шаардлагууд">GIGN eligibility criteria</span>:
+        at least 4 years of service, specific rank, and age between 24 and 34. The GIGN
+        <span class="highlight-term" title="сонгон шалгаруулалт — нэг долоо хоногийн эрчимтэй тест, 8 долоо хоногийн бэлтгэл, 12 сарын сургалт">selection process</span>
+        — famously one of the toughest in the world — has a
+        <span class="highlight-term" title="10 хувийн амжилтын хувь — зөвхөн 10 нэр дэвшигч тутмын 1 нь давдаг">success rate of only 10%</span>.
+        It involves a week-long initial assessment, an 8-week pre-selection stage, 12 months of operational training, and a final 2-month close-protection specialisation.
+      </p>
+      <p>
+        <strong>Final GSPR Selection:</strong> Candidates shortlisted from both tracks face one final
+        <span class="highlight-term" title="нэг долоо хоногийн Елисейн ордон дахь шалгалт">week-long assessment at the Élysée Palace</span>,
+        directed by the Presidential Security Directorate. Those who pass receive specialised training in
+        <span class="highlight-term" title="тулааны техник — гар дайтлага ба зэвсэглэлийн сургалт">combat techniques</span>,
+        <span class="highlight-term" title="нүүлгэн шилжүүлэлтийн дамжлага — ерөнхийлөгчийг яаралтай гаргах тактик">exfiltration protocols</span>,
+        and
+        <span class="highlight-term" title="барьцааны нөхцөл байдал — барьцаалалттай холбоотой нөхцөл байдалд хариу арга хэмжээ авах сургалт">hostage scenarios</span>.
+      </p>
+
+      <div class="para-label mt-3">Salary &amp; Career / Цалин хөлс ба ажлын зам</div>
+      <p>
+        Compensation varies by institution, rank, and experience. In 2024, entry-level monthly salaries range from approximately
+        <span class="highlight-term" title="€2,145 — жандарм доод офицерын орлого">€2,145</span>
+        (gendarmerie non-commissioned officer) to
+        <span class="highlight-term" title="€2,780 — жандарм офицерын орлого">€2,780</span>
+        (gendarmerie officer). Experienced GSPR members earn substantially more, supplemented by
+        <span class="highlight-term" title="бэлэн байдлын нэмэгдэл — жижүүр болон ажлын бус цагийн нэмэгдэл хөлс">availability allowances</span>
+        reflecting the extraordinary demands of protecting the head of state around the clock.
+      </p>
+
+      <div class="alert mt-4 mb-0" style="background:#f0f8ff;border-radius:8px;font-size:13px;border:1px solid #bfdbfe;">
+        <strong style="color:#1b3a6b;"><i class="bi bi-info-circle me-1"></i>Reading Note:</strong>
+        Words with a <span class="highlight-term" style="font-size:13px;">yellow underline</span> are key professional terms.
+        Hover or tap to see the Mongolian meaning. Full definitions, French originals, and example sentences are in the <strong>Glossary</strong> tab.
+        <br><span style="color:#6366f1;font-size:12px;"><strong>🇫🇷 French terms</strong> are shown in <em>italics</em> throughout the article.</span>
+      </div>
+    </div>
+  </div>
+</div><!-- end reading tab -->
+
+<!-- ══════════════════ GLOSSARY TAB ══════════════════ -->
+<div class="tab-pane fade" id="glossary">
+
+  <div class="alert border-0 mb-4" style="background:linear-gradient(135deg,#f0f8ff,#eef2ff);border-left:4px solid #6366f1!important;border-radius:12px;">
+    <div class="fw-bold mb-1" style="color:#4338ca;"><i class="bi bi-journal-text me-2"></i>Professional Glossary — Мэргэжлийн нэр томъёо</div>
+    <div style="font-size:13px;">Grouped by category. <span style="color:#9d174d;font-weight:600;">🇫🇷 FR</span> = French original. <strong>[MN]</strong> = Mongolian. <strong>[DEF]</strong> = English definition. <strong>[EX]</strong> = Example sentence.</div>
+  </div>
+
+  <!-- FRENCH INSTITUTIONS -->
+  <h6 class="fw-bold mb-3 mt-2" style="color:#1b3a6b;"><i class="bi bi-building me-2"></i>French Security Institutions / Францын аюулгүй байдлын байгуулгууд</h6>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-fr">🇫🇷 Institution</span>
+    <div class="gloss-en">GSPR <span class="gloss-fr">— Groupe de Sécurité de la Présidence de la République</span></div>
+    <div class="gloss-def">[DEF] The elite presidential security group responsible for the close protection of the French President and family.</div>
+    <div class="gloss-mn">[MN] <strong>Ерөнхийлөгчийн хамгаалалтын бүлэг</strong> — Францын ерөнхийлөгч болон түүний гэр бүлийн ойрын хамгаалалтыг хариуцдаг элит нэгж (78 ажилтан)</div>
+    <div class="gloss-ex">[EX] "The GSPR operates from the Élysée Palace and organises all operations around the President's daily schedule."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-fr">🇫🇷 Institution</span>
+    <div class="gloss-en">GIGN <span class="gloss-fr">— Groupe d'Intervention de la Gendarmerie Nationale</span></div>
+    <div class="gloss-def">[DEF] France's elite gendarmerie intervention unit, specialising in counter-terrorism, hostage rescue, and high-risk arrests. One of the world's most selective special forces units.</div>
+    <div class="gloss-mn">[MN] <strong>Үндэсний жандармерийн хөндлөн оролцооны бүлэг</strong> — терроризмтой тэмцэх, барьцаалагдсан хүнийг чөлөөлөх мэргэшилтэй Францын элит тусгай нэгж; дэлхийн хамгийн хатуу шилэн авалттай нэгжийн нэг</div>
+    <div class="gloss-ex">[EX] "Only 10% of GIGN applicants pass the full selection process — making it one of the hardest units to join in Europe."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-fr">🇫🇷 Institution</span>
+    <div class="gloss-en">SDLP <span class="gloss-fr">— Service de la Défense et de la Protection</span></div>
+    <div class="gloss-def">[DEF] The Police Nationale's specialist close protection service, providing bodyguard services for senior government officials and feeding candidates to the GSPR.</div>
+    <div class="gloss-mn">[MN] <strong>Хамгаалалт, дэмжлэгийн алба</strong> — Үндэсний цагдаагийн ойрын хамгаалалтын тусгай алба; засгийн газрын өндөр албан тушаалтнуудыг хамгаалдаг ба GSPR-д ажилтан нийлүүлдэг</div>
+    <div class="gloss-ex">[EX] "After two years on the force, police officers can apply for SDLP selection, which acts as a gateway to the GSPR."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-institution">Institution</span>
+    <div class="gloss-en">Police Nationale <span class="gloss-pos">noun phrase</span></div>
+    <div class="gloss-def">[DEF] France's civilian national police force, responsible for law enforcement in urban areas and cities.</div>
+    <div class="gloss-mn">[MN] <strong>Үндэсний цагдаагийн алба</strong> — Францын иргэний цагдаагийн байгууллага; хот, суурин газрын хэв журам хамгаалах үүрэгтэй</div>
+    <div class="gloss-ex">[EX] "Officers from the Police Nationale comprise exactly half of the GSPR's 78-agent roster."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-institution">Institution</span>
+    <div class="gloss-en">Gendarmerie Nationale <span class="gloss-pos">noun phrase</span></div>
+    <div class="gloss-def">[DEF] France's military police force with jurisdiction over rural areas and certain specialist functions, operating under both civil and military authority.</div>
+    <div class="gloss-mn">[MN] <strong>Үндэсний жандармери</strong> — Францын цэргийн цагдаа; хөдөө орон нутгийн хэсэг болон тусгай чиг үүргийг хариуцдаг, иргэний болон цэргийн аль алиных нь эрх мэдэлд ажилладаг</div>
+    <div class="gloss-ex">[EX] "The Gendarmerie Nationale provides the other 39 agents in the GSPR, drawn exclusively from the GIGN."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-fr">🇫🇷 Term</span>
+    <div class="gloss-en">Élysée Palace <span class="gloss-fr">— Palais de l'Élysée</span></div>
+    <div class="gloss-def">[DEF] The official residence and principal workplace of the President of the French Republic, located in Paris.</div>
+    <div class="gloss-mn">[MN] <strong>Елисейн ордон</strong> — Францын ерөнхийлөгчийн албан ёсны оршин сууж, ажлын газар; Парис хотод байрладаг</div>
+    <div class="gloss-ex">[EX] "Final GSPR selection tests are conducted at the Élysée, supervised by the Presidential Security Directorate."</div>
+  </div>
+
+  <!-- PROTECTIVE OPERATIONS -->
+  <h6 class="fw-bold mb-3 mt-4" style="color:#1b3a6b;"><i class="bi bi-shield-fill me-2"></i>Protective Operations / Хамгаалалтын ажиллагаа</h6>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-protection">Protection</span>
+    <div class="gloss-en">Close Protection <span class="gloss-pos">noun phrase</span></div>
+    <div class="gloss-def">[DEF] A security discipline involving physical presence near the protectee to detect, deter, and respond to direct threats.</div>
+    <div class="gloss-mn">[MN] <strong>Ойрын хамгаалалт</strong> — шууд аюулыг илрүүлэх, урьдчилан сэргийлэх, хариу арга хэмжээ авах зорилгоор хамгаалагдагч этгээдтэй биечлэн ойрхон байх хамгаалалтын арга</div>
+    <div class="gloss-ex">[EX] "Close protection requires constant situational awareness and rapid decision-making under pressure."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-protection">Protection</span>
+    <div class="gloss-en">Advance Reconnaissance <span class="gloss-pos">noun phrase</span></div>
+    <div class="gloss-def">[DEF] Pre-visit surveying of a location to identify threats, map routes, and establish security arrangements before the protectee's arrival.</div>
+    <div class="gloss-mn">[MN] <strong>Урьдчилсан тагнуул шалгалт</strong> — хамгаалагдагч этгээд ирэхээс өмнө байршлыг урьдчилан шалгаж, аюулыг илрүүлж, замыг тодорхойлж, аюулгүй байдлын зохицуулалт хийх ажил</div>
+    <div class="gloss-ex">[EX] "The advance team arrived 48 hours early to complete reconnaissance of the conference venue."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-protection">Protection</span>
+    <div class="gloss-en">Exfiltration <span class="gloss-pos">noun</span></div>
+    <div class="gloss-def">[DEF] The tactical removal of the protectee from a dangerous location to a place of safety, using pre-planned or improvised routes.</div>
+    <div class="gloss-mn">[MN] <strong>Нүүлгэн шилжүүлэлт</strong> — урьдчилан боловсруулсан эсвэл тухайн үед сонгосон замаар хамгаалагдагч этгээдийг аюулгүй газарт яаралтай шилжүүлэх тактик ажиллагаа</div>
+    <div class="gloss-ex">[EX] "Each protection detail rehearses exfiltration routes before every major public event."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-protection">Protection</span>
+    <div class="gloss-en">Motorcade / Convoy <span class="gloss-pos">noun</span></div>
+    <div class="gloss-def">[DEF] A coordinated procession of vehicles transporting the protectee, with support, escort, and counter-assault vehicles included.</div>
+    <div class="gloss-mn">[MN] <strong>Машины цуваа / Конвой</strong> — хамгаалалтын дэмжлэг, эскорт болон тэмцэх бүлгийн машинуудтай хамт хамгаалагдагч этгээдийг тээвэрлэх зохицуулалт бүхий машины жагсаал</div>
+    <div class="gloss-ex">[EX] "Only the security chief knows which of the three pre-planned motorcade routes will be used — preventing any planned ambush."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-protection">Protection</span>
+    <div class="gloss-en">Protective Perimeter <span class="gloss-pos">noun phrase</span></div>
+    <div class="gloss-def">[DEF] The layered security boundary formed by agents around the protectee during public appearances or at protected locations.</div>
+    <div class="gloss-mn">[MN] <strong>Хамгаалалтын тойрог хязгаар</strong> — олон нийтийн арга хэмжээний үед эсвэл хамгаалагдсан байршилд ажилтнуудаас бүрдсэн давхаргын хамгаалалтын хил</div>
+    <div class="gloss-ex">[EX] "Agents maintained a tight protective perimeter as the President walked through the crowd."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-protection">Protection</span>
+    <div class="gloss-en">Discretion <span class="gloss-pos">noun</span></div>
+    <div class="gloss-def">[DEF] The professional obligation to keep all information about the protectee's movements, routines, and security arrangements strictly confidential.</div>
+    <div class="gloss-mn">[MN] <strong>Нууцлал / Болгоомжлол</strong> — хамгаалагдагч этгээдийн хөдөлгөөн, дутуу журам, аюулгүй байдлын зохицуулалтын талаарх мэдээллийг чандлан нууцлах мэргэжлийн үүрэг</div>
+    <div class="gloss-ex">[EX] "Discretion is non-negotiable — GSPR agents never discuss the President's schedule with anyone outside the unit."</div>
+  </div>
+
+  <!-- SELECTION & RECRUITMENT -->
+  <h6 class="fw-bold mb-3 mt-4" style="color:#1b3a6b;"><i class="bi bi-person-check-fill me-2"></i>Recruitment &amp; Selection / Элсэлт ба сонгон шалгаруулалт</h6>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-selection">Selection</span>
+    <div class="gloss-en">Concours <span class="gloss-fr">(French) / Competitive Examination</span></div>
+    <div class="gloss-def">[DEF] A rigorous, standardised public examination used in France to fill civil service and government positions. Candidates are ranked by score; only the highest-scoring pass.</div>
+    <div class="gloss-mn">[MN] <strong>Конкурс / Өрсөлдөөнт шалгалт</strong> — Францад засгийн газрын болон төрийн албаны орон тоог нөхөхөд ашигладаг хатуу, стандартчилсан нийтийн шалгалт; дүнгээр эрэмбэлж, хамгийн өндөр оноотой нь тэнцдэг</div>
+    <div class="gloss-ex">[EX] "Passing the Gardien de la Paix concours is the first step toward eventually joining the GSPR."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-selection">Selection</span>
+    <div class="gloss-en">Marksmanship <span class="gloss-pos">noun</span></div>
+    <div class="gloss-def">[DEF] The skill and accuracy of shooting a firearm; assessed as a core competency in protection service selection.</div>
+    <div class="gloss-mn">[MN] <strong>Буудлагын нарийвчлал</strong> — галт зэвсэг харвах чадвар ба нарийвчлал; хамгаалалтын албанд сонгох шалгалтад үндсэн чадамжийн нэг болгон дүгнэгддэг</div>
+    <div class="gloss-ex">[EX] "SDLP candidates must achieve a minimum marksmanship score before advancing to the next stage of selection."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-selection">Selection</span>
+    <div class="gloss-en">Psychotechnical Assessment <span class="gloss-pos">noun phrase</span></div>
+    <div class="gloss-def">[DEF] Standardised tests measuring cognitive ability, concentration, reasoning, and psychological stability — used to evaluate suitability for high-pressure roles.</div>
+    <div class="gloss-mn">[MN] <strong>Сэтгэл зүйн чадварын тест</strong> — оюун ухааны чадвар, анхаарал төвлөрөл, логик сэтгэлгээ, сэтгэл зүйн тогтвортой байдлыг хэмжих стандарт шалгалт; өндөр дарамттай албан тушаалд тохиромжтой эсэхийг үнэлэхэд хэрэглэдэг</div>
+    <div class="gloss-ex">[EX] "The psychotechnical assessment identified candidates who remain calm and focused under extreme stress."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-selection">Selection</span>
+    <div class="gloss-en">Exfiltration Protocols <span class="gloss-pos">noun phrase</span></div>
+    <div class="gloss-def">[DEF] Pre-established procedures and drills for the rapid, controlled extraction of the protectee from a threat environment.</div>
+    <div class="gloss-mn">[MN] <strong>Нүүлгэн шилжүүлэлтийн дамжлага</strong> — аюулын орчноос хамгаалагдагч этгээдийг хурдан, хяналттайгаар гаргах урьдчилан тогтоосон журам болон дадлага</div>
+    <div class="gloss-ex">[EX] "Newly selected GSPR agents spend weeks rehearsing exfiltration protocols for every type of threat scenario."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-selection">Selection</span>
+    <div class="gloss-en">Operational Experience <span class="gloss-pos">noun phrase</span></div>
+    <div class="gloss-def">[DEF] Real-world practical experience gained through active service assignments, as opposed to classroom or theoretical training.</div>
+    <div class="gloss-mn">[MN] <strong>Ажлын байрны практик туршлага</strong> — идэвхтэй үйлчилгээний даалгавраар олж авсан бодит практик туршлага; хичээл танхим эсвэл онолын сургалтаас ялгаатай</div>
+    <div class="gloss-ex">[EX] "Police officers need at least two years of operational experience before they can apply for SDLP selection."</div>
+  </div>
+
+</div><!-- end glossary tab -->
+
+<!-- ══════════════════ WORKSHEET TAB ══════════════════ -->
+<div class="tab-pane fade" id="worksheet">
+
+  <div class="alert border-0 mb-4" style="background:linear-gradient(135deg,#f0fff4,#d4edda);border-left:4px solid #198754!important;border-radius:12px;">
+    <strong class="text-success"><i class="bi bi-pencil-square me-2"></i>Instructions:</strong>
+    <span style="font-size:13px;"> Complete all tasks. Go back to the Reading and Glossary tabs if you need help.<br><strong>[MN]</strong> Бүх даалгаврыг гүйцэтгэнэ үү. Шаардлагатай бол Уншлага болон Толь бичиг хэсэгрүү буцаж болно.</span>
+  </div>
+
+  <!-- Task A: MCQ -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#e8f4fd;color:#1b3a6b;border-radius:12px 12px 0 0;">
+      📖 Task A — Comprehension: Multiple Choice
+      <span id="tAscore" class="badge float-end" style="background:#1b3a6b;">0 / 5</span>
+    </div>
+    <div class="card-body">
+
+      <div class="q-card" id="qA1">
+        <p class="fw-semibold mb-2">1. What does GSPR stand for, and what is its primary mission?</p>
+        <button class="opt-btn" onclick="mcq('qA1',this,false,'A')">A. A French military intelligence unit that monitors foreign threats to the Republic</button>
+        <button class="opt-btn" onclick="mcq('qA1',this,true,'A')">B. The presidential security group responsible for the close protection of the French President and family</button>
+        <button class="opt-btn" onclick="mcq('qA1',this,false,'A')">C. A special gendarmerie unit focused on counter-terrorism and hostage rescue</button>
+        <button class="opt-btn" onclick="mcq('qA1',this,false,'A')">D. A diplomatic security unit protecting French embassies abroad</button>
+        <div class="feedback" id="qA1fb" style="font-size:13px;margin-top:6px;"></div>
+      </div>
+
+      <div class="q-card" id="qA2">
+        <p class="fw-semibold mb-2">2. How many agents are in the GSPR, and how are they divided?</p>
+        <button class="opt-btn" onclick="mcq('qA2',this,false,'A')">A. 100 agents — 60 police and 40 gendarmes</button>
+        <button class="opt-btn" onclick="mcq('qA2',this,false,'A')">B. 50 agents — all from the GIGN</button>
+        <button class="opt-btn" onclick="mcq('qA2',this,true,'A')">C. 78 agents — 39 from the Police Nationale and 39 from the Gendarmerie Nationale</button>
+        <button class="opt-btn" onclick="mcq('qA2',this,false,'A')">D. 120 agents — divided by specialisation, not by institution</button>
+        <div class="feedback" id="qA2fb" style="font-size:13px;margin-top:6px;"></div>
+      </div>
+
+      <div class="q-card" id="qA3">
+        <p class="fw-semibold mb-2">3. Why does only the security chief know which motorcade route will be used?</p>
+        <button class="opt-btn" onclick="mcq('qA3',this,false,'A')">A. Because it is faster if only one person coordinates the entire convoy</button>
+        <button class="opt-btn" onclick="mcq('qA3',this,false,'A')">B. Because the President personally chooses the route each time</button>
+        <button class="opt-btn" onclick="mcq('qA3',this,true,'A')">C. To prevent a predetermined ambush by ensuring no one outside the security chief can leak the route</button>
+        <button class="opt-btn" onclick="mcq('qA3',this,false,'A')">D. Because French law requires route confidentiality to be held by a single officer</button>
+        <div class="feedback" id="qA3fb" style="font-size:13px;margin-top:6px;"></div>
+      </div>
+
+      <div class="q-card" id="qA4">
+        <p class="fw-semibold mb-2">4. What is the approximate success rate for GIGN selection?</p>
+        <button class="opt-btn" onclick="mcq('qA4',this,false,'A')">A. 50%</button>
+        <button class="opt-btn" onclick="mcq('qA4',this,false,'A')">B. 30%</button>
+        <button class="opt-btn" onclick="mcq('qA4',this,false,'A')">C. 25%</button>
+        <button class="opt-btn" onclick="mcq('qA4',this,true,'A')">D. 10%</button>
+        <div class="feedback" id="qA4fb" style="font-size:13px;margin-top:6px;"></div>
+      </div>
+
+      <div class="q-card" id="qA5">
+        <p class="fw-semibold mb-2">5. Which four core competencies are required of all GSPR agents?</p>
+        <button class="opt-btn" onclick="mcq('qA5',this,true,'A')">A. Pressure management, reactivity, discretion, and excellent physical condition</button>
+        <button class="opt-btn" onclick="mcq('qA5',this,false,'A')">B. Foreign language skills, legal knowledge, combat training, and IT expertise</button>
+        <button class="opt-btn" onclick="mcq('qA5',this,false,'A')">C. Leadership, marksmanship, diplomatic awareness, and financial literacy</button>
+        <button class="opt-btn" onclick="mcq('qA5',this,false,'A')">D. Driving skills, first aid, surveillance techniques, and report writing</button>
+        <div class="feedback" id="qA5fb" style="font-size:13px;margin-top:6px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task B: Fill in the blanks -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#e8f4fd;color:#1b3a6b;border-radius:12px 12px 0 0;">
+      📚 Task B — Vocabulary: Fill in the blanks
+      <span id="tBscore" class="badge float-end" style="background:#1b3a6b;">0 / 6</span>
+    </div>
+    <div class="card-body">
+      <p class="text-muted small mb-3">Use the words from the box. <em>Word bank: reconnaissance / exfiltration / discretion / motorcade / concours / perimeter</em></p>
+      <ol style="font-size:14px;line-height:2.4;">
+        <li>Before the President's arrival, agents conducted a thorough <input class="fill-input" id="B1" placeholder="___"> of the venue, mapping all entry and exit points. <div class="feedback d-inline" id="B1fb"></div></li>
+        <li>French police officers must pass a competitive <input class="fill-input" id="B2" placeholder="___"> examination to enter public service. <div class="feedback d-inline" id="B2fb"></div></li>
+        <li>The <input class="fill-input" id="B3" placeholder="___"> routes are rehearsed in advance so every agent knows how to remove the President from danger. <div class="feedback d-inline" id="B3fb"></div></li>
+        <li>Agents surrounded the President in a tight protective <input class="fill-input" id="B4" placeholder="___"> as he walked through the crowd. <div class="feedback d-inline" id="B4fb"></div></li>
+        <li>The <input class="fill-input" id="B5" placeholder="___"> departed the Élysée Palace on time, with three vehicles forming a close convoy. <div class="feedback d-inline" id="B5fb"></div></li>
+        <li>GSPR agents are bound by absolute <input class="fill-input" id="B6" placeholder="___"> — they never discuss the President's schedule with anyone outside the unit. <div class="feedback d-inline" id="B6fb"></div></li>
+      </ol>
+      <button class="btn btn-primary btn-sm mt-3" onclick="checkB()"><i class="bi bi-check2-circle me-1"></i>Check Answers</button>
+    </div>
+  </div>
+
+  <!-- Task C: Short Answer -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#e8f4fd;color:#1b3a6b;border-radius:12px 12px 0 0;">
+      ✍️ Task C — Short Answer / Discussion <span class="text-muted fw-normal small ms-1">(Write 2–4 sentences each)</span>
+    </div>
+    <div class="card-body">
+      <div class="mb-4">
+        <p class="fw-semibold mb-2">1. The GSPR draws its candidates exclusively from the GIGN and SDLP. Why do you think presidential protection units require candidates who have already served in elite units?</p>
+        <div class="text-muted small mb-1">[MN] GSPR нь зөвхөн GIGN болон SDLP-ийн ажилтнуудаас нэр дэвшигчдийг авдаг. Ерөнхийлөгчийн хамгаалалтын нэгжүүд яагаад аль хэдийн элит нэгжид алба хааж байсан нэр дэвшигчид шаарддаг гэж та бодож байна вэ?</div>
+        <textarea class="form-control" rows="4" style="font-size:14px;" placeholder="Write your answer here..."></textarea>
+      </div>
+      <div class="mb-4">
+        <p class="fw-semibold mb-2">2. The article mentions that only the security chief knows the motorcade route. Describe another security measure you have learned about (from this article or your own experience) that uses the principle of "need-to-know" information sharing.</p>
+        <div class="text-muted small mb-1">[MN] Нийтлэлд зөвхөн аюулгүй байдлын дарга л машины цуваан замыг мэддэг гэж дурджээ. "Мэдэх шаардлагатай" зарчим дээр суурилсан мэдээлэл хуваалцах өөр нэг аюулгүй байдлын арга хэмжээг тайлбарлана уу.</div>
+        <textarea class="form-control" rows="4" style="font-size:14px;" placeholder="Write your answer here..."></textarea>
+      </div>
+      <div class="mb-2">
+        <p class="fw-semibold mb-2">3. The GSPR consists of exactly 39 police and 39 gendarmes — a deliberate 50/50 balance. What advantages might this institutional balance bring to a protection unit?</p>
+        <div class="text-muted small mb-1">[MN] GSPR нь яг 39 цагдаа, 39 жандармаас бүрддэг — энэ нь зориудаар хийгдсэн 50/50 тэнцвэр. Энэхүү байгуулагын тэнцвэр хамгаалалтын нэгжид ямар давуу тал авчирч болох вэ?</div>
+        <textarea class="form-control" rows="4" style="font-size:14px;" placeholder="Write your answer here..."></textarea>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end worksheet tab -->
+
+<!-- ══════════════════ COMPARE & REFLECT TAB ══════════════════ -->
+<div class="tab-pane fade" id="compare">
+
+  <div class="alert border-0 mb-4" style="background:linear-gradient(135deg,#fff8ec,#fff3cd);border-left:4px solid #c9a227!important;border-radius:12px;">
+    <div class="fw-bold mb-1" style="color:#7a5c00;"><i class="bi bi-arrow-left-right me-2"></i>Compare &amp; Reflect — Харьцуулж эргэцүүлэх</div>
+    <div style="font-size:13px;color:#5a4000;">
+      <strong>[EN]</strong> In this section, compare the GSPR's practices with your own agency's approach. Use the parallel examples to build professional English vocabulary and deepen your understanding of protection operations.<br>
+      <strong>[MN]</strong> Энэ хэсэгт GSPR-ийн практикийг өөрийн байгууллагынхтай харьцуул. Зэрэгцсэн жишээнүүдийг ашиглан мэргэжлийн англи хэлний үгийн сан тэлж, хамгаалалтын ажиллагааны ойлголтыг гүнзгийрүүл.
+    </div>
+  </div>
+
+  <!-- Parallel comparison boxes -->
+  <h6 class="fw-bold mb-3" style="color:#1b3a6b;">Key Operational Parallels / Ажиллагааны гол ижил төстэй зүйлс</h6>
+
+  <div class="paraphrase-row">
+    <div class="para-orig">
+      <div class="para-label">🇫🇷 GSPR Practice</div>
+      <strong>Advance Reconnaissance:</strong> Agents visit every location before the President arrives to assess threats and plan security measures, entry/exit routes, and emergency contingencies.
+    </div>
+    <div class="para-simple">
+      <div class="para-label">🇲🇳 Mongolian Connection / Монгол холбоо</div>
+      <strong>[MN] Урьдчилсан бэлтгэл:</strong> Ерөнхийлөгч ирэхээс өмнө ажилтнууд байршлыг шалгаж, аюулыг үнэлж, хамгаалалтын арга хэмжээ, орох-гарах зам, яаралтай нөхцөлийн төлөвлөгөө боловсруулдаг. <br><br>
+      <span style="color:#155724;font-size:12px;"><em>This is called <strong>"advance work"</strong> in English — the same practice used by SSPA officers before any VIP visit.</em></span>
+    </div>
+  </div>
+
+  <div class="paraphrase-row">
+    <div class="para-orig">
+      <div class="para-label">🇫🇷 GSPR Practice</div>
+      <strong>Route Secrecy:</strong> Multiple motorcade routes are planned, but only the security chief knows which one will actually be used — preventing any pre-planned ambush.
+    </div>
+    <div class="para-simple">
+      <div class="para-label">🇲🇳 Mongolian Connection / Монгол холбоо</div>
+      <strong>[MN] Замын нууцлал:</strong> Олон зам урьдчилан боловсруулдаг ч аль нь ашиглагдахыг зөвхөн аюулгүй байдлын дарга мэддэг — энэ нь урьдчилан төлөвлөсөн довтолгоог хориглодог.
+      <br><br>
+      <span style="color:#155724;font-size:12px;"><em>English phrase: <strong>"need-to-know basis"</strong> — information is shared only with those who must know it to do their job.</em></span>
+    </div>
+  </div>
+
+  <div class="paraphrase-row">
+    <div class="para-orig">
+      <div class="para-label">🇫🇷 GSPR Practice</div>
+      <strong>Elite Feeder Units:</strong> All GSPR candidates must first excel in the GIGN or SDLP — only proven elite operators are considered for presidential protection duty.
+    </div>
+    <div class="para-simple">
+      <div class="para-label">🇲🇳 Mongolian Connection / Монгол холбоо</div>
+      <strong>[MN] Элит нэгжийн шаардлага:</strong> GSPR-ийн бүх нэр дэвшигчид эхлээд GIGN эсвэл SDLP-д гарамгай байдлаа харуулах ёстой — зөвхөн туршлагатай элит операторуудыг ерөнхийлөгчийн хамгаалалтад авч үздэг.
+      <br><br>
+      <span style="color:#155724;font-size:12px;"><em>English phrase: <strong>"proven track record"</strong> — a demonstrated history of success in previous roles.</em></span>
+    </div>
+  </div>
+
+  <div class="paraphrase-row">
+    <div class="para-orig">
+      <div class="para-label">🇫🇷 GSPR Practice</div>
+      <strong>78-Agent Dual Structure:</strong> Exactly half from police, half from gendarmerie — ensuring two institutional cultures permanently coexist and contribute to the unit.
+    </div>
+    <div class="para-simple">
+      <div class="para-label">🇲🇳 Mongolian Connection / Монгол холбоо</div>
+      <strong>[MN] Хоёр байгуулагын бүтэц:</strong> Яг хагас нь цагдаа, хагас нь жандарм — хоёр байгуулагын соёл байнга хамт оршиж, нэгжид хувь нэмэр оруулдаг.
+      <br><br>
+      <span style="color:#155724;font-size:12px;"><em>English phrase: <strong>"inter-agency cooperation"</strong> — collaboration between different government bodies toward a shared goal.</em></span>
+    </div>
+  </div>
+
+  <!-- Paraphrase practice -->
+  <div class="card border-0 shadow-sm mb-4 mt-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#fff8ec;color:#7a5c00;border-radius:12px 12px 0 0;">
+      ✍️ Your Turn — Paraphrase &amp; Reflect
+    </div>
+    <div class="card-body">
+      <div class="mb-4">
+        <div class="para-orig mb-2"><div class="para-label">📄 Rewrite in plain English:</div>"Routes are varied for security reasons; only the security chief knows which route will actually be used — preventing any possibility of a predetermined ambush."</div>
+        <textarea class="form-control" rows="3" style="font-size:14px;" placeholder="Your plain English version..."></textarea>
+        <div class="mt-2 p-2 rounded" style="background:#f0fff4;font-size:12px;color:#155724;"><strong>Hint [MN]:</strong> Аюулгүй байдлыг хангахын тулд зам байнга өөрчлөгддөг; урьдчилан тогтоосон дайралтаас зайлсхийхийн тулд зөвхөн нэг хүн яг ямар замыг хэрэглэхийг мэддэг.</div>
+      </div>
+      <div class="mb-4">
+        <div class="para-orig mb-2"><div class="para-label">📄 Rewrite in plain English:</div>"Candidates shortlisted from SDLP/GIGN undergo week-long testing at the Élysée, directed by the Presidential Security Directorate, before receiving specialised training in combat, exfiltration protocols, and hostage scenarios."</div>
+        <textarea class="form-control" rows="3" style="font-size:14px;" placeholder="Your plain English version..."></textarea>
+        <div class="mt-2 p-2 rounded" style="background:#f0fff4;font-size:12px;color:#155724;"><strong>Hint [MN]:</strong> Шилэгдсэн нэр дэвшигчид Елисейн ордонд нэг долоо хоног шалгалт өгч, тэнцсэн нь тулааны техник, нүүлгэн шилжүүлэлт, барьцааны нөхцөл байдлын тусгай сургалт авдаг.</div>
+      </div>
+      <div class="mb-0">
+        <div class="para-label mb-2">💬 Discussion prompt / Хэлэлцүүлгийн асуулт</div>
+        <p class="fw-semibold mb-2">In English, write 3–5 sentences comparing the GSPR's selection process with your own agency's entry requirements. What is similar? What is different?</p>
+        <div class="text-muted small mb-1">[MN] GSPR-ийн сонгон шалгаруулалтын үйл явцыг өөрийн байгууллагын элсэлтийн шаардлагатай харьцуулан 3–5 өгүүлбэр бич. Юу адилхан вэ? Юу ялгаатай вэ?</div>
+        <textarea class="form-control" rows="5" style="font-size:14px;" placeholder="Write your comparison here..."></textarea>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end compare tab -->
+</div><!-- end tab-content -->
+
+<script>
+const scores = {A:0, B:0};
+const maxes  = {A:5, B:6};
+const mcqDone = {};
+const bAns = {B1:'reconnaissance',B2:'concours',B3:'exfiltration',B4:'perimeter',B5:'motorcade',B6:'discretion'};
+
+function updateTotal() {
+  const got = Object.values(scores).reduce((a,b)=>a+b,0);
+  const tot = Object.values(maxes).reduce((a,b)=>a+b,0);
+  document.getElementById('totalScore').textContent = got+' / '+tot;
+  document.getElementById('totalBar').style.width = (tot ? got/tot*100 : 0)+'%';
+}
+function scoreEl(task) {
+  document.getElementById('t'+task+'score').textContent = scores[task]+' / '+maxes[task];
+  updateTotal();
+}
+
+function mcq(qid, btn, correct, task) {
+  if (mcqDone[qid]) return;
+  mcqDone[qid] = true;
+  const div = document.getElementById(qid);
+  div.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+  if (correct) {
+    btn.classList.add('opt-correct');
+    document.getElementById(qid+'fb').className='feedback c';
+    document.getElementById(qid+'fb').textContent='✅ Correct!';
+    scores[task]++; scoreEl(task);
+  } else {
+    btn.classList.add('opt-wrong');
+    document.getElementById(qid+'fb').className='feedback w';
+    document.getElementById(qid+'fb').textContent='❌ Not quite — re-read the passage.';
+    div.querySelectorAll('.opt-btn').forEach(b => { if(b.dataset.correct) b.classList.add('opt-correct'); });
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  [['qA1',1],['qA2',2],['qA3',2],['qA4',3],['qA5',0]].forEach(([id,idx]) => {
+    document.querySelectorAll('#'+id+' .opt-btn')[idx].dataset.correct='yes';
+  });
+});
+
+function checkB() {
+  let got = 0;
+  Object.entries(bAns).forEach(([id,ans]) => {
+    const inp = document.getElementById(id);
+    const fb  = document.getElementById(id+'fb');
+    const val = inp.value.trim().toLowerCase();
+    if (val === ans.toLowerCase()) {
+      inp.classList.add('correct'); inp.classList.remove('wrong');
+      fb.className='feedback c'; fb.textContent='✅'; got++;
+    } else {
+      inp.classList.add('wrong'); inp.classList.remove('correct');
+      fb.className='feedback w'; fb.textContent='❌ '+ans;
+    }
+  });
+  scores['B'] = got; scoreEl('B');
+}
+
+function resetAll() { location.reload(); }
+updateTotal();
+</script>
+
+{% endblock %}

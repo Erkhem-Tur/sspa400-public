@@ -28,6 +28,10 @@ def worksheets_view(request):
     return render(request, 'lms/worksheets.html')
 
 
+def past_tense_view(request):
+    return render(request, 'lms/past_tense.html')
+
+
 def videos_view(request):
     videos = Video.objects.filter(is_published=True)
     return render(request, 'lms/videos.html', {'videos': videos})

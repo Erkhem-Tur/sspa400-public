@@ -1,0 +1,816 @@
+{% extends 'lms/base.html' %}
+{% block title %}Past Tense Lesson – ТТХГ{% endblock %}
+{% block content %}
+
+<div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
+  <div class="d-flex align-items-center gap-2">
+    <i class="bi bi-journal-bookmark-fill fs-4" style="color:#1b3a6b;"></i>
+    <div>
+      <h4 class="fw-bold mb-0" style="color:#1b3a6b;">Past vs. Present Tense</h4>
+      <div class="text-muted small">A1–A2 · SSPA English Language Training</div>
+    </div>
+  </div>
+  <div class="d-flex gap-2 align-items-center">
+    <span class="badge rounded-pill" style="background:#e8f4fd;color:#1b3a6b;font-size:12px;">
+      <i class="bi bi-clock me-1"></i>90 + 30 мин
+    </span>
+    <button class="btn btn-sm btn-outline-secondary" onclick="resetAll()">
+      <i class="bi bi-arrow-counterclockwise me-1"></i>Дахин эхлэх
+    </button>
+  </div>
+</div>
+
+<!-- Overall score bar -->
+<div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+  <div class="card-body py-2 px-4">
+    <div class="d-flex align-items-center gap-3">
+      <span class="fw-semibold small" style="color:#1b3a6b;white-space:nowrap;">Нийт оноо:</span>
+      <div class="flex-grow-1" style="height:10px;background:#e2e8f0;border-radius:6px;overflow:hidden;">
+        <div id="totalBar" style="height:100%;width:0%;background:linear-gradient(90deg,#1b3a6b,#c9a227);border-radius:6px;transition:width .4s;"></div>
+      </div>
+      <span id="totalScore" class="fw-bold" style="color:#1b3a6b;font-size:14px;white-space:nowrap;">0 / 0</span>
+    </div>
+  </div>
+</div>
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-4" id="lessonTabs">
+  <li class="nav-item">
+    <button class="nav-link active fw-semibold" data-bs-toggle="tab" data-bs-target="#sspa">
+      <i class="bi bi-shield-fill me-1"></i>SSPA Worksheet
+    </button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link fw-semibold" data-bs-toggle="tab" data-bs-target="#rashid">
+      <i class="bi bi-airplane me-1"></i>Mr. Rashid's Vacation
+    </button>
+  </li>
+</ul>
+
+<div class="tab-content">
+
+<!-- ══════════════════════ SSPA TAB ══════════════════════ -->
+<div class="tab-pane fade show active" id="sspa">
+
+  <!-- Grammar Reference -->
+  <div class="accordion mb-4" id="grammarRef">
+    <div class="accordion-item border-0 shadow-sm" style="border-radius:12px;overflow:hidden;">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#grammarBody"
+                style="background:#fff8ec;color:#7a5c00;border-radius:12px;">
+          <i class="bi bi-book-fill me-2" style="color:#c9a227;"></i>Grammar Reference — Дүрмийн лавлах
+          <span class="badge ms-2" style="background:#c9a227;font-size:10px;">10 мин</span>
+        </button>
+      </h2>
+      <div id="grammarBody" class="accordion-collapse collapse">
+        <div class="accordion-body" style="background:#fffbf0;">
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <div class="card border-0 h-100" style="background:#f0f7ff;border-radius:10px;">
+                <div class="card-body">
+                  <h6 class="fw-bold mb-2" style="color:#1b3a6b;">🔵 Present Simple — Одоогийн цаг</h6>
+                  <div class="small mb-2"><strong>USE:</strong> Habits, routines, facts</div>
+                  <div class="small mb-2"><strong>+</strong> I/You/We/They + verb &nbsp;|&nbsp; He/She/It + verb<strong>s</strong></div>
+                  <div class="small mb-2"><strong>−</strong> do/does + not + verb</div>
+                  <div class="small mb-0 p-2" style="background:#fff;border-radius:6px;border-left:3px solid #1b3a6b;">
+                    "I <strong>check</strong> badges every day."<br>
+                    "The SSPA <strong>protects</strong> the President."
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card border-0 h-100" style="background:#fff0f0;border-radius:10px;">
+                <div class="card-body">
+                  <h6 class="fw-bold mb-2" style="color:#c0392b;">🔴 Simple Past — Өнгөрсөн цаг</h6>
+                  <div class="small mb-2"><strong>USE:</strong> Completed actions, past events</div>
+                  <div class="small mb-2"><strong>Regular:</strong> verb + <strong>-ed</strong></div>
+                  <div class="small mb-2"><strong>Irregular:</strong> special form (see table)</div>
+                  <div class="small mb-0 p-2" style="background:#fff;border-radius:6px;border-left:3px solid #c0392b;">
+                    "I <strong>checked</strong> his badge yesterday."<br>
+                    "He <strong>went</strong> to the checkpoint."
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Verb table -->
+          <h6 class="fw-bold mb-2" style="color:#1b3a6b;">Verb Table — Үйл үгийн хүснэгт</h6>
+          <div class="table-responsive">
+            <table class="table table-sm table-bordered mb-0" style="font-size:12px;">
+              <thead style="background:#1b3a6b;color:#fff;">
+                <tr><th>Base</th><th>Past</th><th>Монгол</th><th>Type</th><th>Base</th><th>Past</th><th>Монгол</th><th>Type</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>check</td><td>checked</td><td>шалгах</td><td><span class="badge bg-secondary">REG</span></td><td>go</td><td>went</td><td>явах</td><td><span class="badge bg-danger">IRR</span></td></tr>
+                <tr><td>patrol</td><td>patrolled</td><td>эргүүл хийх</td><td><span class="badge bg-secondary">REG</span></td><td>see</td><td>saw</td><td>харах</td><td><span class="badge bg-danger">IRR</span></td></tr>
+                <tr><td>escort</td><td>escorted</td><td>дагалдах</td><td><span class="badge bg-secondary">REG</span></td><td>have</td><td>had</td><td>байх/авах</td><td><span class="badge bg-danger">IRR</span></td></tr>
+                <tr><td>report</td><td>reported</td><td>мэдэгдэх</td><td><span class="badge bg-secondary">REG</span></td><td>give</td><td>gave</td><td>өгөх</td><td><span class="badge bg-danger">IRR</span></td></tr>
+                <tr><td>inspect</td><td>inspected</td><td>үзлэг хийх</td><td><span class="badge bg-secondary">REG</span></td><td>take</td><td>took</td><td>авах</td><td><span class="badge bg-danger">IRR</span></td></tr>
+                <tr><td>search</td><td>searched</td><td>нэгжлэг хийх</td><td><span class="badge bg-secondary">REG</span></td><td>speak</td><td>spoke</td><td>ярих</td><td><span class="badge bg-danger">IRR</span></td></tr>
+                <tr><td>detain</td><td>detained</td><td>саатуулах</td><td><span class="badge bg-secondary">REG</span></td><td>write</td><td>wrote</td><td>бичих</td><td><span class="badge bg-danger">IRR</span></td></tr>
+                <tr><td>radio</td><td>radioed</td><td>радио дамжуулах</td><td><span class="badge bg-secondary">REG</span></td><td>stand</td><td>stood</td><td>зогсох</td><td><span class="badge bg-danger">IRR</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TASK 1 -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:14px;">
+    <div class="card-header fw-bold" style="background:linear-gradient(135deg,#0f2744,#1b3a6b);color:#fff;border-radius:14px 14px 0 0;">
+      <i class="bi bi-1-circle me-2"></i>Task 1 — Choose Correct Tense
+      <span class="badge ms-2" style="background:rgba(255,255,255,.2);font-size:11px;">12 мин</span>
+    </div>
+    <div class="card-body p-4">
+      <p class="small text-muted mb-4">Зөв цагийн хэлбэрийг сонгоно уу. Choose the correct verb form.</p>
+      <div id="t1-questions"></div>
+      <button class="btn btn-primary mt-3" onclick="checkTask1()">
+        <i class="bi bi-check2-circle me-1"></i>Шалгах
+      </button>
+      <span id="t1-score" class="ms-3 fw-bold small"></span>
+    </div>
+  </div>
+
+  <!-- TASK 2 -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:14px;">
+    <div class="card-header fw-bold" style="background:linear-gradient(135deg,#0f2744,#1b3a6b);color:#fff;border-radius:14px 14px 0 0;">
+      <i class="bi bi-2-circle me-2"></i>Task 2 — Fill in the Blanks
+      <span class="badge ms-2" style="background:rgba(255,255,255,.2);font-size:11px;">12 мин</span>
+    </div>
+    <div class="card-body p-4">
+      <div class="alert border-0 mb-4 py-2 px-3" style="background:#e8f4fd;border-radius:8px;font-size:12px;">
+        <strong>PRESENT clues:</strong> every day · always · usually · often · now &nbsp;|&nbsp;
+        <strong>PAST clues:</strong> yesterday · last week · ago · this morning
+      </div>
+      <div id="t2-questions"></div>
+      <button class="btn btn-primary mt-3" onclick="checkTask2()">
+        <i class="bi bi-check2-circle me-1"></i>Шалгах
+      </button>
+      <span id="t2-score" class="ms-3 fw-bold small"></span>
+    </div>
+  </div>
+
+  <!-- TASK 3 -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:14px;">
+    <div class="card-header fw-bold" style="background:linear-gradient(135deg,#0f2744,#1b3a6b);color:#fff;border-radius:14px 14px 0 0;">
+      <i class="bi bi-3-circle me-2"></i>Task 3 — Correct the Mistakes
+      <span class="badge ms-2" style="background:rgba(255,255,255,.2);font-size:11px;">10 мин</span>
+    </div>
+    <div class="card-body p-4">
+      <p class="small text-muted mb-4">Доорх өгүүлбэр бүрт <strong>нэг</strong> цагийн алдаа байна. Зөв хэлбэрийг бичнэ үү.</p>
+      <div id="t3-questions"></div>
+      <button class="btn btn-primary mt-3" onclick="checkTask3()">
+        <i class="bi bi-check2-circle me-1"></i>Шалгах
+      </button>
+      <span id="t3-score" class="ms-3 fw-bold small"></span>
+    </div>
+  </div>
+
+  <!-- TASK 4 -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:14px;">
+    <div class="card-header fw-bold" style="background:linear-gradient(135deg,#0f2744,#1b3a6b);color:#fff;border-radius:14px 14px 0 0;">
+      <i class="bi bi-4-circle me-2"></i>Task 4 — Irregular Verbs Table
+      <span class="badge ms-2" style="background:rgba(255,255,255,.2);font-size:11px;">12 мин</span>
+    </div>
+    <div class="card-body p-4">
+      <p class="small text-muted mb-3">Дутуу хэлбэрийг нөхнэ үү. Complete the missing forms.</p>
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle" style="font-size:13px;" id="t4-table">
+          <thead class="table-light">
+            <tr>
+              <th style="width:110px;">Base Form</th>
+              <th style="width:110px;">Simple Past</th>
+              <th>SSPA Sentence</th>
+            </tr>
+          </thead>
+          <tbody id="t4-body"></tbody>
+        </table>
+      </div>
+      <button class="btn btn-primary mt-2" onclick="checkTask4()">
+        <i class="bi bi-check2-circle me-1"></i>Шалгах
+      </button>
+      <span id="t4-score" class="ms-3 fw-bold small"></span>
+    </div>
+  </div>
+
+  <!-- TASK 6 Dialogue -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:14px;">
+    <div class="card-header fw-bold" style="background:linear-gradient(135deg,#0f2744,#1b3a6b);color:#fff;border-radius:14px 14px 0 0;">
+      <i class="bi bi-chat-dots me-2"></i>Task 6 — Checkpoint Dialogue
+      <span class="badge ms-2" style="background:rgba(255,255,255,.2);font-size:11px;">9 мин</span>
+    </div>
+    <div class="card-body p-4">
+      <div class="alert border-0 py-2 px-3 mb-4" style="background:#f0f7ff;border-radius:8px;font-size:12px;">
+        <i class="bi bi-geo-alt me-1"></i><strong>Situation:</strong> An SSPA officer interviews a visitor at the State Palace checkpoint.
+      </div>
+      <div id="t6-dialogue"></div>
+      <button class="btn btn-primary mt-3" onclick="checkTask6()">
+        <i class="bi bi-check2-circle me-1"></i>Шалгах
+      </button>
+      <span id="t6-score" class="ms-3 fw-bold small"></span>
+    </div>
+  </div>
+
+  <!-- Self Assessment -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:14px;">
+    <div class="card-header fw-bold" style="background:#e8f4fd;color:#1b3a6b;border-radius:14px 14px 0 0;">
+      <i class="bi bi-patch-check me-2"></i>Self-Assessment — Өөрийгөө үнэлэх
+    </div>
+    <div class="card-body p-4">
+      <div class="row g-2" id="selfAssess"></div>
+    </div>
+  </div>
+
+</div><!-- /sspa tab -->
+
+<!-- ══════════════════════ MR RASHID TAB ══════════════════════ -->
+<div class="tab-pane fade" id="rashid">
+
+  <!-- Story -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:14px;border-left:4px solid #c9a227!important;">
+    <div class="card-header fw-bold" style="background:#fff8ec;color:#7a5c00;border-radius:14px 14px 0 0;">
+      <i class="bi bi-airplane me-2"></i>Mr. Rashid's Vacation — Story
+    </div>
+    <div class="card-body p-4" style="font-size:14px;line-height:1.8;">
+      Mr. Rashid <strong>went</strong> on vacation last month. His flight <strong>was</strong> terrible — it <strong>was</strong> so bumpy and very scary. When he <strong>arrived</strong>, the weather <strong>was</strong> terrible. He never <strong>saw</strong> the sun. He <strong>stayed</strong> inside the hotel every day. His room <strong>was</strong> fine but the music from a nearby café <strong>was</strong> very loud — he didn't sleep much. The food <strong>was</strong> too salty and the waiters <strong>were</strong> very unfriendly. Then someone <strong>stole</strong> his wallet! After that he <strong>stayed</strong> in the hotel and <strong>read</strong> a book. To make things worse, they <strong>cancelled</strong> his flight home. He <strong>had</strong> to stay for two more days. But — there was one good thing! He <strong>met</strong> a very nice woman named Basmar. He is seeing her tonight! 😊
+    </div>
+  </div>
+
+  <!-- RQ Task 1 True/False -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:14px;">
+    <div class="card-header fw-bold" style="background:linear-gradient(135deg,#0f2744,#1b3a6b);color:#fff;border-radius:14px 14px 0 0;">
+      <i class="bi bi-1-circle me-2"></i>Task 1 — True or False?
+      <span class="badge ms-2" style="background:rgba(255,255,255,.2);font-size:11px;">Watch once</span>
+    </div>
+    <div class="card-body p-4">
+      <div id="rq1-questions"></div>
+      <button class="btn btn-primary mt-3" onclick="checkRQ1()">
+        <i class="bi bi-check2-circle me-1"></i>Шалгах
+      </button>
+      <span id="rq1-score" class="ms-3 fw-bold small"></span>
+    </div>
+  </div>
+
+  <!-- RQ Task 2 Fill Blanks -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:14px;">
+    <div class="card-header fw-bold" style="background:linear-gradient(135deg,#0f2744,#1b3a6b);color:#fff;border-radius:14px 14px 0 0;">
+      <i class="bi bi-2-circle me-2"></i>Task 2 — Fill in the Blanks
+      <span class="badge ms-2" style="background:rgba(255,255,255,.2);font-size:11px;">Watch again</span>
+    </div>
+    <div class="card-body p-4">
+      <p class="small text-muted mb-3">All missing words are <strong>past tense verbs</strong>.</p>
+      <div id="rq2-questions"></div>
+      <button class="btn btn-primary mt-3" onclick="checkRQ2()">
+        <i class="bi bi-check2-circle me-1"></i>Шалгах
+      </button>
+      <span id="rq2-score" class="ms-3 fw-bold small"></span>
+    </div>
+  </div>
+
+  <!-- RQ Task 3 Verb Forms -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:14px;">
+    <div class="card-header fw-bold" style="background:linear-gradient(135deg,#0f2744,#1b3a6b);color:#fff;border-radius:14px 14px 0 0;">
+      <i class="bi bi-3-circle me-2"></i>Task 3 — Verb Forms (Past + R/I)
+    </div>
+    <div class="card-body p-4">
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle" style="font-size:13px;">
+          <thead class="table-light">
+            <tr><th>Verb</th><th style="width:130px;">Past form</th><th style="width:60px;">R / I</th><th>Verb</th><th style="width:130px;">Past form</th><th style="width:60px;">R / I</th></tr>
+          </thead>
+          <tbody id="rq3-body"></tbody>
+        </table>
+      </div>
+      <button class="btn btn-primary mt-2" onclick="checkRQ3()">
+        <i class="bi bi-check2-circle me-1"></i>Шалгах
+      </button>
+      <span id="rq3-score" class="ms-3 fw-bold small"></span>
+    </div>
+  </div>
+
+  <!-- RQ Task 4 Write Questions -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:14px;">
+    <div class="card-header fw-bold" style="background:linear-gradient(135deg,#0f2744,#1b3a6b);color:#fff;border-radius:14px 14px 0 0;">
+      <i class="bi bi-4-circle me-2"></i>Task 4 — Write the Question
+    </div>
+    <div class="card-body p-4">
+      <div id="rq4-questions"></div>
+      <button class="btn btn-primary mt-3" onclick="checkRQ4()">
+        <i class="bi bi-check2-circle me-1"></i>Шалгах
+      </button>
+      <span id="rq4-score" class="ms-3 fw-bold small"></span>
+    </div>
+  </div>
+
+  <!-- RQ Task 5 Good or Bad -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:14px;">
+    <div class="card-header fw-bold" style="background:linear-gradient(135deg,#0f2744,#1b3a6b);color:#fff;border-radius:14px 14px 0 0;">
+      <i class="bi bi-5-circle me-2"></i>Task 5 — Good or Bad?
+    </div>
+    <div class="card-body p-4">
+      <p class="small text-muted mb-3">Дараах үгсийг GOOD эсвэл BAD баганад хуваарилаарай. Click each word to sort it.</p>
+      <div class="mb-3 d-flex flex-wrap gap-2" id="rq5-words"></div>
+      <div class="row g-3">
+        <div class="col-6">
+          <div class="card h-100 border-0" style="background:#f0fdf4;border-radius:10px;min-height:120px;">
+            <div class="card-header fw-bold small" style="background:#16a34a;color:#fff;border-radius:10px 10px 0 0;">
+              😊 GOOD
+            </div>
+            <div class="card-body p-2 d-flex flex-wrap gap-1 align-content-start" id="rq5-good"></div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="card h-100 border-0" style="background:#fef2f2;border-radius:10px;min-height:120px;">
+            <div class="card-header fw-bold small" style="background:#dc2626;color:#fff;border-radius:10px 10px 0 0;">
+              😞 BAD
+            </div>
+            <div class="card-body p-2 d-flex flex-wrap gap-1 align-content-start" id="rq5-bad"></div>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary mt-3" onclick="checkRQ5()">
+        <i class="bi bi-check2-circle me-1"></i>Шалгах
+      </button>
+      <span id="rq5-score" class="ms-3 fw-bold small"></span>
+    </div>
+  </div>
+
+</div><!-- /rashid tab -->
+</div><!-- /tab-content -->
+
+<style>
+.answer-input { border-radius:6px; border:1.5px solid #e2e8f0; padding:5px 10px; font-size:13px; width:130px; text-align:center; }
+.answer-input.correct { border-color:#16a34a!important; background:#f0fdf4; color:#15803d; }
+.answer-input.wrong   { border-color:#dc2626!important; background:#fef2f2; color:#991b1b; }
+.q-row { padding:10px 12px; border-radius:8px; background:#f8fafc; margin-bottom:8px; font-size:13px; line-height:1.7; }
+.q-row.correct-row { background:#f0fdf4; }
+.q-row.wrong-row   { background:#fef2f2; }
+.feedback { font-size:11px; font-weight:700; margin-left:6px; }
+.feedback.ok  { color:#16a34a; }
+.feedback.err { color:#dc2626; }
+.word-chip { cursor:pointer; padding:5px 14px; border-radius:20px; font-size:12px; font-weight:600;
+             background:#e8f4fd; color:#1b3a6b; border:1.5px solid #b8d4f0; transition:all .15s; }
+.word-chip:hover { transform:translateY(-1px); box-shadow:0 2px 8px rgba(0,0,0,.1); }
+.word-chip.in-good { background:#d1fae5; color:#065f46; border-color:#6ee7b7; }
+.word-chip.in-bad  { background:#fee2e2; color:#991b1b; border-color:#fca5a5; }
+</style>
+
+<script>
+// ── DATA ────────────────────────────────────────────────────────────────────
+const T1 = [
+  { pre:"Every morning, the checkpoint officer", ans:"check", opts:["check","checked"], post:"all visitor badges before entry.", mn:"Шалган нэвтрүүлэх ажилтан өр бүр зочдын тэмдгийг нэвтрэхийн өмнө ___." },
+  { pre:"Yesterday, the team leader", ans:"reported", opts:["reports","reported"], post:"a suspicious package near the gate.", mn:"Өчигдөр багийн дарга хаалганы ойролцоо сэжигтэй эд зүйл ___." },
+  { pre:"SSPA officers", ans:"escort", opts:["escort","escorted"], post:"the President to all official events.", mn:"ТТХГ-ын ажилтнууд Ерөнхийлөгчийг бүх арга хэмжээнд ___." },
+  { pre:"Last week, the advance team", ans:"inspected", opts:["inspects","inspected"], post:"the venue before the visit.", mn:"Өнгөрсөн долоо хоногт урьдчилсан үзлэгийн тасаг газрыг ___." },
+  { pre:"I", ans:"report", opts:["report","reported"], post:"my supervisor every day after the shift.", mn:"Би ээлжийн дараа өдөр бүр дарга руугаа ___." },
+  { pre:"The close protection officer", ans:"escorted", opts:["escorts","escorted"], post:"the protectee to the airport this morning.", mn:"Шадар хамгаалалтын ажилтан өнөөдөр өглөө хамгаалуулагчийг нисэх буудал хүртэл ___." },
+  { pre:"The guard", ans:"stood", opts:["stands","stood"], post:"at the main gate for 12 hours yesterday.", mn:"Харуулч өчигдөр 12 цагийн турш үндсэн хаалган дээр ___." },
+  { pre:"Do you", ans:"ask", opts:["ask","asked"], post:"all visitors to sign the access register?", mn:"Та нэвтрэх бүртгэлд бүх зочдоор гарын үсэг зуруулдаг уу?" },
+];
+
+const T2 = [
+  { pre:"The protection officer", verb:"check", post:"the delegate's badge at 0800 hours this morning.", ans:"checked", mn:"Хамгаалалтын ажилтан өнөөдөр 08:00 цагт төлөөлөгчийн тэмдгийг ___." },
+  { pre:"I usually", verb:"patrol", post:"the perimeter twice during my shift.", ans:"patrol", mn:"Би ээлжийн үед ихэвчлэн периметрийг хоёр удаа ___." },
+  { pre:"Last month, our team", verb:"escort", post:"a foreign head of state.", ans:"escorted", mn:"Өнгөрсөн сард манай баг гадаадын төрийн тэргүүнийг ___." },
+  { pre:"The shift leader always", verb:"write", post:"the incident report after duty.", ans:"writes", mn:"Ээлжийн дарга үүрэгний дараа осол явдлын тайланг байнга ___." },
+  { pre:"Two officers", verb:"detain", post:"the suspect at the north gate yesterday.", ans:"detained", mn:"Өчигдөр хоёр ажилтан хойд хаалган дээр сэжигтнийг ___." },
+  { pre:"We", verb:"go", post:"to the advance briefing at 0600 hours this morning.", ans:"went", mn:"Бид өнөөдөр 06:00 цагт урьдчилсан мэдээллийн хуралд ___." },
+  { pre:"The dog handler", verb:"search", post:"all vehicles every day.", ans:"searches", mn:"Нохой хөтлөгч өр бүр бүх тээврийн хэрэгслийг ___." },
+  { pre:"The team", verb:"have", post:"a security briefing before the motorcade last Friday.", ans:"had", mn:"Өнгөрсөн Баасан гарагт цуваа гарахаас өмнө баг аюулгүйн мэдээлэл ___." },
+];
+
+const T3 = [
+  { sentence:'Yesterday, the officer <span class="text-danger fw-bold">check</span> the visitor\'s ID at the main entrance.', ans:"checked" },
+  { sentence:'I always <span class="text-danger fw-bold">escorted</span> the protectee to the morning briefing every day.', ans:"escort" },
+  { sentence:'The protection team <span class="text-danger fw-bold">goed</span> to the State Palace last Tuesday.', ans:"went" },
+  { sentence:'She usually <span class="text-danger fw-bold">radioed</span> the shift leader before she leaves the post.', ans:"radios" },
+  { sentence:'We <span class="text-danger fw-bold">detain</span> a suspicious person at 1400 hours this afternoon.', ans:"detained" },
+  { sentence:'The close protection agent <span class="text-danger fw-bold">taked</span> the protectee to the airport yesterday.', ans:"took" },
+];
+
+const T4 = [
+  { base:"go",    past:"went",  blank:"past",  sentence:'The team ___ to the motorcade briefing yesterday.' },
+  { base:"see",   past:"saw",   blank:"base",  sentence:'The officer ___ a suspicious vehicle near the gate last night.' },
+  { base:"speak", past:"spoke", blank:"past",  sentence:'The shift leader ___ to the foreign agent this morning.' },
+  { base:"take",  past:"took",  blank:"base",  sentence:'The protectee ___ the armored vehicle to the airport.' },
+  { base:"give",  past:"gave",  blank:"past",  sentence:'The supervisor ___ the briefing to all officers before the event.' },
+  { base:"stand", past:"stood", blank:"past",  sentence:'The guard ___ at the checkpoint for six hours yesterday.' },
+  { base:"write", past:"wrote", blank:"past",  sentence:'I ___ the incident report after my shift last night.' },
+  { base:"have",  past:"had",   blank:"past",  sentence:'We ___ a security drill at 0700 hours this morning.' },
+];
+
+const T6 = [
+  { speaker:"Officer",  pre:'Good morning. I', ans:"am",         post:'the checkpoint officer today. Please', ans2:"show", post2:'me your ID and permission letter.', double:true },
+  { speaker:"Visitor",  pre:'Good morning. Here', ans:"is",      post:'my ID. I', ans2:"arrived", post2:'this morning for a meeting with the State Secretary.', double:true },
+  { speaker:"Officer",  pre:'Thank you. Did you', ans:"have",    post:'an appointment? We always', ans2:"check", post2:'all appointments in advance.', double:true },
+  { speaker:"Visitor",  pre:'Yes. My office', ans:"called",      post:'yesterday and', ans2:"spoke", post2:'to your permissions officer.', double:true },
+  { speaker:"Officer",  pre:'I', ans:"see",                      post:'. One moment — I', ans2:"radio", post2:'the duty officer now. Please', ans3:"wait", post3:'here.', triple:true },
+  { speaker:"Visitor",  pre:'Of course. I', ans:"understand",    post:'. Security', ans2:"is", post2:'very important.', double:true },
+  { speaker:"Officer",  pre:'Confirmed. You', ans:"are",         post:'cleared. Please', ans2:"keep", post2:'your badge visible at all times.', double:true },
+];
+
+const selfItems = [
+  "Explain the difference between present and past tense | Одоо ба өнгөрсөн цагийн ялгааг тайлбарлах",
+  "Form regular past verbs correctly with -ed | Тогтмол үйл үгийг -ed нэмж зөв хэлбэржүүлэх",
+  "Use the correct form of 5+ irregular verbs | 5-аас дээш жишиг бус үйл үгийн хэлбэрийг хэрэглэх",
+  "Write sentences about SSPA duties in both tenses | Хоёр цагийг ашиглан ТТХГ-ын үүргийн өгүүлбэр бичих",
+  "Speak about past and present protection duties | Өнгөрсөн ба одоогийн хамгаалалтын үүргийн талаар ярих",
+];
+
+// Mr Rashid data
+const RQ1 = [
+  { s:"The flight was smooth and comfortable.", ans:"FALSE" },
+  { s:"The weather was sunny after Mr. Rashid arrived.", ans:"FALSE" },
+  { s:"Mr. Rashid went out and saw the city every day.", ans:"FALSE" },
+  { s:"His hotel room was next to a café with loud music.", ans:"TRUE" },
+  { s:"The food was good and the waiters were friendly.", ans:"FALSE" },
+  { s:"Someone stole Mr. Rashid's wallet.", ans:"TRUE" },
+  { s:"His flight home was on time.", ans:"FALSE" },
+  { s:"Mr. Rashid met a woman named Basmar.", ans:"TRUE" },
+];
+
+const RQ2 = [
+  { pre:"1. It", blanks:["was","was"], post:"so bumpy. It ___ very scary." },
+  { pre:"2. The weather", blanks:["was","saw"], post:"terrible. I never ___ the sun." },
+  { pre:"3. I", blanks:["stayed"], post:"inside the hotel.", single:true },
+  { pre:"4. The room", blanks:["was","was"], post:"fine but the music ___ very loud." },
+  { pre:"5. It", blanks:["was","were"], post:"too salty and the waiters ___ very unfriendly." },
+  { pre:"6. Someone", blanks:["stole","stayed","read"], post:"my wallet. After that I ___ in the hotel and ___ a book.", triple:true },
+  { pre:"7. They", blanks:["cancelled","had"], post:"my flight. I ___ to stay for two more days." },
+  { pre:"8. I", blanks:["met"], post:"a very nice woman. Her name is Basmar.", single:true },
+];
+
+const RQ3_data = [
+  { verb:"be",     past:"was",       ri:"I" },
+  { verb:"see",    past:"saw",       ri:"I" },
+  { verb:"have",   past:"had",       ri:"I" },
+  { verb:"meet",   past:"met",       ri:"I" },
+  { verb:"stay",   past:"stayed",    ri:"R" },
+  { verb:"steal",  past:"stole",     ri:"I" },
+  { verb:"cancel", past:"cancelled", ri:"R" },
+  { verb:"read",   past:"read",      ri:"I" },
+];
+
+const RQ4 = [
+  { answer:'"It was wonderful."',               hint:"How / vacation",    ans:"How was your vacation?" },
+  { answer:'"No — it was so bumpy."',           hint:"flight / okay",     ans:"Was your flight okay?" },
+  { answer:'"No, the weather was terrible."',   hint:"weather / nice",    ans:"Did you have nice weather?" },
+  { answer:'"I stayed inside the hotel."',      hint:"What / do",         ans:"What did you do?" },
+  { answer:'"No, it was too salty."',           hint:"food / good",       ans:"Was the food good?" },
+];
+
+const RQ5_words = [
+  { text:"bumpy flight",       good:false },
+  { text:"terrible weather",   good:false },
+  { text:"loud music",         good:false },
+  { text:"stolen wallet",      good:false },
+  { text:"cancelled flight",   good:false },
+  { text:"met Basmar",         good:true  },
+  { text:"unfriendly waiters", good:false },
+  { text:"too salty",          good:false },
+  { text:"seeing her tonight", good:true  },
+];
+
+// ── SCORE TRACKING ────────────────────────────────────────────────────────────
+const scores = {};
+function updateTotal() {
+  let total=0, max=0;
+  for(const k in scores) { total+=scores[k][0]; max+=scores[k][1]; }
+  document.getElementById('totalScore').textContent = total+' / '+max;
+  const pct = max>0 ? Math.round(total/max*100) : 0;
+  document.getElementById('totalBar').style.width = pct+'%';
+}
+
+function scoreEl(taskId, correct, total) {
+  scores[taskId]=[correct,total];
+  const pct = Math.round(correct/total*100);
+  const el = document.getElementById(taskId+'-score');
+  el.textContent = correct+' / '+total+' зөв ('+pct+'%)';
+  el.style.color = pct>=80?'#16a34a':pct>=50?'#f59e0b':'#dc2626';
+  updateTotal();
+}
+
+function check(inp, correct) {
+  const val = inp.value.trim().toLowerCase();
+  const ok = correct.split('|').map(s=>s.trim().toLowerCase()).includes(val);
+  inp.classList.remove('correct','wrong');
+  inp.classList.add(ok?'correct':'wrong');
+  const fb = inp.nextElementSibling;
+  if(fb && fb.classList.contains('feedback')) {
+    fb.className='feedback '+(ok?'ok':'err');
+    fb.textContent = ok ? '✓' : '✗ → '+correct.split('|')[0];
+  }
+  return ok;
+}
+
+// ── RENDER TASK 1 ─────────────────────────────────────────────────────────────
+function renderT1() {
+  const div = document.getElementById('t1-questions');
+  T1.forEach((q,i) => {
+    div.innerHTML += `<div class="q-row" id="t1r${i}">
+      <strong>${i+1}.</strong> ${q.pre}
+      ${q.opts.map(o=>`<label class="me-3"><input type="radio" name="t1_${i}" value="${o}" class="me-1">${o}</label>`).join('')}
+      ${q.post}
+      <span class="feedback" id="t1f${i}"></span>
+      <div class="text-muted mt-1" style="font-size:11px;">${q.mn}</div>
+    </div>`;
+  });
+}
+function checkTask1() {
+  let c=0;
+  T1.forEach((q,i) => {
+    const sel = document.querySelector(`input[name="t1_${i}"]:checked`);
+    const ok = sel && sel.value===q.ans;
+    if(ok) c++;
+    const row = document.getElementById('t1r'+i);
+    row.classList.remove('correct-row','wrong-row');
+    row.classList.add(ok?'correct-row':'wrong-row');
+    const fb = document.getElementById('t1f'+i);
+    fb.className='feedback '+(ok?'ok':'err');
+    fb.textContent = ok?'✓':'✗ → '+q.ans;
+  });
+  scoreEl('t1',c,T1.length);
+}
+
+// ── RENDER TASK 2 ─────────────────────────────────────────────────────────────
+function renderT2() {
+  const div = document.getElementById('t2-questions');
+  T2.forEach((q,i) => {
+    div.innerHTML += `<div class="q-row" id="t2r${i}">
+      <strong>${i+1}.</strong> ${q.pre} <input class="answer-input" id="t2i${i}" placeholder="${q.verb}"> <span class="feedback"></span> ${q.post}
+      <div class="text-muted mt-1" style="font-size:11px;">${q.mn}</div>
+    </div>`;
+  });
+}
+function checkTask2() {
+  let c=0;
+  T2.forEach((q,i) => {
+    const inp = document.getElementById('t2i'+i);
+    if(check(inp, q.ans)) c++;
+  });
+  scoreEl('t2',c,T2.length);
+}
+
+// ── RENDER TASK 3 ─────────────────────────────────────────────────────────────
+function renderT3() {
+  const div = document.getElementById('t3-questions');
+  T3.forEach((q,i) => {
+    div.innerHTML += `<div class="q-row" id="t3r${i}">
+      <strong>${i+1}.</strong> ${q.sentence}
+      <br><span class="text-muted small">Correction: </span>
+      <input class="answer-input ms-1" id="t3i${i}" placeholder="correct form">
+      <span class="feedback"></span>
+    </div>`;
+  });
+}
+function checkTask3() {
+  let c=0;
+  T3.forEach((q,i) => {
+    const inp = document.getElementById('t3i'+i);
+    if(check(inp, q.ans)) c++;
+  });
+  scoreEl('t3',c,T3.length);
+}
+
+// ── RENDER TASK 4 ─────────────────────────────────────────────────────────────
+function renderT4() {
+  const tbody = document.getElementById('t4-body');
+  T4.forEach((q,i) => {
+    const baseCell = q.blank==='base'
+      ? `<input class="answer-input" id="t4b${i}" placeholder="base form"><span class="feedback"></span>`
+      : `<span class="fw-semibold">${q.base}</span>`;
+    const pastCell = q.blank==='past'
+      ? `<input class="answer-input" id="t4p${i}" placeholder="past form"><span class="feedback"></span>`
+      : `<span class="fw-semibold">${q.past}</span>`;
+    const sent = q.sentence.replace('___', `<input class="answer-input" id="t4s${i}" style="width:80px;" placeholder="..."><span class="feedback"></span>`);
+    tbody.innerHTML += `<tr><td>${baseCell}</td><td>${pastCell}</td><td style="font-size:12px;">${sent}</td></tr>`;
+  });
+}
+function checkTask4() {
+  let c=0, total=0;
+  T4.forEach((q,i) => {
+    if(q.blank==='base') {
+      total++;
+      const inp=document.getElementById('t4b'+i);
+      if(check(inp, q.base)) c++;
+    } else {
+      total++;
+      const inp=document.getElementById('t4p'+i);
+      if(check(inp, q.past)) c++;
+    }
+    // sentence blank (always the past form)
+    total++;
+    const sinp=document.getElementById('t4s'+i);
+    if(check(sinp, q.past)) c++;
+  });
+  scoreEl('t4',c,total);
+}
+
+// ── RENDER TASK 6 DIALOGUE ───────────────────────────────────────────────────
+function renderT6() {
+  const div = document.getElementById('t6-dialogue');
+  T6.forEach((line,i) => {
+    const color = line.speaker==='Officer' ? '#0f2744' : '#1b3a6b';
+    const bg    = line.speaker==='Officer' ? '#e8f4fd' : '#f8fafc';
+    let content = `${line.pre} <input class="answer-input" id="t6a${i}0" placeholder="verb"><span class="feedback"></span> ${line.post}`;
+    if(line.double||line.triple) content += ` <input class="answer-input" id="t6a${i}1" placeholder="verb"><span class="feedback"></span> ${line.post2}`;
+    if(line.triple) content += ` <input class="answer-input" id="t6a${i}2" placeholder="verb"><span class="feedback"></span> ${line.post3}`;
+    div.innerHTML += `<div class="mb-2 p-3" style="border-radius:8px;background:${bg};font-size:13px;">
+      <span class="fw-bold me-2" style="color:${color};">${line.speaker}:</span>${content}
+    </div>`;
+  });
+}
+function checkTask6() {
+  let c=0, total=0;
+  const answers = [
+    [['am'],['show']],
+    [['is'],['arrived']],
+    [['have'],['check']],
+    [['called'],['spoke']],
+    [['see'],['radio'],['wait']],
+    [['understand'],['is']],
+    [['are'],['keep']],
+  ];
+  answers.forEach((line,i) => {
+    line.forEach((ans,j) => {
+      total++;
+      const inp=document.getElementById(`t6a${i}${j}`);
+      if(inp && check(inp, ans.join('|'))) c++;
+    });
+  });
+  scoreEl('t6',c,total);
+}
+
+// ── SELF ASSESSMENT ──────────────────────────────────────────────────────────
+function renderSelf() {
+  const div = document.getElementById('selfAssess');
+  selfItems.forEach((item,i) => {
+    const [en,mn] = item.split('|');
+    div.innerHTML += `<div class="col-12">
+      <div class="d-flex align-items-start gap-3 p-3" style="border-radius:8px;background:#f8fafc;">
+        <div class="d-flex gap-2 flex-shrink-0">
+          <label class="d-flex align-items-center gap-1 small"><input type="radio" name="sa${i}" value="yes"> 😊 Yes</label>
+          <label class="d-flex align-items-center gap-1 small"><input type="radio" name="sa${i}" value="mostly"> 🙂 Mostly</label>
+          <label class="d-flex align-items-center gap-1 small"><input type="radio" name="sa${i}" value="no"> 😕 Not yet</label>
+        </div>
+        <div>
+          <div class="fw-semibold small">${en.trim()}</div>
+          <div class="text-muted" style="font-size:11px;">${mn.trim()}</div>
+        </div>
+      </div>
+    </div>`;
+  });
+}
+
+// ── MR RASHID ────────────────────────────────────────────────────────────────
+function renderRQ1() {
+  const div=document.getElementById('rq1-questions');
+  RQ1.forEach((q,i) => {
+    div.innerHTML += `<div class="q-row" id="rq1r${i}">
+      <strong>${i+1}.</strong> ${q.s}
+      <span class="ms-2">
+        <label class="me-2"><input type="radio" name="rq1_${i}" value="TRUE" class="me-1">TRUE</label>
+        <label><input type="radio" name="rq1_${i}" value="FALSE" class="me-1">FALSE</label>
+      </span>
+      <span class="feedback" id="rq1f${i}"></span>
+    </div>`;
+  });
+}
+function checkRQ1() {
+  let c=0;
+  RQ1.forEach((q,i) => {
+    const sel=document.querySelector(`input[name="rq1_${i}"]:checked`);
+    const ok=sel&&sel.value===q.ans;
+    if(ok) c++;
+    const row=document.getElementById('rq1r'+i);
+    row.classList.remove('correct-row','wrong-row');
+    row.classList.add(ok?'correct-row':'wrong-row');
+    const fb=document.getElementById('rq1f'+i);
+    fb.className='feedback '+(ok?'ok':'err');
+    fb.textContent=ok?'✓':'✗ → '+q.ans;
+  });
+  scoreEl('rq1',c,RQ1.length);
+}
+
+function renderRQ2() {
+  const div=document.getElementById('rq2-questions');
+  RQ2.forEach((q,i) => {
+    let html=`<div class="q-row"><strong>${i+1}.</strong> ${q.pre} <input class="answer-input" id="rq2i${i}0" placeholder="verb"><span class="feedback"></span> `;
+    if(q.single) {
+      html+=q.post;
+    } else if(q.triple) {
+      const parts=q.post.split('___');
+      html+=parts[0]+`<input class="answer-input" id="rq2i${i}1" placeholder="verb"><span class="feedback"></span>`+parts[1]+`<input class="answer-input" id="rq2i${i}2" placeholder="verb"><span class="feedback"></span>`+parts[2];
+    } else {
+      const parts=q.post.split('___');
+      html+=parts[0]+`<input class="answer-input" id="rq2i${i}1" placeholder="verb"><span class="feedback"></span>`+parts[1];
+    }
+    html+='</div>';
+    div.innerHTML+=html;
+  });
+}
+function checkRQ2() {
+  let c=0, total=0;
+  RQ2.forEach((q,i) => {
+    q.blanks.forEach((ans,j) => {
+      total++;
+      const inp=document.getElementById(`rq2i${i}${j}`);
+      if(inp&&check(inp,ans)) c++;
+    });
+  });
+  scoreEl('rq2',c,total);
+}
+
+function renderRQ3() {
+  const tbody=document.getElementById('rq3-body');
+  for(let i=0;i<4;i++) {
+    const a=RQ3_data[i], b=RQ3_data[i+4];
+    tbody.innerHTML+=`<tr>
+      <td class="fw-semibold">${a.verb}</td>
+      <td><input class="answer-input w-100" id="rq3p${i}" placeholder="past form"><span class="feedback"></span></td>
+      <td><input class="answer-input" style="width:50px;" id="rq3r${i}" placeholder="R/I"><span class="feedback"></span></td>
+      <td class="fw-semibold">${b.verb}</td>
+      <td><input class="answer-input w-100" id="rq3p${i+4}" placeholder="past form"><span class="feedback"></span></td>
+      <td><input class="answer-input" style="width:50px;" id="rq3r${i+4}" placeholder="R/I"><span class="feedback"></span></td>
+    </tr>`;
+  }
+}
+function checkRQ3() {
+  let c=0;
+  RQ3_data.forEach((q,i) => {
+    const pi=document.getElementById('rq3p'+i);
+    const ri=document.getElementById('rq3r'+i);
+    if(check(pi,q.past)) c++;
+    if(check(ri,q.ri)) c++;
+  });
+  scoreEl('rq3',c,RQ3_data.length*2);
+}
+
+function renderRQ4() {
+  const div=document.getElementById('rq4-questions');
+  RQ4.forEach((q,i) => {
+    div.innerHTML+=`<div class="q-row">
+      <strong>${i+1}.</strong> Answer: ${q.answer} <span class="text-muted small">[Hint: ${q.hint}]</span><br>
+      Question: <input class="answer-input" id="rq4i${i}" style="width:300px;" placeholder="Write the question..."><span class="feedback"></span>
+    </div>`;
+  });
+}
+function checkRQ4() {
+  let c=0;
+  RQ4.forEach((q,i) => {
+    const inp=document.getElementById('rq4i'+i);
+    if(check(inp,q.ans)) c++;
+  });
+  scoreEl('rq4',c,RQ4.length);
+}
+
+// Task 5 Good/Bad
+const rq5State={};
+function renderRQ5() {
+  const div=document.getElementById('rq5-words');
+  RQ5_words.forEach((w,i) => {
+    rq5State[i]='unsorted';
+    div.innerHTML+=`<span class="word-chip" id="rq5w${i}" onclick="sortWord(${i})">${w.text}</span>`;
+  });
+}
+function sortWord(i) {
+  const chip=document.getElementById('rq5w'+i);
+  const goodDiv=document.getElementById('rq5-good');
+  const badDiv=document.getElementById('rq5-bad');
+  const cur=rq5State[i];
+  if(cur==='unsorted'||cur==='bad') {
+    rq5State[i]='good';
+    chip.classList.remove('in-bad'); chip.classList.add('in-good');
+    goodDiv.appendChild(chip);
+  } else {
+    rq5State[i]='bad';
+    chip.classList.remove('in-good'); chip.classList.add('in-bad');
+    badDiv.appendChild(chip);
+  }
+}
+function checkRQ5() {
+  let c=0;
+  RQ5_words.forEach((w,i) => {
+    const correctBucket=w.good?'good':'bad';
+    const ok=rq5State[i]===correctBucket;
+    if(ok) c++;
+    const chip=document.getElementById('rq5w'+i);
+    chip.style.outline=ok?'2px solid #16a34a':'2px solid #dc2626';
+  });
+  scoreEl('rq5',c,RQ5_words.length);
+}
+
+function resetAll() {
+  if(!confirm('Бүх хариултыг устгаж дахин эхлэх үү?')) return;
+  location.reload();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+renderT1(); renderT2(); renderT3(); renderT4(); renderT6(); renderSelf();
+renderRQ1(); renderRQ2(); renderRQ3(); renderRQ4(); renderRQ5();
+</script>
+
+{% endblock %}

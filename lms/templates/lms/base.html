@@ -175,6 +175,9 @@
     <a href="{% url 'logbook' %}" class="{% if request.resolver_match.url_name == 'logbook' %}active{% endif %}">
       <i class="bi bi-journal-check"></i> Ирцийн бүртгэл
     </a>
+    <a href="{% url 'past_tense' %}" class="{% if request.resolver_match.url_name == 'past_tense' %}active{% endif %}">
+      <i class="bi bi-journal-bookmark-fill"></i> Past Tense Lesson
+    </a>
     {% if user.is_authenticated and user.is_staff %}
     <div class="sidebar-title">Удирдлага</div>
     <a href="{% url 'logbook_admin' %}" class="{% if request.resolver_match.url_name == 'logbook_admin' %}active{% endif %}">

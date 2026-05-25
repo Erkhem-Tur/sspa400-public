@@ -185,6 +185,10 @@
     <a href="{% url 'past_continuous' %}" class="{% if request.resolver_match.url_name == 'past_continuous' %}active{% endif %}">
       <i class="bi bi-clock-history"></i> Past Continuous
     </a>
+    <div class="sidebar-title" style="margin-top:8px;">Reading &amp; Research</div>
+    <a href="{% url 'usss_report' %}" class="{% if request.resolver_match.url_name == 'usss_report' %}active{% endif %}">
+      <i class="bi bi-file-earmark-text"></i> USSS GAO Report
+    </a>
     {% if user.is_authenticated and user.is_staff %}
     <div class="sidebar-title">Удирдлага</div>
     <a href="{% url 'logbook_admin' %}" class="{% if request.resolver_match.url_name == 'logbook_admin' %}active{% endif %}">

@@ -66,6 +66,10 @@ def past_continuous_view(request):
     return render(request, 'lms/past_continuous.html')
 
 
+def usss_report_view(request):
+    return render(request, 'lms/usss_report.html')
+
+
 def videos_view(request):
     videos = Video.objects.filter(is_published=True)
     return render(request, 'lms/videos.html', {'videos': videos})

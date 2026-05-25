@@ -25,4 +25,5 @@ urlpatterns = [
     path('past-tense/', views.past_tense_view, name='past_tense'),
     path('present-simple/', views.present_simple_view, name='present_simple'),
     path('past-continuous/', views.past_continuous_view, name='past_continuous'),
+    path('usss-report/', views.usss_report_view, name='usss_report'),
 ]

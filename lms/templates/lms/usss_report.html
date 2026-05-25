@@ -1,0 +1,706 @@
+{% extends 'lms/base.html' %}
+{% block title %}USSS GAO Report — Advanced Reading{% endblock %}
+{% block extra_head %}
+<style>
+.highlight-term { background:#fff3cd; border-bottom:2px solid #c9a227; cursor:help; border-radius:2px; padding:0 2px; }
+.highlight-term:hover { background:#ffe69c; }
+.reading-body { font-size:15.5px; line-height:1.9; color:#1e293b; }
+.reading-body p { margin-bottom:1.1rem; }
+.para-label { font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px; }
+.gloss-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:14px 16px; margin-bottom:10px; transition:box-shadow .15s; }
+.gloss-card:hover { box-shadow:0 4px 12px rgba(0,0,0,.08); }
+.gloss-en { font-size:15px; font-weight:700; color:#1b3a6b; }
+.gloss-pos { font-size:11px; color:#94a3b8; font-style:italic; margin-left:6px; }
+.gloss-def { font-size:13px; color:#475569; margin:4px 0; }
+.gloss-mn { font-size:13px; color:#7a5c00; background:#fff8ec; border-radius:6px; padding:4px 8px; margin:4px 0; }
+.gloss-ex { font-size:12px; color:#64748b; font-style:italic; border-left:3px solid #e2e8f0; padding-left:8px; margin-top:6px; }
+.paraphrase-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
+@media(max-width:640px){ .paraphrase-row{ grid-template-columns:1fr; } }
+.para-orig { background:#f0f8ff; border:1px solid #bfdbfe; border-radius:8px; padding:12px; font-size:13px; }
+.para-simple { background:#f0fff4; border:1px solid #bbf7d0; border-radius:8px; padding:12px; font-size:13px; }
+.category-badge { display:inline-block; font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; margin-bottom:8px; text-transform:uppercase; letter-spacing:.5px; }
+.cat-protection { background:#dbeafe; color:#1e40af; }
+.cat-workforce  { background:#dcfce7; color:#166534; }
+.cat-finance    { background:#fef9c3; color:#854d0e; }
+.cat-radio      { background:#fce7f3; color:#9d174d; }
+.cat-legal      { background:#ede9fe; color:#5b21b6; }
+.cat-report     { background:#f1f5f9; color:#334155; }
+.fill-input { border:none; border-bottom:2px solid #1b3a6b; background:transparent; font-size:14px; outline:none; padding:1px 4px; min-width:120px; }
+.fill-input.correct { border-bottom-color:#198754; color:#198754; }
+.fill-input.wrong   { border-bottom-color:#dc3545; color:#dc3545; }
+.feedback { font-size:12px; font-weight:600; margin-left:4px; }
+.feedback.c { color:#198754; }
+.feedback.w { color:#dc3545; }
+.q-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:16px; margin-bottom:12px; }
+.opt-btn { display:block; width:100%; text-align:left; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px 14px; margin:6px 0; cursor:pointer; font-size:14px; transition:all .15s; }
+.opt-btn:hover:not(:disabled) { border-color:#1b3a6b; background:#f0f8ff; }
+.opt-correct { background:#d4edda!important; border-color:#198754!important; color:#155724!important; }
+.opt-wrong   { background:#f8d7da!important; border-color:#dc3545!important; color:#721c24!important; }
+</style>
+{% endblock %}
+{% block content %}
+
+<!-- Header -->
+<div class="d-flex align-items-start justify-content-between flex-wrap gap-2 mb-4">
+  <div class="d-flex align-items-center gap-3">
+    <div style="width:48px;height:48px;background:linear-gradient(135deg,#1b3a6b,#c9a227);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <i class="bi bi-file-earmark-text-fill text-white fs-5"></i>
+    </div>
+    <div>
+      <h4 class="fw-bold mb-0" style="color:#1b3a6b;">USSS Workforce & Protective Mission</h4>
+      <div class="text-muted small">GAO Report Reading · B2–C1 Upper Intermediate–Advanced · Professional English</div>
+      <div class="mt-1">
+        <span class="badge me-1" style="background:#e8f4fd;color:#1b3a6b;">Government Report</span>
+        <span class="badge me-1" style="background:#fff8ec;color:#7a5c00;">Close Protection</span>
+        <span class="badge" style="background:#f0fff4;color:#155724;">Operational English</span>
+      </div>
+    </div>
+  </div>
+  <button class="btn btn-sm btn-outline-secondary mt-1" onclick="resetAll()">
+    <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
+  </button>
+</div>
+
+<!-- Score bar -->
+<div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+  <div class="card-body py-2 px-4">
+    <div class="d-flex align-items-center gap-3">
+      <span class="fw-semibold small" style="color:#1b3a6b;white-space:nowrap;">Worksheet Score:</span>
+      <div class="flex-grow-1" style="height:10px;background:#e2e8f0;border-radius:6px;overflow:hidden;">
+        <div id="totalBar" style="height:100%;width:0%;background:linear-gradient(90deg,#1b3a6b,#c9a227);border-radius:6px;transition:width .4s;"></div>
+      </div>
+      <span id="totalScore" class="fw-bold" style="color:#1b3a6b;font-size:14px;white-space:nowrap;">0 / 0</span>
+    </div>
+  </div>
+</div>
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-4" id="reportTabs">
+  <li class="nav-item"><button class="nav-link active fw-semibold" data-bs-toggle="tab" data-bs-target="#reading"><i class="bi bi-book me-1"></i>Reading</button></li>
+  <li class="nav-item"><button class="nav-link fw-semibold" data-bs-toggle="tab" data-bs-target="#glossary"><i class="bi bi-journal-text me-1"></i>Glossary</button></li>
+  <li class="nav-item"><button class="nav-link fw-semibold" data-bs-toggle="tab" data-bs-target="#worksheet"><i class="bi bi-pencil-square me-1"></i>Worksheet</button></li>
+  <li class="nav-item"><button class="nav-link fw-semibold" data-bs-toggle="tab" data-bs-target="#paraphrase"><i class="bi bi-arrow-left-right me-1"></i>Paraphrase</button></li>
+</ul>
+
+<div class="tab-content">
+
+<!-- ══════════════════ READING TAB ══════════════════ -->
+<div class="tab-pane fade show active" id="reading">
+
+  <!-- Translanguaging banner -->
+  <div class="alert border-0 mb-4" style="background:linear-gradient(135deg,#fff8ec,#fff3cd);border-left:4px solid #c9a227!important;border-radius:12px;">
+    <div class="fw-bold mb-1" style="color:#7a5c00;"><i class="bi bi-translate me-2"></i>Reading Strategy / Уншлагын стратеги</div>
+    <div style="font-size:13px;color:#5a4000;">
+      <strong>[EN]</strong> This is an adapted passage based on U.S. Government Accountability Office (GAO) reports on the United States Secret Service (USSS). Underlined terms are key vocabulary — hover or tap to see their Mongolian meaning in the Glossary tab.<br>
+      <strong>[MN]</strong> Энэ нь АНУ-ын Засгийн газрын Тооцооны алба (GAO)-аас АНУ-ын Нууц албаны (USSS) талаар гаргасан тайлангуудад үндэслэсэн дасан тохируулсан уншлагын материал юм.
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#1b3a6b;color:#fff;border-radius:12px 12px 0 0;">
+      <i class="bi bi-file-earmark-text me-2"></i>
+      United States Secret Service: Workforce Challenges and Protective Mission
+      <span class="badge ms-2" style="background:rgba(255,255,255,.2);font-size:11px;">GAO Report — Adapted</span>
+    </div>
+    <div class="card-body p-4 reading-body">
+
+      <div class="para-label">Background / Танилцуулга</div>
+      <p>
+        The <span class="highlight-term" title="Нууц алба — АНУ-ын тусгай хамгаалалтын байгууллага">United States Secret Service (USSS)</span> is a federal
+        <span class="highlight-term" title="хууль сахиулах байгууллага">law enforcement agency</span>
+        within the Department of Homeland Security. Established in 1865, the agency carries out a dual mission: protecting the nation's
+        <span class="highlight-term" title="хамгаалагдагч этгээдүүд">protectees</span>
+        — including the President, Vice President, and visiting
+        <span class="highlight-term" title="гадаад улсын тэргүүнүүд">heads of state</span>
+        — and investigating financial crimes such as
+        <span class="highlight-term" title="хуурамч мөнгө үйлдвэрлэх">counterfeiting</span>
+        and
+        <span class="highlight-term" title="цахим гэмт хэрэг">cybercrime</span>.
+        As of 2024, the agency employs approximately 8,300 personnel across 136 domestic
+        <span class="highlight-term" title="салбар газар">field offices</span>
+        and 20 overseas locations.
+      </p>
+
+      <div class="para-label mt-3">Workforce Structure / Ажилтны бүтэц</div>
+      <p>
+        The USSS
+        <span class="highlight-term" title="ажилтны хүч">workforce</span>
+        consists of two primary categories.
+        <span class="highlight-term" title="тусгай мөрдөгч">Special Agents (SAs)</span>
+        conduct both criminal investigations and protective operations, while
+        <span class="highlight-term" title="Жигд Хэлтсийн ажилтнууд">Uniformed Division (UD) Officers</span>
+        provide physical security at
+        <span class="highlight-term" title="хамгаалалтад байгаа байр">protected facilities</span>,
+        including the White House Complex and diplomatic missions. Supporting these two groups are
+        <span class="highlight-term" title="дэмжих ажилтнууд">administrative and technical support personnel</span>
+        who manage logistics, communications, and specialized functions.
+      </p>
+      <p>
+        According to GAO findings, the agency has faced persistent
+        <span class="highlight-term" title="ажилчдын гарц — ажил орхиход хэрэглэдэг нэр томъёо">attrition</span>
+        challenges. The
+        <span class="highlight-term" title="ажлаас гарах хувь">separation rate</span>
+        for Special Agents has consistently exceeded the agency's ability to
+        <span class="highlight-term" title="шинэ ажилтан авах, сонгон шалгаруулах">recruit and onboard</span>
+        qualified replacements. The
+        <span class="highlight-term" title="ажил горилогчдын шалгуур">eligibility requirements</span>
+        for entry — including a
+        <span class="highlight-term" title="аюулгүй байдлын шалгалт">security clearance</span>,
+        physical fitness standards, and a
+        <span class="highlight-term" title="олон шатны сонгон шалгаруулалт">multi-stage selection process</span>
+        — further constrain the
+        <span class="highlight-term" title="шалгалт өгч буй нэр дэвшигчдийн нийт">candidate pool</span>.
+      </p>
+
+      <div class="para-label mt-3">Training Pipeline / Сургалтын дамжлага</div>
+      <p>
+        Newly hired agents must complete an extensive
+        <span class="highlight-term" title="шинэ ажилтны сургалт">onboarding and training pipeline</span>
+        lasting 18 months or more. This includes the Criminal Investigator Training Program at the
+        <span class="highlight-term" title="Хуулийн сахиулах сургалтын төв">Federal Law Enforcement Training Centers (FLETC)</span>
+        and the agency's own
+        <span class="highlight-term" title="дотоод сургалтын хөтөлбөр">in-house training curriculum</span>.
+        During this period,
+        <span class="highlight-term" title="шинэ ажилтнуудыг сургаж, хяналт тавьдаг туршлагатай ажилтнууд">field training officers (FTOs)</span>
+        mentor recruits and certify their
+        <span class="highlight-term" title="ажлын чадамж">operational readiness</span>.
+        GAO noted that
+        <span class="highlight-term" title="сургалтын нөөц дутагдал">resource constraints</span>
+        in the training pipeline have at times delayed
+        <span class="highlight-term" title="ажил горилогчдыг хүлээн авах">class intakes</span>,
+        compounding existing staffing shortfalls.
+      </p>
+
+      <div class="para-label mt-3">Protective Operations / Хамгаалалтын ажиллагаа</div>
+      <p>
+        The agency's
+        <span class="highlight-term" title="хамгаалалтын нэгж, баг">protective details</span>
+        operate around the clock, providing
+        <span class="highlight-term" title="24 цагийн хамгаалалт">24/7 coverage</span>
+        to designated
+        <span class="highlight-term" title="хамгаалалтад байгаа хүн">protectees</span>.
+        Prior to any visit, agents conduct
+        <span class="highlight-term" title="урьдчилсан шалгалт, газар дээрх бэлтгэл ажил">advance work</span>
+        — surveying venues, coordinating with local
+        <span class="highlight-term" title="хууль сахиулах байгууллагууд">law enforcement counterparts</span>,
+        and establishing
+        <span class="highlight-term" title="аюулгүйн периметр">security perimeters</span>.
+        The
+        <span class="highlight-term" title="тэмцэх довтолгооны баг">Counter Assault Team (CAT)</span>
+        and
+        <span class="highlight-term" title="мэргэн буудагч">counter-sniper</span>
+        units provide tactical
+        <span class="highlight-term" title="хамгаалалтын дэмжлэг">protective support</span>
+        during high-risk movements such as
+        <span class="highlight-term" title="машины цуваа">motorcades</span>
+        and
+        <span class="highlight-term" title="олон нийтийн арга хэмжээ">public events</span>.
+      </p>
+      <p>
+        The agency also manages
+        <span class="highlight-term" title="үндэсний тусгай аюулгүй байдлын арга хэмжээ">National Special Security Events (NSSEs)</span>
+        such as presidential inaugurations, State of the Union addresses, and international summits. These events require
+        <span class="highlight-term" title="олон байгууллагын зохицуулалт">multi-agency coordination</span>
+        and the temporary
+        <span class="highlight-term" title="ажилтан дайчлах">deployment</span>
+        of large numbers of personnel.
+      </p>
+
+      <div class="para-label mt-3">Key Challenges / Гол бэрхшээлүүд</div>
+      <p>
+        GAO identified several critical challenges affecting USSS
+        <span class="highlight-term" title="ажилтны сайн сайхан байдал">workforce well-being</span>
+        and
+        <span class="highlight-term" title="байгууллагын үр нөлөө">organizational effectiveness</span>.
+        Excessive
+        <span class="highlight-term" title="илүү цаг">overtime</span>
+        — sometimes exceeding 20 hours per week — has led to
+        <span class="highlight-term" title="ядаргааны хуримтлал">cumulative fatigue</span>
+        among agents and officers. Surveys indicated that a significant proportion of personnel reported
+        <span class="highlight-term" title="ажил, амьдралын тэнцвэргүй байдал">work-life imbalance</span>
+        and
+        <span class="highlight-term" title="мэргэжлийн сэтгэл зүйн шавхалт">professional burnout</span>
+        as primary reasons for
+        <span class="highlight-term" title="ажлаас гарах шийдвэр">separation decisions</span>.
+      </p>
+      <p>
+        GAO recommended that the USSS develop a comprehensive
+        <span class="highlight-term" title="ажиллах хүчний стратегийн төлөвлөгөө">strategic workforce plan</span>
+        that addresses
+        <span class="highlight-term" title="ажилтан хадгалах">retention</span>,
+        <span class="highlight-term" title="элсүүлэх">recruitment</span>,
+        and
+        <span class="highlight-term" title="ажиллах хүчний нийт зохицуулалт">staffing levels</span>
+        in alignment with
+        <span class="highlight-term" title="үйл ажиллагааны хэрэгцээ">operational requirements</span>.
+        The agency
+        <span class="highlight-term" title="зөвшөөрч, дэмжиж байгаагаа илэрхийлэх">concurred</span>
+        with the majority of recommendations and outlined planned corrective actions.
+      </p>
+
+      <div class="alert mt-4 mb-0" style="background:#f0f8ff;border-radius:8px;font-size:13px;border:1px solid #bfdbfe;">
+        <strong style="color:#1b3a6b;"><i class="bi bi-info-circle me-1"></i>Reading Note:</strong>
+        Words with a <span class="highlight-term" style="font-size:13px;">yellow underline</span> are key professional terms.
+        Find their full definitions, Mongolian translations, and example sentences in the <strong>Glossary</strong> tab.
+      </div>
+    </div>
+  </div>
+</div><!-- end reading tab -->
+
+<!-- ══════════════════ GLOSSARY TAB ══════════════════ -->
+<div class="tab-pane fade" id="glossary">
+
+  <div class="alert border-0 mb-4" style="background:linear-gradient(135deg,#f0f8ff,#e8f4fd);border-left:4px solid #1b3a6b!important;border-radius:12px;">
+    <div class="fw-bold mb-1" style="color:#1b3a6b;"><i class="bi bi-journal-text me-2"></i>Professional & Occupational Glossary — Мэргэжлийн нэр томъёоны тайлбар толь</div>
+    <div style="font-size:13px;">Terms are grouped by category. <strong>[MN]</strong> = Mongolian translation. <strong>[DEF]</strong> = English definition. <strong>[EX]</strong> = Example sentence.</div>
+  </div>
+
+  <!-- PROTECTION TERMS -->
+  <h6 class="fw-bold mb-3 mt-2" style="color:#1b3a6b;"><i class="bi bi-shield-fill me-2"></i>Protective Operations / Хамгаалалтын ажиллагаа</h6>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-protection">Protection</span>
+    <div class="gloss-en">Protectee <span class="gloss-pos">noun</span></div>
+    <div class="gloss-def">[DEF] A person who is officially assigned protection by a security agency.</div>
+    <div class="gloss-mn">[MN] <strong>Хамгаалагдагч этгээд</strong> — албан ёсоор хамгаалалтанд байгаа хүн (Ерөнхийлөгч, сайд гэх мэт)</div>
+    <div class="gloss-ex">[EX] "The protectee arrived at the venue thirty minutes ahead of schedule."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-protection">Protection</span>
+    <div class="gloss-en">Advance Work <span class="gloss-pos">noun phrase</span></div>
+    <div class="gloss-def">[DEF] Preparatory reconnaissance and security coordination conducted before a protectee's arrival at a location.</div>
+    <div class="gloss-mn">[MN] <strong>Урьдчилсан бэлтгэл ажил</strong> — хамгаалагдагч этгээд ирэхээс өмнө хийгддэг газар шалгах, аюулгүй байдал зохицуулах ажил</div>
+    <div class="gloss-ex">[EX] "The advance team surveyed the hotel, mapped evacuation routes, and briefed local police."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-protection">Protection</span>
+    <div class="gloss-en">Protective Detail <span class="gloss-pos">noun phrase</span></div>
+    <div class="gloss-def">[DEF] The assigned team of agents responsible for the continuous close protection of a specific protectee.</div>
+    <div class="gloss-mn">[MN] <strong>Хамгаалалтын баг (дэтэйл)</strong> — тодорхой хамгаалагдагч этгээдийн хамгаалалтыг хариуцсан ажилтнуудын баг</div>
+    <div class="gloss-ex">[EX] "The protective detail maintained a tight perimeter throughout the state visit."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-protection">Protection</span>
+    <div class="gloss-en">Security Perimeter <span class="gloss-pos">noun phrase</span></div>
+    <div class="gloss-def">[DEF] A defined boundary established around a protectee or protected site to control access and detect threats.</div>
+    <div class="gloss-mn">[MN] <strong>Аюулгүйн тойрог хязгаар</strong> — хамгаалагдагч этгээд эсвэл байрлалын орчимд тогтоогдсон хяналтын хил</div>
+    <div class="gloss-ex">[EX] "No one was permitted inside the security perimeter without a valid credential."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-protection">Protection</span>
+    <div class="gloss-en">Counter Assault Team (CAT) <span class="gloss-pos">noun phrase</span></div>
+    <div class="gloss-def">[DEF] A heavily armed tactical unit trained to engage and neutralize a direct attack on a protectee.</div>
+    <div class="gloss-mn">[MN] <strong>Тэмцэх довтолгооны баг (CAT)</strong> — хамгаалагдагч этгээдэд шууд довтолгоо гарсан тохиолдолд саармагжуулах зорилготой зэвсэглэсэн тактик баг</div>
+    <div class="gloss-ex">[EX] "The CAT was positioned at strategic points along the motorcade route."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-protection">Protection</span>
+    <div class="gloss-en">Motorcade <span class="gloss-pos">noun</span></div>
+    <div class="gloss-def">[DEF] A procession of vehicles used to transport a protectee, typically including escort, principal, and support vehicles.</div>
+    <div class="gloss-mn">[MN] <strong>Машины цуваа</strong> — хамгаалагдагч этгээдийг тээвэрлэх зориулалтбүхий машины дараалал</div>
+    <div class="gloss-ex">[EX] "The motorcade departed the airport with a police pilot vehicle at the front."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-protection">Protection</span>
+    <div class="gloss-en">Counter-Sniper <span class="gloss-pos">noun / adjective</span></div>
+    <div class="gloss-def">[DEF] A trained marksman positioned to detect and neutralize long-range threats to a protectee.</div>
+    <div class="gloss-mn">[MN] <strong>Мэргэн буудагч (хамгаалалтын)</strong> — хамгаалагдагч этгээдэд учрах алсын аюулыг илрүүлж, саармагжуулах чадварлаг тэмцэгч</div>
+    <div class="gloss-ex">[EX] "Counter-sniper teams were deployed on the rooftops surrounding the rally venue."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-protection">Protection</span>
+    <div class="gloss-en">National Special Security Event (NSSE) <span class="gloss-pos">noun phrase</span></div>
+    <div class="gloss-def">[DEF] A designated high-profile event deemed to require the full coordination of federal security resources.</div>
+    <div class="gloss-mn">[MN] <strong>Үндэсний тусгай аюулгүй байдлын арга хэмжээ</strong> — Холбооны засгийн газрын бүх аюулгүй байдлын нөөцийг зохицуулахыг шаарддаг өндөр ач холбогдол бүхий арга хэмжээ</div>
+    <div class="gloss-ex">[EX] "Presidential inaugurations are designated as NSSEs, requiring coordination across dozens of agencies."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-protection">Protection</span>
+    <div class="gloss-en">Threat Assessment <span class="gloss-pos">noun phrase</span></div>
+    <div class="gloss-def">[DEF] The structured process of evaluating the credibility and severity of a potential threat to a protectee or facility.</div>
+    <div class="gloss-mn">[MN] <strong>Аюулын үнэлгээ</strong> — хамгаалагдагч этгээд эсвэл байрлалд учрах аюулын батлагаа, хүнд хэцүүг үнэлэх системтэй үйл явц</div>
+    <div class="gloss-ex">[EX] "Analysts completed a threat assessment before approving the visit to the high-risk region."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-protection">Protection</span>
+    <div class="gloss-en">Protective Intelligence <span class="gloss-pos">noun phrase</span></div>
+    <div class="gloss-def">[DEF] Information gathered and analyzed to identify and mitigate potential threats to protected persons.</div>
+    <div class="gloss-mn">[MN] <strong>Хамгаалалтын тагнуул мэдээлэл</strong> — хамгаалагдагч этгээдэд учрах аюулыг тодорхойлж, бууруулах зорилгоор цуглуулсан болон шинжилсэн мэдээлэл</div>
+    <div class="gloss-ex">[EX] "Protective intelligence officers monitor social media and informant networks continuously."</div>
+  </div>
+
+  <!-- WORKFORCE TERMS -->
+  <h6 class="fw-bold mb-3 mt-4" style="color:#1b3a6b;"><i class="bi bi-people-fill me-2"></i>Workforce & Personnel / Ажиллах хүч ба боловсон хүчин</h6>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-workforce">Workforce</span>
+    <div class="gloss-en">Special Agent (SA) <span class="gloss-pos">noun phrase</span></div>
+    <div class="gloss-def">[DEF] A federal law enforcement officer with authority to investigate crimes and protect designated individuals.</div>
+    <div class="gloss-mn">[MN] <strong>Тусгай мөрдөгч</strong> — гэмт хэрэг мөрдөн шалгах, тодорхой хүмүүсийг хамгаалах эрх бүхий холбооны хууль сахиулах ажилтан</div>
+    <div class="gloss-ex">[EX] "Special Agents rotate between investigative and protective assignments throughout their careers."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-workforce">Workforce</span>
+    <div class="gloss-en">Uniformed Division (UD) Officer <span class="gloss-pos">noun phrase</span></div>
+    <div class="gloss-def">[DEF] A sworn officer in uniform who secures fixed sites such as the White House and diplomatic premises.</div>
+    <div class="gloss-mn">[MN] <strong>Жигд хэлтсийн ажилтан</strong> — Цагаан орон болон дипломатын байшин зэрэг тогтмол байршлыг хамгаалдаг дүрэмт хувцастай ажилтан</div>
+    <div class="gloss-ex">[EX] "UD Officers conduct access control and perimeter patrols at the White House Complex."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-workforce">Workforce</span>
+    <div class="gloss-en">Attrition <span class="gloss-pos">noun</span></div>
+    <div class="gloss-def">[DEF] The gradual reduction of workforce through resignation, retirement, or other separations — not through dismissal.</div>
+    <div class="gloss-mn">[MN] <strong>Ажилтны гарц / ажлаас гарах явдал</strong> — огцрох, тэтгэвэрт гарах зэргээс үүдэлтэй ажиллах хүчний аажмаар буурах үзэгдэл</div>
+    <div class="gloss-ex">[EX] "High attrition rates left the agency understaffed during the peak event season."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-workforce">Workforce</span>
+    <div class="gloss-en">Retention <span class="gloss-pos">noun</span></div>
+    <div class="gloss-def">[DEF] The ability of an organization to keep its existing employees and prevent voluntary resignation.</div>
+    <div class="gloss-mn">[MN] <strong>Ажилтан хадгалалт</strong> — байгууллага өөрийн одоогийн ажилтнуудыг хадгалж, сайн дурын огцролтоос урьдчилан сэргийлэх чадвар</div>
+    <div class="gloss-ex">[EX] "Retention bonuses were introduced to improve long-term staffing stability."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-workforce">Workforce</span>
+    <div class="gloss-en">Operational Readiness <span class="gloss-pos">noun phrase</span></div>
+    <div class="gloss-def">[DEF] The state of being fully trained, equipped, and prepared to carry out assigned duties effectively.</div>
+    <div class="gloss-mn">[MN] <strong>Үйл ажиллагааны бэлэн байдал</strong> — өгөгдсөн үүргийг үр дүнтэй гүйцэтгэхэд шаардлагатай сургалт, тоног төхөөрөмж, бэлтгэлтэй байх байдал</div>
+    <div class="gloss-ex">[EX] "All agents must demonstrate operational readiness before joining a protective detail."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-workforce">Workforce</span>
+    <div class="gloss-en">Security Clearance <span class="gloss-pos">noun phrase</span></div>
+    <div class="gloss-def">[DEF] Official authorization granted to an individual following a background investigation, permitting access to classified information.</div>
+    <div class="gloss-mn">[MN] <strong>Аюулгүй байдлын зөвшөөрөл</strong> — нарийн мэдээлэлд нэвтрэх эрх олгодог, арын хяналт шалгалтын дараа олгогддог зөвшөөрөл</div>
+    <div class="gloss-ex">[EX] "Applicants must pass a top-secret security clearance before entering the training program."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-workforce">Workforce</span>
+    <div class="gloss-en">Field Training Officer (FTO) <span class="gloss-pos">noun phrase</span></div>
+    <div class="gloss-def">[DEF] An experienced officer assigned to supervise and evaluate new recruits during on-the-job training.</div>
+    <div class="gloss-mn">[MN] <strong>Газар дээрх сургагч ажилтан</strong> — ажлын байран дээр шинэ ажилтнуудыг хянаж, үнэлдэг туршлагатай ажилтан</div>
+    <div class="gloss-ex">[EX] "Each recruit was paired with an FTO for the first six months of field assignment."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-workforce">Workforce</span>
+    <div class="gloss-en">Burnout <span class="gloss-pos">noun</span></div>
+    <div class="gloss-def">[DEF] A state of chronic physical and emotional exhaustion resulting from prolonged workplace stress.</div>
+    <div class="gloss-mn">[MN] <strong>Мэргэжлийн сэтгэл зүйн шавхалт</strong> — удаан үргэлжилсэн ажлын дарамтаас үүдэлтэй архаг биеийн болон сэтгэл зүйн ядаргааны байдал</div>
+    <div class="gloss-ex">[EX] "Burnout was cited as the leading reason for resignation among mid-career agents."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-workforce">Workforce</span>
+    <div class="gloss-en">Staffing Shortfall <span class="gloss-pos">noun phrase</span></div>
+    <div class="gloss-def">[DEF] A gap between the number of personnel required to fulfill the mission and those actually available.</div>
+    <div class="gloss-mn">[MN] <strong>Ажилтны дутагдал</strong> — үйл ажиллагааны хэрэгцээ болон бодит боломжийн хооронд байгаа цоорхой</div>
+    <div class="gloss-ex">[EX] "The staffing shortfall forced many agents to work excessive overtime hours."</div>
+  </div>
+
+  <!-- LEGAL / REPORT TERMS -->
+  <h6 class="fw-bold mb-3 mt-4" style="color:#1b3a6b;"><i class="bi bi-file-earmark-text me-2"></i>Government Report & Legal / Засгийн газрын тайлан ба хууль эрх зүй</h6>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-legal">Legal</span>
+    <div class="gloss-en">Government Accountability Office (GAO) <span class="gloss-pos">noun phrase</span></div>
+    <div class="gloss-def">[DEF] An independent, nonpartisan federal agency that audits government programs and reports findings to Congress.</div>
+    <div class="gloss-mn">[MN] <strong>Засгийн газрын Тооцооны алба (GAO)</strong> — Засгийн газрын хөтөлбөрүүдийг аудитлаж, Конгресст тайлагнадаг бие даасан, намын бус холбооны агентлаг</div>
+    <div class="gloss-ex">[EX] "The GAO's report criticized the agency's failure to address chronic overtime."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-report">Report</span>
+    <div class="gloss-en">Recommendation <span class="gloss-pos">noun</span></div>
+    <div class="gloss-def">[DEF] A formal suggestion made by an oversight body for an agency to improve its practices or policies.</div>
+    <div class="gloss-mn">[MN] <strong>Зөвлөмж</strong> — хяналтын байгууллагаас агентлагийн практик эсвэл бодлогыг сайжруулахыг санал болгосон албан ёсны санал</div>
+    <div class="gloss-ex">[EX] "The agency concurred with all eight recommendations in the report."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-report">Report</span>
+    <div class="gloss-en">Corrective Action Plan <span class="gloss-pos">noun phrase</span></div>
+    <div class="gloss-def">[DEF] A documented set of steps an organization commits to in order to address identified deficiencies.</div>
+    <div class="gloss-mn">[MN] <strong>Засч залруулах арга хэмжээний төлөвлөгөө</strong> — тодорхойлсон дутагдлыг арилгахын тулд байгууллага хүлээн зөвшөөрсөн алхмуудыг тусгасан баримт бичиг</div>
+    <div class="gloss-ex">[EX] "A corrective action plan was submitted to GAO within 90 days of the report's release."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-legal">Legal</span>
+    <div class="gloss-en">Law Enforcement Agency <span class="gloss-pos">noun phrase</span></div>
+    <div class="gloss-def">[DEF] A government body authorized to enforce laws, investigate crimes, and make arrests.</div>
+    <div class="gloss-mn">[MN] <strong>Хууль сахиулах байгууллага</strong> — хууль хэрэгжүүлэх, гэмт хэрэг мөрдөх, баривчлах эрх бүхий засгийн газрын байгуулга</div>
+    <div class="gloss-ex">[EX] "The USSS is a federal law enforcement agency under the Department of Homeland Security."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-legal">Legal</span>
+    <div class="gloss-en">Counterfeiting <span class="gloss-pos">noun</span></div>
+    <div class="gloss-def">[DEF] The illegal production of fraudulent copies of currency or documents.</div>
+    <div class="gloss-mn">[MN] <strong>Хуурамч мөнгө, баримт бичиг үйлдвэрлэх</strong> — мөнгон тэмдэгт эсвэл баримт бичгийн хууль бус хуурамч хуулбарыг бүтээх явдал</div>
+    <div class="gloss-ex">[EX] "The Secret Service was originally founded in 1865 to combat widespread counterfeiting."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-legal">Legal</span>
+    <div class="gloss-en">Concur <span class="gloss-pos">verb</span></div>
+    <div class="gloss-def">[DEF] To formally agree with a finding, recommendation, or conclusion in an official report.</div>
+    <div class="gloss-mn">[MN] <strong>Зөвшөөрөх, дэмжих</strong> — албан ёсны тайлан дахь дүгнэлт эсвэл зөвлөмжтэй нийцэж байгаагаа илэрхийлэх</div>
+    <div class="gloss-ex">[EX] "The Director concurred with the GAO's findings and pledged prompt action."</div>
+  </div>
+
+  <div class="gloss-card">
+    <span class="category-badge cat-report">Report</span>
+    <div class="gloss-en">Strategic Workforce Plan <span class="gloss-pos">noun phrase</span></div>
+    <div class="gloss-def">[DEF] A long-term organizational document that aligns human capital resources with mission requirements and future goals.</div>
+    <div class="gloss-mn">[MN] <strong>Ажиллах хүчний стратегийн төлөвлөгөө</strong> — хүний нөөцийг байгууллагын эрхэм зорилго болон ирээдүйн зорилттой уялдуулдаг урт хугацааны баримт бичиг</div>
+    <div class="gloss-ex">[EX] "GAO urged the agency to finalize and implement its strategic workforce plan."</div>
+  </div>
+
+</div><!-- end glossary tab -->
+
+<!-- ══════════════════ WORKSHEET TAB ══════════════════ -->
+<div class="tab-pane fade" id="worksheet">
+
+  <div class="alert border-0 mb-4" style="background:linear-gradient(135deg,#f0fff4,#d4edda);border-left:4px solid #198754!important;border-radius:12px;">
+    <strong class="text-success"><i class="bi bi-pencil-square me-2"></i>Instructions:</strong>
+    <span style="font-size:13px;"> Complete all tasks. Go back to the Reading and Glossary tabs if you need help. <strong>[MN]</strong> Бүх даалгаврыг гүйцэтгэнэ үү. Шаардлагатай бол Уншлага болон Толь бичиг хэсэгрүү буцаж болно.</span>
+  </div>
+
+  <!-- Task A: Comprehension -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#e8f4fd;color:#1b3a6b;border-radius:12px 12px 0 0;">
+      📖 Task A — Comprehension: Multiple Choice
+      <span id="tAscore" class="badge float-end" style="background:#1b3a6b;">0 / 5</span>
+    </div>
+    <div class="card-body">
+
+      <div class="q-card" id="qA1">
+        <p class="fw-semibold mb-2">1. What are the two primary missions of the United States Secret Service?</p>
+        <button class="opt-btn" onclick="mcq('qA1',this,false,'A')">A. Counterterrorism and border patrol</button>
+        <button class="opt-btn" onclick="mcq('qA1',this,true,'A')">B. Protection of designated individuals and investigation of financial crimes</button>
+        <button class="opt-btn" onclick="mcq('qA1',this,false,'A')">C. Intelligence gathering and diplomatic relations</button>
+        <button class="opt-btn" onclick="mcq('qA1',this,false,'A')">D. Cybersecurity and drug enforcement</button>
+        <div class="feedback" id="qA1fb" style="font-size:13px;margin-top:6px;"></div>
+      </div>
+
+      <div class="q-card" id="qA2">
+        <p class="fw-semibold mb-2">2. According to the reading, approximately how many personnel does the USSS employ as of 2024?</p>
+        <button class="opt-btn" onclick="mcq('qA2',this,false,'A')">A. 3,500</button>
+        <button class="opt-btn" onclick="mcq('qA2',this,false,'A')">B. 5,200</button>
+        <button class="opt-btn" onclick="mcq('qA2',this,true,'A')">C. 8,300</button>
+        <button class="opt-btn" onclick="mcq('qA2',this,false,'A')">D. 12,000</button>
+        <div class="feedback" id="qA2fb" style="font-size:13px;margin-top:6px;"></div>
+      </div>
+
+      <div class="q-card" id="qA3">
+        <p class="fw-semibold mb-2">3. What is the primary role of Uniformed Division Officers?</p>
+        <button class="opt-btn" onclick="mcq('qA3',this,false,'A')">A. Conducting criminal investigations overseas</button>
+        <button class="opt-btn" onclick="mcq('qA3',this,true,'A')">B. Providing physical security at protected facilities such as the White House</button>
+        <button class="opt-btn" onclick="mcq('qA3',this,false,'A')">C. Leading protective details for the President during travel</button>
+        <button class="opt-btn" onclick="mcq('qA3',this,false,'A')">D. Managing the agency's training pipeline</button>
+        <div class="feedback" id="qA3fb" style="font-size:13px;margin-top:6px;"></div>
+      </div>
+
+      <div class="q-card" id="qA4">
+        <p class="fw-semibold mb-2">4. Which of the following best describes "advance work" in the context of protective operations?</p>
+        <button class="opt-btn" onclick="mcq('qA4',this,false,'A')">A. Recruiting and training new agents before deployment</button>
+        <button class="opt-btn" onclick="mcq('qA4',this,false,'A')">B. Reviewing financial crime case files before prosecution</button>
+        <button class="opt-btn" onclick="mcq('qA4',this,true,'A')">C. Pre-visit reconnaissance, venue assessment, and coordination with local law enforcement</button>
+        <button class="opt-btn" onclick="mcq('qA4',this,false,'A')">D. Post-event security debriefing with senior officials</button>
+        <div class="feedback" id="qA4fb" style="font-size:13px;margin-top:6px;"></div>
+      </div>
+
+      <div class="q-card" id="qA5">
+        <p class="fw-semibold mb-2">5. What did GAO recommend to address the USSS workforce challenges?</p>
+        <button class="opt-btn" onclick="mcq('qA5',this,false,'A')">A. Abolish the Uniformed Division and merge it with Special Agents</button>
+        <button class="opt-btn" onclick="mcq('qA5',this,true,'A')">B. Develop a comprehensive strategic workforce plan covering retention, recruitment, and staffing</button>
+        <button class="opt-btn" onclick="mcq('qA5',this,false,'A')">C. Reduce the number of designated protectees</button>
+        <button class="opt-btn" onclick="mcq('qA5',this,false,'A')">D. Transfer the agency to the Department of Justice</button>
+        <div class="feedback" id="qA5fb" style="font-size:13px;margin-top:6px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task B: Vocabulary matching -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#e8f4fd;color:#1b3a6b;border-radius:12px 12px 0 0;">
+      📚 Task B — Vocabulary: Fill in the blanks
+      <span id="tBscore" class="badge float-end" style="background:#1b3a6b;">0 / 6</span>
+    </div>
+    <div class="card-body">
+      <p class="text-muted small mb-3">Use the words from the box. <em>Word bank: attrition / protectee / perimeter / concurred / burnout / advance</em></p>
+      <ol style="font-size:14px;line-height:2.2;">
+        <li>The agency <input class="fill-input" id="B1" placeholder="___"> with all GAO recommendations and pledged corrective action. <div class="feedback" id="B1fb"></div></li>
+        <li>High <input class="fill-input" id="B2" placeholder="___"> rates have left the USSS with significant staffing gaps. <div class="feedback" id="B2fb"></div></li>
+        <li>The <input class="fill-input" id="B3" placeholder="___"> team surveyed the venue three days before the President's arrival. <div class="feedback" id="B3fb"></div></li>
+        <li>No unauthorized person was allowed inside the security <input class="fill-input" id="B4" placeholder="___"> during the event. <div class="feedback" id="B4fb"></div></li>
+        <li>Excessive overtime was identified as the leading cause of <input class="fill-input" id="B5" placeholder="___"> among mid-career agents. <div class="feedback" id="B5fb"></div></li>
+        <li>The <input class="fill-input" id="B6" placeholder="___"> departed the White House at exactly 09:00 with full security coverage. <div class="feedback" id="B6fb"></div></li>
+      </ol>
+      <button class="btn btn-primary btn-sm mt-3" onclick="checkB()"><i class="bi bi-check2-circle me-1"></i>Check Answers</button>
+    </div>
+  </div>
+
+  <!-- Task C: Short answer -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#e8f4fd;color:#1b3a6b;border-radius:12px 12px 0 0;">
+      ✍️ Task C — Short Answer / Discussion <span class="text-muted fw-normal small ms-1">(Write 2–4 sentences each)</span>
+    </div>
+    <div class="card-body">
+      <div class="mb-4">
+        <p class="fw-semibold mb-2">1. What challenges does your own agency face that are similar to those described in the USSS report? How does your agency address workforce attrition?</p>
+        <div class="text-muted small mb-1">[MN] Танай байгууллага тайланд дурдсантай төстэй ямар бэрхшээлтэй тулгардаг вэ? Ажилтны гарцыг хэрхэн шийддэг вэ?</div>
+        <textarea class="form-control" rows="4" style="font-size:14px;" placeholder="Write your answer here..."></textarea>
+      </div>
+      <div class="mb-4">
+        <p class="fw-semibold mb-2">2. Why do you think "advance work" is critical to a successful protective operation? Describe the steps you would take when conducting advance work for a VIP visit.</p>
+        <div class="text-muted small mb-1">[MN] "Урьдчилсан бэлтгэл ажил" яагаад амжилттай хамгаалалтын ажиллагааны чухал хэсэг гэж та бодож байна вэ?</div>
+        <textarea class="form-control" rows="4" style="font-size:14px;" placeholder="Write your answer here..."></textarea>
+      </div>
+      <div class="mb-2">
+        <p class="fw-semibold mb-2">3. The report mentions "burnout" as a major reason for resignation. What strategies would you recommend to improve well-being among protection officers?</p>
+        <div class="text-muted small mb-1">[MN] Тайланд "мэргэжлийн шавхалт" огцролтын гол шалтгаан болж байгааг дурдсан. Хамгаалалтын ажилтнуудын сайн сайхан байдлыг сайжруулахад ямар стратеги санал болгох вэ?</div>
+        <textarea class="form-control" rows="4" style="font-size:14px;" placeholder="Write your answer here..."></textarea>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end worksheet tab -->
+
+<!-- ══════════════════ PARAPHRASE TAB ══════════════════ -->
+<div class="tab-pane fade" id="paraphrase">
+
+  <div class="alert border-0 mb-4" style="background:linear-gradient(135deg,#fff8ec,#fff3cd);border-left:4px solid #c9a227!important;border-radius:12px;">
+    <div class="fw-bold mb-1" style="color:#7a5c00;"><i class="bi bi-arrow-left-right me-2"></i>Paraphrase Practice — Өөрийн үгээр дахин илэрхийлэх</div>
+    <div style="font-size:13px;color:#5a4000;">
+      <strong>[EN]</strong> The left column shows formal government/report language. The right column shows a plain-English paraphrase. Study the differences, then practice rewriting the originals yourself.<br>
+      <strong>[MN]</strong> Зүүн баганад засгийн газрын тайлангийн хэлбэрийн өгүүлбэрүүд байна. Баруун баганад энгийн англи хэлээр дахин илэрхийлсэн байна. Ялгааг судалж, дараа нь өөрийн үгээр дахин бичиж үзнэ үү.
+    </div>
+  </div>
+
+  <div class="paraphrase-row">
+    <div class="para-orig"><div class="para-label">📄 Original (Formal Report Language)</div>"The agency has faced persistent attrition challenges, with the separation rate for Special Agents consistently exceeding the agency's ability to recruit and onboard qualified replacements."</div>
+    <div class="para-simple"><div class="para-label">✅ Plain English Paraphrase</div>"The Secret Service keeps losing experienced agents faster than it can hire and train new ones."<br><br><span style="color:#5a4000;font-size:12px;">[MN] Нууц алба шинэ ажилтан авч, сургахаасаа хурдан туршлагатай ажилтнуудаа алдсаар байна.</span></div>
+  </div>
+
+  <div class="paraphrase-row">
+    <div class="para-orig"><div class="para-label">📄 Original</div>"Agents conduct advance work — surveying venues, coordinating with local law enforcement counterparts, and establishing security perimeters."</div>
+    <div class="para-simple"><div class="para-label">✅ Plain English</div>"Before a visit, agents check the location in advance, work with local police, and set up a secure zone around the area."<br><br><span style="color:#5a4000;font-size:12px;">[MN] Айлчлал болохын өмнө мөрдөгчид байршлыг урьдчилан шалгаж, орон нутгийн цагдаатай хамтарч, аюулгүй бүсийг тогтооно.</span></div>
+  </div>
+
+  <div class="paraphrase-row">
+    <div class="para-orig"><div class="para-label">📄 Original</div>"GAO identified several critical challenges affecting USSS workforce well-being and organizational effectiveness."</div>
+    <div class="para-simple"><div class="para-label">✅ Plain English</div>"GAO found a number of serious problems that are harming both the employees and the agency's ability to do its job."<br><br><span style="color:#5a4000;font-size:12px;">[MN] GAO ажилтнуудад болон байгууллагын ажлын чадварт хохирол учруулж буй хэд хэдэн томоохон асуудлыг тогтоов.</span></div>
+  </div>
+
+  <div class="paraphrase-row">
+    <div class="para-orig"><div class="para-label">📄 Original</div>"Excessive overtime — sometimes exceeding 20 hours per week — has led to cumulative fatigue among agents and officers."</div>
+    <div class="para-simple"><div class="para-label">✅ Plain English</div>"Many agents are working more than 20 extra hours a week, which is making them increasingly exhausted over time."<br><br><span style="color:#5a4000;font-size:12px;">[MN] Олон мөрдөгч долоо хоногт 20 гаруй цагийн илүү ажил хийдэг бөгөөд энэ нь тэднийг цаг хугацааны явцад улам ядрааж байна.</span></div>
+  </div>
+
+  <div class="paraphrase-row">
+    <div class="para-orig"><div class="para-label">📄 Original</div>"The agency concurred with the majority of recommendations and outlined planned corrective actions."</div>
+    <div class="para-simple"><div class="para-label">✅ Plain English</div>"The Secret Service agreed with most of GAO's suggestions and described what steps it plans to take to fix the problems."<br><br><span style="color:#5a4000;font-size:12px;">[MN] Нууц алба GAO-ийн зөвлөмжийн ихэнхтэй санал нийлж, асуудлуудыг засахын тулд авах арга хэмжээгээ тайлбарлав.</span></div>
+  </div>
+
+  <!-- Practice section -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:12px;">
+    <div class="card-header fw-bold" style="background:#fff8ec;color:#7a5c00;border-radius:12px 12px 0 0;">
+      ✍️ Your Turn — Paraphrase these sentences
+    </div>
+    <div class="card-body">
+      <div class="mb-4">
+        <div class="para-orig mb-2"><div class="para-label">📄 Rewrite this in plain English:</div>"Multi-agency coordination and the temporary deployment of large numbers of personnel are required during National Special Security Events."</div>
+        <textarea class="form-control" rows="3" style="font-size:14px;" placeholder="Your plain English version..."></textarea>
+        <div class="mt-2 p-2 rounded" style="background:#f0fff4;font-size:12px;color:#155724;"><strong>Hint [MN]:</strong> "Олон байгууллага хамтран ажиллах, олон тооны ажилтан дайчлах шаардлагатай" гэсэн утгатай.</div>
+      </div>
+      <div class="mb-2">
+        <div class="para-orig mb-2"><div class="para-label">📄 Rewrite this in plain English:</div>"Resource constraints in the training pipeline have at times delayed class intakes, compounding existing staffing shortfalls."</div>
+        <textarea class="form-control" rows="3" style="font-size:14px;" placeholder="Your plain English version..."></textarea>
+        <div class="mt-2 p-2 rounded" style="background:#f0fff4;font-size:12px;color:#155724;"><strong>Hint [MN]:</strong> "Нөөцийн хомсдол сургалтын группын эхлэлийг хойшлуулж, ажилтны дутагдлыг улам хүндрүүлсэн" гэсэн утгатай.</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end paraphrase tab -->
+</div><!-- end tab-content -->
+
+<script>
+const scores = {A:0, B:0};
+const maxes  = {A:5, B:6};
+const mcqDone = {};
+const bAns = {B1:'concurred',B2:'attrition',B3:'advance',B4:'perimeter',B5:'burnout',B6:'protectee'};
+
+function updateTotal() {
+  const got = Object.values(scores).reduce((a,b)=>a+b,0);
+  const tot = Object.values(maxes).reduce((a,b)=>a+b,0);
+  document.getElementById('totalScore').textContent = got+' / '+tot;
+  document.getElementById('totalBar').style.width = (tot ? got/tot*100 : 0)+'%';
+}
+function scoreEl(task) {
+  document.getElementById('t'+task+'score').textContent = scores[task]+' / '+maxes[task];
+  updateTotal();
+}
+
+function mcq(qid, btn, correct, task) {
+  if (mcqDone[qid]) return;
+  mcqDone[qid] = true;
+  const div = document.getElementById(qid);
+  div.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+  if (correct) {
+    btn.classList.add('opt-correct');
+    document.getElementById(qid+'fb').className='feedback c';
+    document.getElementById(qid+'fb').textContent='✅ Correct!';
+    scores[task]++; scoreEl(task);
+  } else {
+    btn.classList.add('opt-wrong');
+    document.getElementById(qid+'fb').className='feedback w';
+    document.getElementById(qid+'fb').textContent='❌ Not quite — re-read the passage.';
+    div.querySelectorAll('.opt-btn').forEach(b => { if(b.dataset.correct) b.classList.add('opt-correct'); });
+  }
+}
+// mark correct answers
+document.addEventListener('DOMContentLoaded', function(){
+  [['qA1',1],['qA2',2],['qA3',1],['qA4',2],['qA5',1]].forEach(([id,idx]) => {
+    document.querySelectorAll('#'+id+' .opt-btn')[idx].dataset.correct='yes';
+  });
+});
+
+function checkB() {
+  let got = 0;
+  Object.entries(bAns).forEach(([id,ans]) => {
+    const inp = document.getElementById(id);
+    const fb  = document.getElementById(id+'fb');
+    const val = inp.value.trim().toLowerCase();
+    if (val === ans.toLowerCase()) {
+      inp.classList.add('correct'); inp.classList.remove('wrong');
+      fb.className='feedback c'; fb.textContent='✅'; got++;
+    } else {
+      inp.classList.add('wrong'); inp.classList.remove('correct');
+      fb.className='feedback w'; fb.textContent='❌ '+ans;
+    }
+  });
+  scores['B'] = got; scoreEl('B');
+}
+
+function resetAll() { location.reload(); }
+updateTotal();
+</script>
+
+{% endblock %}

@@ -14,13 +14,17 @@
   <meta property="og:site_name" content="ТТХГ Цахим Сургалт">
   <meta property="og:title" content="{% block og_title %}ТӨРИЙН ТУСГАЙ ХАМГААЛАЛТЫН АЛБА ХААГЧИЙН АНГЛИ ХЭЛНИЙ ЦАХИМ СУРГАЛТЫН СИСТЕМ{% endblock %}">
   <meta property="og:description" content="{% block og_description %}Төрийн Тусгай Хамгаалалтын Алба Хаагчийн Англи Хэлний Цахим Сургалтын Систем — ТТХГ-ийн онлайн сургалтын платформ.{% endblock %}">
-  <meta property="og:url" content="https://sspa400v3.onrender.com{% block og_url %}{% endblock %}">
-  <meta property="og:image" content="https://sspa400v3.onrender.com/static/lms/og-cover.png">
+  <meta property="og:url" content="https://sspa400-public.onrender.com{% block og_url %}{% endblock %}">
+  <meta property="og:image" content="https://sspa400-public.onrender.com{% block og_image %}/static/lms/og-cover.png{% endblock %}">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:locale" content="mn_MN">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://sspa400-public.onrender.com{% block tw_image %}/static/lms/og-cover.png{% endblock %}">
   <link rel="manifest" href="{% static 'lms/manifest.json' %}">
-  <link rel="apple-touch-icon" href="{% static 'lms/logo.png' %}">
+  <link rel="icon" type="image/x-icon" href="{% static 'lms/favicon.ico' %}">
+  <link rel="icon" type="image/png" sizes="64x64" href="{% static 'lms/favicon.png' %}">
+  <link rel="apple-touch-icon" sizes="192x192" href="{% static 'lms/icon-192.png' %}">
   <title>{% block title %}ТӨРИЙН ТУСГАЙ ХАМГААЛАЛТЫН АЛБА ХААГЧИЙН АНГЛИ ХЭЛНИЙ ЦАХИМ СУРГАЛТЫН СИСТЕМ{% endblock %}</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
@@ -166,8 +170,14 @@
     <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
       <i class="bi bi-house-door"></i> Нүүр хуудас
     </a>
-    <a href="{% url 'worksheets' %}" class="{% if request.resolver_match.url_name == 'worksheets' %}active{% endif %}">
+    <a href="{% url 'worksheets' %}" class="{% if request.resolver_match.url_name == 'worksheets' and not request.GET.tab %}active{% endif %}">
       <i class="bi bi-journal-text"></i> Worksheets &amp; Tests
+    </a>
+    <a href="{% url 'worksheets' %}?tab=vocabulary" class="{% if request.resolver_match.url_name == 'worksheets' and request.GET.tab == 'vocabulary' %}active{% endif %}">
+      <i class="bi bi-book"></i> Vocabulary
+    </a>
+    <a href="{% url 'worksheets' %}?tab=reading" class="{% if request.resolver_match.url_name == 'worksheets' and request.GET.tab == 'reading' %}active{% endif %}">
+      <i class="bi bi-file-text"></i> Reading
     </a>
     <a href="{% url 'videos' %}" class="{% if request.resolver_match.url_name == 'videos' %}active{% endif %}">
       <i class="bi bi-play-circle"></i> Видео хичээлүүд

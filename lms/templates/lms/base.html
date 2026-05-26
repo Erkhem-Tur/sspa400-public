@@ -182,6 +182,9 @@
     <a href="{% url 'videos' %}" class="{% if request.resolver_match.url_name == 'videos' %}active{% endif %}">
       <i class="bi bi-play-circle"></i> Видео хичээлүүд
     </a>
+    <a href="{% url 'padlet' %}" class="{% if request.resolver_match.url_name == 'padlet' %}active{% endif %}">
+      <i class="bi bi-grid-3x3-gap-fill"></i> Хэлэлцүүлгийн хана
+    </a>
     <a href="{% url 'logbook' %}" class="{% if request.resolver_match.url_name == 'logbook' %}active{% endif %}">
       <i class="bi bi-journal-check"></i> Ирцийн бүртгэл
     </a>

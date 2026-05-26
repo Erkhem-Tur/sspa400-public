@@ -130,6 +130,31 @@ class LogEntry(models.Model):
         return f"{self.full_name} – {self.logged_at.strftime('%Y-%m-%d %H:%M')}"
 
 
+PROMPT_CHOICES = [
+    ('learned',   'Өнөөдөр би сурсан зүйл...'),
+    ('difficult', 'Надад хэцүү байсан...'),
+    ('question',  'Би асуухыг хүссэн...'),
+    ('next',      'Дараагийн удаа би...'),
+]
+
+
+class WallPost(models.Model):
+    PROMPT_CHOICES = PROMPT_CHOICES
+    author_name = models.CharField(max_length=100, verbose_name='Нэр')
+    prompt      = models.CharField(max_length=20, choices=PROMPT_CHOICES, verbose_name='Асуулт')
+    content     = models.TextField(max_length=300, verbose_name='Хариулт')
+    created_at  = models.DateTimeField(auto_now_add=True)
+    ip          = models.GenericIPAddressField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Хана нийтлэл'
+        verbose_name_plural = 'Хана нийтлэлүүд'
+
+    def __str__(self):
+        return f"{self.author_name} – {self.get_prompt_display()}"
+
+
 class TlOverride(models.Model):
     """Inline-editable Mongolian translation overrides for lesson pages."""
     path       = models.CharField(max_length=200, verbose_name='Хуудасны зам')

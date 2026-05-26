@@ -1,0 +1,326 @@
+{% extends 'lms/base.html' %}
+{% block title %}Хэлэлцүүлгийн хана – ТТХГ{% endblock %}
+{% block og_url %}/padlet/{% endblock %}
+{% block content %}
+
+{% load tz %}
+
+{% comment %}Prompt config: key → label, color, icon, text-color{% endcomment %}
+
+<div class="d-flex align-items-center gap-2 mb-2">
+  <i class="bi bi-grid-3x3-gap-fill fs-4" style="color:#1b3a6b;"></i>
+  <h4 class="fw-bold mb-0" style="color:#1b3a6b;">Хэлэлцүүлгийн хана</h4>
+  <span class="badge rounded-pill ms-1" style="background:#e8f4fd;color:#1b3a6b;font-size:12px;">
+    {{ posts|length }} нийтлэл
+  </span>
+</div>
+<p class="text-muted small mb-4">Асуулт сонгоод хариултаа бичнэ үү — бусад нь таны нийтлэлийг харна.</p>
+
+<div class="row g-4">
+
+  <!-- ── POST FORM ── -->
+  <div class="col-12 col-lg-4">
+    <div class="card border-0 shadow-sm sticky-top" style="border-radius:14px;top:80px;">
+      <div class="card-header fw-bold"
+           style="background:linear-gradient(135deg,#0f2744,#1b3a6b);color:#fff;border-radius:14px 14px 0 0;padding:.85rem 1.25rem;">
+        <i class="bi bi-pencil-square me-2"></i>Нийтлэл нэмэх
+      </div>
+      <div class="card-body p-4">
+
+        {% if success %}
+        <div class="text-center py-3">
+          <div class="mb-3 mx-auto d-flex align-items-center justify-content-center"
+               style="width:64px;height:64px;background:#f0fdf4;border-radius:50%;">
+            <i class="bi bi-check-circle-fill" style="font-size:32px;color:#16a34a;"></i>
+          </div>
+          <div class="fw-bold mb-1" style="color:#15803d;">Амжилттай нийтлэгдлээ!</div>
+          <a href="{% url 'padlet' %}" class="btn btn-success btn-sm mt-2 px-4" style="border-radius:20px;">
+            <i class="bi bi-plus-circle me-1"></i>Дахин нэмэх
+          </a>
+        </div>
+        {% else %}
+
+        {% if error %}
+        <div class="alert alert-danger py-2 px-3 mb-3 d-flex align-items-center gap-2" style="font-size:13px;border-radius:8px;">
+          <i class="bi bi-exclamation-triangle-fill flex-shrink-0"></i>{{ error }}
+        </div>
+        {% endif %}
+
+        <form method="post" id="padletForm">
+          {% csrf_token %}
+
+          <!-- Prompt selector -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold small mb-2">Асуулт сонгох <span class="text-danger">*</span></label>
+            <div class="d-flex flex-column gap-2" id="promptBtns">
+              <label class="prompt-choice" data-key="learned" style="--pc:#fef08a;--pb:#ca8a04;">
+                <input type="radio" name="prompt" value="learned" class="d-none" required>
+                <div class="prompt-pill d-flex align-items-center gap-2 px-3 py-2" style="border-radius:10px;cursor:pointer;border:2px solid transparent;background:#fef9c3;transition:all .15s;">
+                  <span style="font-size:18px;">📖</span>
+                  <span class="small fw-semibold" style="color:#713f12;">Өнөөдөр би сурсан зүйл...</span>
+                </div>
+              </label>
+              <label class="prompt-choice" data-key="difficult" style="--pc:#bfdbfe;--pb:#1d4ed8;">
+                <input type="radio" name="prompt" value="difficult" class="d-none">
+                <div class="prompt-pill d-flex align-items-center gap-2 px-3 py-2" style="border-radius:10px;cursor:pointer;border:2px solid transparent;background:#dbeafe;transition:all .15s;">
+                  <span style="font-size:18px;">🤔</span>
+                  <span class="small fw-semibold" style="color:#1e3a8a;">Надад хэцүү байсан...</span>
+                </div>
+              </label>
+              <label class="prompt-choice" data-key="question" style="--pc:#bbf7d0;--pb:#15803d;">
+                <input type="radio" name="prompt" value="question" class="d-none">
+                <div class="prompt-pill d-flex align-items-center gap-2 px-3 py-2" style="border-radius:10px;cursor:pointer;border:2px solid transparent;background:#dcfce7;transition:all .15s;">
+                  <span style="font-size:18px;">❓</span>
+                  <span class="small fw-semibold" style="color:#14532d;">Би асуухыг хүссэн...</span>
+                </div>
+              </label>
+              <label class="prompt-choice" data-key="next" style="--pc:#e9d5ff;--pb:#7e22ce;">
+                <input type="radio" name="prompt" value="next" class="d-none">
+                <div class="prompt-pill d-flex align-items-center gap-2 px-3 py-2" style="border-radius:10px;cursor:pointer;border:2px solid transparent;background:#f3e8ff;transition:all .15s;">
+                  <span style="font-size:18px;">🎯</span>
+                  <span class="small fw-semibold" style="color:#3b0764;">Дараагийн удаа би...</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Response -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold small mb-1">Хариулт <span class="text-danger">*</span></label>
+            <textarea name="content" id="contentArea" class="form-control" rows="3" maxlength="300"
+                      placeholder="Энд бичнэ үү..." style="border-radius:8px;resize:none;" required></textarea>
+            <div class="d-flex justify-content-end mt-1">
+              <span id="charCount" class="text-muted" style="font-size:11px;">0 / 300</span>
+            </div>
+          </div>
+
+          <!-- Name -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold small mb-1">Нэр <span class="text-danger">*</span></label>
+            <input type="text" name="author_name" class="form-control" maxlength="100"
+                   placeholder="Таны нэр" style="border-radius:8px;" required>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100 py-2 fw-bold" style="border-radius:8px;">
+            <i class="bi bi-send-fill me-2"></i>Нийтлэх
+          </button>
+        </form>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── WALL ── -->
+  <div class="col-12 col-lg-8">
+
+    <!-- Filter tabs -->
+    <div class="d-flex flex-wrap gap-2 mb-3">
+      <button class="filter-btn active btn btn-sm fw-semibold" data-filter="all"
+              style="border-radius:20px;background:#1b3a6b;color:#fff;border:none;font-size:12px;">
+        Бүгд <span class="badge ms-1" style="background:rgba(255,255,255,.25);">{{ posts|length }}</span>
+      </button>
+      <button class="filter-btn btn btn-sm fw-semibold" data-filter="learned"
+              style="border-radius:20px;background:#fef9c3;color:#713f12;border:1.5px solid #ca8a04;font-size:12px;">
+        📖 Сурсан зүйл
+      </button>
+      <button class="filter-btn btn btn-sm fw-semibold" data-filter="difficult"
+              style="border-radius:20px;background:#dbeafe;color:#1e3a8a;border:1.5px solid #1d4ed8;font-size:12px;">
+        🤔 Хэцүү байсан
+      </button>
+      <button class="filter-btn btn btn-sm fw-semibold" data-filter="question"
+              style="border-radius:20px;background:#dcfce7;color:#14532d;border:1.5px solid #15803d;font-size:12px;">
+        ❓ Асуулт
+      </button>
+      <button class="filter-btn btn btn-sm fw-semibold" data-filter="next"
+              style="border-radius:20px;background:#f3e8ff;color:#3b0764;border:1.5px solid #7e22ce;font-size:12px;">
+        🎯 Дараагийн зорилго
+      </button>
+    </div>
+
+    {% if posts %}
+    <div class="wall-grid" id="wallGrid">
+      {% for p in posts %}
+      {% if p.prompt == 'learned' %}
+        {% with bg="#fef9c3" border="#ca8a04" tc="#713f12" icon="📖" label="Өнөөдөр би сурсан зүйл..." %}
+        <div class="wall-card" data-prompt="{{ p.prompt }}"
+             style="background:{{ bg }};border-left:4px solid {{ border }};border-radius:12px;padding:1rem;position:relative;break-inside:avoid;margin-bottom:1rem;">
+          <div class="small fw-bold mb-1" style="color:{{ tc }};font-size:11px;">{{ icon }} {{ label }}</div>
+          <p class="mb-2" style="font-size:13px;line-height:1.55;color:#1c1917;word-break:break-word;">{{ p.content }}</p>
+          <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-1">
+              <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                   style="width:22px;height:22px;background:{{ border }};color:#fff;font-size:10px;font-weight:800;">
+                {{ p.author_name|first|upper }}
+              </div>
+              <span style="font-size:11px;color:#57534e;font-weight:600;">{{ p.author_name }}</span>
+            </div>
+            <span style="font-size:10px;color:#a8a29e;">{{ p.created_at|localtime|date:"m/d H:i" }}</span>
+          </div>
+          {% if request.user.is_staff %}
+          <form method="post" action="{% url 'padlet_delete' p.id %}" class="d-inline"
+                onsubmit="return confirm('Устгах уу?')">
+            {% csrf_token %}
+            <button type="submit" class="btn-close position-absolute"
+                    style="top:8px;right:8px;font-size:9px;opacity:.4;" title="Устгах"></button>
+          </form>
+          {% endif %}
+        </div>
+        {% endwith %}
+      {% elif p.prompt == 'difficult' %}
+        {% with bg="#dbeafe" border="#1d4ed8" tc="#1e3a8a" icon="🤔" label="Надад хэцүү байсан..." %}
+        <div class="wall-card" data-prompt="{{ p.prompt }}"
+             style="background:{{ bg }};border-left:4px solid {{ border }};border-radius:12px;padding:1rem;position:relative;break-inside:avoid;margin-bottom:1rem;">
+          <div class="small fw-bold mb-1" style="color:{{ tc }};font-size:11px;">{{ icon }} {{ label }}</div>
+          <p class="mb-2" style="font-size:13px;line-height:1.55;color:#1c1917;word-break:break-word;">{{ p.content }}</p>
+          <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-1">
+              <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                   style="width:22px;height:22px;background:{{ border }};color:#fff;font-size:10px;font-weight:800;">
+                {{ p.author_name|first|upper }}
+              </div>
+              <span style="font-size:11px;color:#57534e;font-weight:600;">{{ p.author_name }}</span>
+            </div>
+            <span style="font-size:10px;color:#a8a29e;">{{ p.created_at|localtime|date:"m/d H:i" }}</span>
+          </div>
+          {% if request.user.is_staff %}
+          <form method="post" action="{% url 'padlet_delete' p.id %}" class="d-inline"
+                onsubmit="return confirm('Устгах уу?')">
+            {% csrf_token %}
+            <button type="submit" class="btn-close position-absolute"
+                    style="top:8px;right:8px;font-size:9px;opacity:.4;" title="Устгах"></button>
+          </form>
+          {% endif %}
+        </div>
+        {% endwith %}
+      {% elif p.prompt == 'question' %}
+        {% with bg="#dcfce7" border="#15803d" tc="#14532d" icon="❓" label="Би асуухыг хүссэн..." %}
+        <div class="wall-card" data-prompt="{{ p.prompt }}"
+             style="background:{{ bg }};border-left:4px solid {{ border }};border-radius:12px;padding:1rem;position:relative;break-inside:avoid;margin-bottom:1rem;">
+          <div class="small fw-bold mb-1" style="color:{{ tc }};font-size:11px;">{{ icon }} {{ label }}</div>
+          <p class="mb-2" style="font-size:13px;line-height:1.55;color:#1c1917;word-break:break-word;">{{ p.content }}</p>
+          <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-1">
+              <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                   style="width:22px;height:22px;background:{{ border }};color:#fff;font-size:10px;font-weight:800;">
+                {{ p.author_name|first|upper }}
+              </div>
+              <span style="font-size:11px;color:#57534e;font-weight:600;">{{ p.author_name }}</span>
+            </div>
+            <span style="font-size:10px;color:#a8a29e;">{{ p.created_at|localtime|date:"m/d H:i" }}</span>
+          </div>
+          {% if request.user.is_staff %}
+          <form method="post" action="{% url 'padlet_delete' p.id %}" class="d-inline"
+                onsubmit="return confirm('Устгах уу?')">
+            {% csrf_token %}
+            <button type="submit" class="btn-close position-absolute"
+                    style="top:8px;right:8px;font-size:9px;opacity:.4;" title="Устгах"></button>
+          </form>
+          {% endif %}
+        </div>
+        {% endwith %}
+      {% else %}
+        {% with bg="#f3e8ff" border="#7e22ce" tc="#3b0764" icon="🎯" label="Дараагийн удаа би..." %}
+        <div class="wall-card" data-prompt="{{ p.prompt }}"
+             style="background:{{ bg }};border-left:4px solid {{ border }};border-radius:12px;padding:1rem;position:relative;break-inside:avoid;margin-bottom:1rem;">
+          <div class="small fw-bold mb-1" style="color:{{ tc }};font-size:11px;">{{ icon }} {{ label }}</div>
+          <p class="mb-2" style="font-size:13px;line-height:1.55;color:#1c1917;word-break:break-word;">{{ p.content }}</p>
+          <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-1">
+              <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                   style="width:22px;height:22px;background:{{ border }};color:#fff;font-size:10px;font-weight:800;">
+                {{ p.author_name|first|upper }}
+              </div>
+              <span style="font-size:11px;color:#57534e;font-weight:600;">{{ p.author_name }}</span>
+            </div>
+            <span style="font-size:10px;color:#a8a29e;">{{ p.created_at|localtime|date:"m/d H:i" }}</span>
+          </div>
+          {% if request.user.is_staff %}
+          <form method="post" action="{% url 'padlet_delete' p.id %}" class="d-inline"
+                onsubmit="return confirm('Устгах уу?')">
+            {% csrf_token %}
+            <button type="submit" class="btn-close position-absolute"
+                    style="top:8px;right:8px;font-size:9px;opacity:.4;" title="Устгах"></button>
+          </form>
+          {% endif %}
+        </div>
+        {% endwith %}
+      {% endif %}
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="card border-0 shadow-sm" style="border-radius:14px;">
+      <div class="card-body text-center py-5">
+        <div class="mb-3 mx-auto d-flex align-items-center justify-content-center"
+             style="width:80px;height:80px;background:#f8fafc;border-radius:50%;">
+          <i class="bi bi-grid-3x3-gap" style="font-size:40px;color:#1b3a6b;opacity:.2;"></i>
+        </div>
+        <p class="fw-semibold text-muted mb-1">Одоогоор нийтлэл байхгүй байна.</p>
+        <p class="text-muted small mb-0">Эхлээд нийтлэл нэмсэн хүн энд харагдана.</p>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<style>
+.wall-grid {
+  columns: 2;
+  column-gap: 1rem;
+}
+@media (max-width: 576px) {
+  .wall-grid { columns: 1; }
+}
+.wall-card { transition: box-shadow .15s; }
+.wall-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,.12); }
+
+.prompt-choice input:checked + .prompt-pill {
+  border-color: var(--pb) !important;
+  box-shadow: 0 0 0 3px rgba(0,0,0,.08);
+}
+.filter-btn { transition: opacity .15s; }
+.filter-btn:not(.active) { opacity: .7; }
+</style>
+
+<script>
+// Character counter
+var ta = document.getElementById('contentArea');
+if (ta) {
+  ta.addEventListener('input', function() {
+    document.getElementById('charCount').textContent = ta.value.length + ' / 300';
+  });
+}
+
+// Prompt radio highlight
+document.querySelectorAll('.prompt-choice').forEach(function(lbl) {
+  lbl.addEventListener('click', function() {
+    document.querySelectorAll('.prompt-pill').forEach(function(p) {
+      p.style.borderColor = 'transparent';
+    });
+  });
+});
+
+// Filter buttons
+document.querySelectorAll('.filter-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.filter-btn').forEach(function(b) {
+      b.classList.remove('active');
+      b.style.background = b.dataset.origBg || b.style.background;
+    });
+    btn.classList.add('active');
+
+    var filter = btn.dataset.filter;
+    document.querySelectorAll('.wall-card').forEach(function(card) {
+      if (filter === 'all' || card.dataset.prompt === filter) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  });
+});
+</script>
+
+{% endblock %}

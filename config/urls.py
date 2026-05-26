@@ -27,4 +27,6 @@ urlpatterns = [
     path('past-continuous/', views.past_continuous_view, name='past_continuous'),
     path('usss-report/', views.usss_report_view, name='usss_report'),
     path('gspr-article/', views.gspr_article_view, name='gspr_article'),
+    path('padlet/', views.padlet_view, name='padlet'),
+    path('padlet/<int:post_id>/delete/', views.padlet_delete_view, name='padlet_delete'),
 ]

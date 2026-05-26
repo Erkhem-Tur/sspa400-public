@@ -7,7 +7,7 @@ from django.views.decorators.http import require_POST
 from django.db.models import Avg, Sum
 from django.utils import timezone
 
-from .models import Lesson, QuizResult, UserProgress, Department, Video, LogEntry, TlOverride, RANK_CHOICES
+from .models import Lesson, QuizResult, UserProgress, Department, Video, LogEntry, TlOverride, WallPost, RANK_CHOICES, PROMPT_CHOICES
 
 
 # ── Public views (no login required) ────────────────────────────────────────
@@ -245,6 +245,45 @@ def logbook_admin_view(request):
 
 
 # ── Stub views (kept for URL reverse compatibility) ─────────────────────────
+
+def padlet_view(request):
+    error = None
+    success = False
+    if request.method == 'POST':
+        author_name = request.POST.get('author_name', '').strip()
+        prompt      = request.POST.get('prompt', '').strip()
+        content     = request.POST.get('content', '').strip()
+        valid_keys  = [k for k, _ in PROMPT_CHOICES]
+        if not author_name:
+            error = 'Нэрээ оруулна уу.'
+        elif prompt not in valid_keys:
+            error = 'Асуулт сонгоно уу.'
+        elif not content:
+            error = 'Хариултаа бичнэ үү.'
+        else:
+            ip = (request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0].strip()
+                  or request.META.get('REMOTE_ADDR'))
+            WallPost.objects.create(
+                author_name=author_name, prompt=prompt,
+                content=content, ip=ip or None,
+            )
+            success = True
+
+    posts = WallPost.objects.all()
+    return render(request, 'lms/padlet.html', {
+        'posts': posts,
+        'error': error,
+        'success': success,
+        'PROMPT_CHOICES': PROMPT_CHOICES,
+    })
+
+
+@require_POST
+@user_passes_test(lambda u: u.is_staff, login_url='/admin/login/')
+def padlet_delete_view(request, post_id):
+    get_object_or_404(WallPost, pk=post_id).delete()
+    return redirect('padlet')
+
 
 def login_view(request):
     return redirect('dashboard')

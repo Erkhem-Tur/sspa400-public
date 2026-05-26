@@ -113,6 +113,16 @@
                 <tr><td>search</td><td>searched</td><td>нэгжлэг хийх</td><td><span class="badge bg-secondary">REG</span></td><td>speak</td><td>spoke</td><td>ярих</td><td><span class="badge bg-danger">IRR</span></td></tr>
                 <tr><td>detain</td><td>detained</td><td>саатуулах</td><td><span class="badge bg-secondary">REG</span></td><td>write</td><td>wrote</td><td>бичих</td><td><span class="badge bg-danger">IRR</span></td></tr>
                 <tr><td>radio</td><td>radioed</td><td>радио дамжуулах</td><td><span class="badge bg-secondary">REG</span></td><td>stand</td><td>stood</td><td>зогсох</td><td><span class="badge bg-danger">IRR</span></td></tr>
+                <tr><td>arrest</td><td>arrested</td><td>баривчлах</td><td><span class="badge bg-secondary">REG</span></td><td>run</td><td>ran</td><td>гүйх</td><td><span class="badge bg-danger">IRR</span></td></tr>
+                <tr><td>guard</td><td>guarded</td><td>харуул хийх</td><td><span class="badge bg-secondary">REG</span></td><td>find</td><td>found</td><td>олох</td><td><span class="badge bg-danger">IRR</span></td></tr>
+                <tr><td>secure</td><td>secured</td><td>хамгаалах/бэхжүүлэх</td><td><span class="badge bg-secondary">REG</span></td><td>send</td><td>sent</td><td>илгээх</td><td><span class="badge bg-danger">IRR</span></td></tr>
+                <tr><td>brief</td><td>briefed</td><td>товч мэдэгдэх</td><td><span class="badge bg-secondary">REG</span></td><td>meet</td><td>met</td><td>уулзах</td><td><span class="badge bg-danger">IRR</span></td></tr>
+                <tr><td>deploy</td><td>deployed</td><td>байрлуулах</td><td><span class="badge bg-secondary">REG</span></td><td>hold</td><td>held</td><td>барих/хурал хийх</td><td><span class="badge bg-danger">IRR</span></td></tr>
+                <tr><td>monitor</td><td>monitored</td><td>хянах/ажиглах</td><td><span class="badge bg-secondary">REG</span></td><td>lead</td><td>led</td><td>удирдах</td><td><span class="badge bg-danger">IRR</span></td></tr>
+                <tr><td>respond</td><td>responded</td><td>хариу арга хэмжээ авах</td><td><span class="badge bg-secondary">REG</span></td><td>catch</td><td>caught</td><td>барих/таслах</td><td><span class="badge bg-danger">IRR</span></td></tr>
+                <tr><td>coordinate</td><td>coordinated</td><td>зохицуулах</td><td><span class="badge bg-secondary">REG</span></td><td>bring</td><td>brought</td><td>авчрах</td><td><span class="badge bg-danger">IRR</span></td></tr>
+                <tr><td>evacuate</td><td>evacuated</td><td>нүүлгэн шилжүүлэх</td><td><span class="badge bg-secondary">REG</span></td><td>keep</td><td>kept</td><td>хадгалах/байлгах</td><td><span class="badge bg-danger">IRR</span></td></tr>
+                <tr><td>alert</td><td>alerted</td><td>анхааруулах/дохио өгөх</td><td><span class="badge bg-secondary">REG</span></td><td>leave</td><td>left</td><td>орхих/явах</td><td><span class="badge bg-danger">IRR</span></td></tr>
               </tbody>
             </table>
           </div>
@@ -395,14 +405,22 @@ const T3 = [
 ];
 
 const T4 = [
-  { base:"go",    past:"went",  blank:"past",  sentence:'The team ___ to the motorcade briefing yesterday.' },
-  { base:"see",   past:"saw",   blank:"base",  sentence:'The officer ___ a suspicious vehicle near the gate last night.' },
-  { base:"speak", past:"spoke", blank:"past",  sentence:'The shift leader ___ to the foreign agent this morning.' },
-  { base:"take",  past:"took",  blank:"base",  sentence:'The protectee ___ the armored vehicle to the airport.' },
-  { base:"give",  past:"gave",  blank:"past",  sentence:'The supervisor ___ the briefing to all officers before the event.' },
-  { base:"stand", past:"stood", blank:"past",  sentence:'The guard ___ at the checkpoint for six hours yesterday.' },
-  { base:"write", past:"wrote", blank:"past",  sentence:'I ___ the incident report after my shift last night.' },
-  { base:"have",  past:"had",   blank:"past",  sentence:'We ___ a security drill at 0700 hours this morning.' },
+  { base:"go",         past:"went",    blank:"past",  sentence:'The team ___ to the motorcade briefing yesterday.' },
+  { base:"see",        past:"saw",     blank:"base",  sentence:'The officer ___ a suspicious vehicle near the gate last night.' },
+  { base:"speak",      past:"spoke",   blank:"past",  sentence:'The shift leader ___ to the foreign agent this morning.' },
+  { base:"take",       past:"took",    blank:"base",  sentence:'The protectee ___ the armored vehicle to the airport.' },
+  { base:"give",       past:"gave",    blank:"past",  sentence:'The supervisor ___ the briefing to all officers before the event.' },
+  { base:"stand",      past:"stood",   blank:"past",  sentence:'The guard ___ at the checkpoint for six hours yesterday.' },
+  { base:"write",      past:"wrote",   blank:"past",  sentence:'I ___ the incident report after my shift last night.' },
+  { base:"have",       past:"had",     blank:"past",  sentence:'We ___ a security drill at 0700 hours this morning.' },
+  { base:"run",        past:"ran",     blank:"past",  sentence:'The agent ___ to the protectee when the alarm sounded.' },
+  { base:"find",       past:"found",   blank:"past",  sentence:'Officers ___ a suspicious package near the main entrance.' },
+  { base:"send",       past:"sent",    blank:"past",  sentence:'The commander ___ two officers to cover the rear exit.' },
+  { base:"meet",       past:"met",     blank:"past",  sentence:'The advance team ___ the delegation at the airport.' },
+  { base:"hold",       past:"held",    blank:"past",  sentence:'The shift supervisor ___ an emergency briefing after the incident.' },
+  { base:"lead",       past:"led",     blank:"base",  sentence:'A senior agent always ___ the motorcade in high-risk zones.' },
+  { base:"catch",      past:"caught",  blank:"past",  sentence:'The officer ___ the intruder before he reached the perimeter.' },
+  { base:"bring",      past:"brought", blank:"past",  sentence:'The medic ___ the first-aid kit to the scene immediately.' },
 ];
 
 const T6 = [

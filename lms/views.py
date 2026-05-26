@@ -7,7 +7,7 @@ from django.views.decorators.http import require_POST
 from django.db.models import Avg, Sum
 from django.utils import timezone
 
-from .models import Lesson, QuizResult, UserProgress, Department, Video, LogEntry, TlOverride
+from .models import Lesson, QuizResult, UserProgress, Department, Video, LogEntry, TlOverride, RANK_CHOICES
 
 
 # ── Public views (no login required) ────────────────────────────────────────
@@ -177,9 +177,8 @@ def logbook_view(request):
             )
             success = True
 
-    # Today's entries
-    from django.utils import timezone
-    today = timezone.now().date()
+    # Today's entries — use localtime so Mongolia midnight is correct
+    today = timezone.localtime(timezone.now()).date()
     today_entries = LogEntry.objects.filter(logged_at__date=today).select_related('department')
 
     return render(request, 'lms/logbook.html', {
@@ -187,7 +186,7 @@ def logbook_view(request):
         'today_entries': today_entries,
         'success': success,
         'error': error,
-        'RANK_CHOICES': [r for r in __import__('lms.models', fromlist=['RANK_CHOICES']).RANK_CHOICES if r[0]],
+        'RANK_CHOICES': [r for r, _ in RANK_CHOICES if r],
     })
 
 

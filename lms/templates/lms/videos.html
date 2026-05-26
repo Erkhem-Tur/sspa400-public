@@ -87,24 +87,6 @@
 </div>
 {% endif %}
 
-<!-- Modal for full-screen playback -->
-<div class="modal fade" id="videoModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content border-0" style="background:#000;border-radius:16px;overflow:hidden;">
-      <div class="modal-header border-0 px-4 py-3" style="background:linear-gradient(135deg,#0f2744,#1b3a6b);">
-        <h6 class="modal-title text-white fw-bold" id="videoModalTitle" style="font-size:14px;"></h6>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body p-0">
-        <div class="ratio ratio-16x9">
-          <iframe id="videoFrame" src="" frameborder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowfullscreen></iframe>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <style>
 .video-card { transition: transform .18s, box-shadow .18s; }
@@ -117,18 +99,9 @@
 <script>
 document.querySelectorAll('.video-thumb-wrap').forEach(function(el) {
   el.addEventListener('click', function() {
-    var id    = el.dataset.id;
-    var title = el.closest('.card').querySelector('h6').textContent.trim();
-    document.getElementById('videoFrame').src =
-      'https://www.youtube.com/embed/' + id + '?rel=0&modestbranding=1&autoplay=1';
-    document.getElementById('videoModalTitle').textContent = title;
-    var modal = new bootstrap.Modal(document.getElementById('videoModal'));
-    modal.show();
+    var id = el.dataset.id;
+    window.open('https://www.youtube.com/watch?v=' + id, '_blank');
   });
-});
-
-document.getElementById('videoModal').addEventListener('hidden.bs.modal', function() {
-  document.getElementById('videoFrame').src = '';
 });
 </script>
 

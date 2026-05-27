@@ -17,6 +17,7 @@
   .ws-nav .wt:hover:not(.active) { background: #f8fafc; border-color: #94a3b8; }
   .ws-sec { display: none; }
   .ws-sec.active { display: block; }
+  .ws-trans-box { background:#eef5ff; border-left:3px solid #1b3a6b; border-radius:0 6px 6px 0; padding:10px 12px; margin:8px 0 6px; font-size:13px; line-height:1.6; color:#1e3a5f; }
 
   /* ── LEVEL BADGES ── */
   .lv { display: inline-block; border-radius: 999px; padding: 2px 10px; font-size: 11px; font-weight: 700; }
@@ -42,6 +43,7 @@
   /* ── QUIZ OPTIONS ── */
   .ws-opt { display:block; width:100%; text-align:left; border:1.5px solid #e2e8f0; background:#fff; color:#1e293b; border-radius:10px; padding:10px 14px; margin:5px 0; font-size:13px; font-weight:500; cursor:pointer; transition:all .15s; }
   .ws-opt:hover { border-color:#1b3a6b; background:#f0f4f8; }
+  .ws-opt.selected { border-color:#1b3a6b!important; background:#e8f0fc!important; color:#1b3a6b!important; font-weight:600; }
   .ws-opt.correct { border-color:#16a34a!important; background:#dcfce7!important; color:#166534!important; font-weight:700; }
   .ws-opt.wrong   { border-color:#dc2626!important; background:#fee2e2!important; color:#991b1b!important; }
 
@@ -93,8 +95,8 @@
   <button class="wt active"     onclick="wsShow('home',this)"><i class="bi bi-house me-1"></i>Home</button>
   <button class="wt"            onclick="wsShow('bank',this)"><i class="bi bi-collection me-1"></i>500 Worksheets</button>
   <button class="wt"            onclick="wsShow('tests',this)"><i class="bi bi-clipboard-check me-1"></i>Test Center</button>
-  <button class="wt"            onclick="wsShow('terms',this)"><i class="bi bi-book me-1"></i>Vocabulary</button>
-  <button class="wt"            onclick="wsShow('reading',this)"><i class="bi bi-file-text me-1"></i>Reading</button>
+  <button id="wt-terms"  class="wt" onclick="wsShow('terms',this)"><i class="bi bi-book me-1"></i>Vocabulary</button>
+  <button id="wt-reading" class="wt" onclick="wsShow('reading',this)"><i class="bi bi-file-text me-1"></i>Reading</button>
   <button class="wt"            onclick="wsShow('teacher',this)"><i class="bi bi-person-workspace me-1"></i>Teacher Guide</button>
   <button class="wt ms-auto"    onclick="window.print()"><i class="bi bi-printer me-1"></i>Print</button>
 </div>
@@ -581,8 +583,12 @@ function wsRenderReading(){
       <div id="wsRI${i}" class="accordion-collapse collapse">
         <div class="accordion-body small">
           <p>${w.reading}</p>
+          <div id="wsRT${i}" class="ws-trans-box" style="display:none;" data-key="${wsEsc(w.reading.slice(0,60))}"></div>
           <ol>${w.comp.map(c=>`<li class="mb-1">${c[0]} <span class="text-success fw-semibold">→ ${c[1]}</span></li>`).join('')}</ol>
-          <button class="btn btn-sm btn-outline-primary mt-1" onclick="speak(${JSON.stringify(w.reading)},this)"><i class="bi bi-volume-up me-1"></i>Listen</button>
+          <div class="d-flex gap-2 flex-wrap mt-1">
+            <button class="btn btn-sm btn-outline-primary" onclick="speak(${JSON.stringify(w.reading)},this)"><i class="bi bi-volume-up me-1"></i>Listen</button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="wsTranslate(this,${JSON.stringify(w.reading)},'wsRT${i}')"><i class="bi bi-translate me-1"></i>Орчуулах</button>
+          </div>
         </div>
       </div>
     </div>`).join('');
@@ -632,15 +638,20 @@ function wsStartTest(kind){
 }
 function wsSelOpt(btn){
   const card=btn.closest('.ws-qcard');
-  card.querySelectorAll('.ws-opt').forEach(b=>b.classList.remove('correct','wrong'));
-  btn.dataset.selected=btn.textContent;card.dataset.selected=btn.textContent;btn.classList.add('correct');
+  card.querySelectorAll('.ws-opt').forEach(b=>b.classList.remove('correct','wrong','selected'));
+  btn.dataset.selected=btn.textContent;card.dataset.selected=btn.textContent;
+  btn.classList.add('selected');
 }
 function wsSubmit(kind,title){
   const cards=[...document.querySelectorAll('#wsTestArea .ws-qcard')];
   let ok=0;
   cards.forEach(c=>{
     const ans=wsNorm(c.dataset.a),sel=wsNorm(c.dataset.selected||'');
-    c.querySelectorAll('.ws-opt').forEach(b=>{if(wsNorm(b.textContent)===ans)b.classList.add('correct');else if(wsNorm(b.textContent)===sel)b.classList.add('wrong');});
+    c.querySelectorAll('.ws-opt').forEach(b=>{
+      b.classList.remove('selected');
+      if(wsNorm(b.textContent)===ans)b.classList.add('correct');
+      else if(wsNorm(b.textContent)===sel)b.classList.add('wrong');
+    });
     if(sel===ans)ok++;
     const fb=c.querySelector('.ws-fb');if(fb)fb.textContent=sel===ans?'✓ Correct.':'✗ Incorrect.';
   });
@@ -701,8 +712,99 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)_wsSendTime
 window.addEventListener('beforeunload',_wsSendTime);
 
 /* ═══════════════════════════════════════════════════
+   TRANSLATION
+═══════════════════════════════════════════════════ */
+const _wsTCache=JSON.parse(localStorage.getItem('wsTransCache')||'{}');
+
+/* Render translated text with Edit button */
+function _wsTransShow(box,text){
+  box.innerHTML=
+    '<div class="d-flex justify-content-between align-items-center mb-1">'+
+      '<span style="font-size:11px;font-weight:700;letter-spacing:.4px;opacity:.55;text-transform:uppercase;">🇲🇳 Монгол орчуулга</span>'+
+      '<button class="btn btn-link btn-sm p-0 text-secondary" style="font-size:11px;text-decoration:none;" onclick="wsTransEdit(this.closest(\'.ws-trans-box\'))"><i class="bi bi-pencil-square me-1"></i>Засах</button>'+
+    '</div>'+
+    '<p class="mb-0 ws-trans-text">'+wsEsc(text)+'</p>';
+}
+
+/* Toggle show / hide */
+function wsTranslate(btn,text,boxId){
+  const box=document.getElementById(boxId);
+  if(box.style.display==='block'){
+    box.style.display='none';
+    btn.innerHTML='<i class="bi bi-translate me-1"></i>Орчуулах';
+    return;
+  }
+  const key=text.slice(0,60);
+  box.dataset.key=key;
+  if(_wsTCache[key]){
+    _wsTransShow(box,_wsTCache[key]);
+    box.style.display='block';
+    btn.innerHTML='<i class="bi bi-eye-slash me-1"></i>Нуух';
+    return;
+  }
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner-border spinner-border-sm me-1" role="status"></span>Орчуулж байна...';
+  fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(text.slice(0,500))+'&langpair=en|mn')
+    .then(r=>r.json())
+    .then(d=>{
+      const t=(d.responseData&&d.responseData.translatedText)||'';
+      if(t&&d.responseStatus===200&&!t.includes('MYMEMORY WARNING')){
+        _wsTCache[key]=t;
+        try{localStorage.setItem('wsTransCache',JSON.stringify(_wsTCache));}catch(e){}
+        _wsTransShow(box,t);
+      }else{
+        box.innerHTML=
+          '<span style="font-size:11px;font-weight:600;opacity:.6;">Орчуулгын лимит дүүрсэн.</span> '+
+          '<a href="https://translate.google.com/?sl=en&tl=mn&text='+encodeURIComponent(text.slice(0,500))+'&op=translate" target="_blank" rel="noopener" class="small">Google Translate-д нээх ↗</a>';
+      }
+      box.style.display='block';
+      btn.disabled=false;
+      btn.innerHTML='<i class="bi bi-eye-slash me-1"></i>Нуух';
+    })
+    .catch(()=>{btn.disabled=false;btn.innerHTML='<i class="bi bi-translate me-1"></i>Орчуулах';});
+}
+
+/* Switch box to edit mode */
+function wsTransEdit(box){
+  const current=box.querySelector('.ws-trans-text');
+  const val=current?current.textContent:'';
+  box.innerHTML=
+    '<div class="d-flex justify-content-between align-items-center mb-1">'+
+      '<span style="font-size:11px;font-weight:700;letter-spacing:.4px;opacity:.55;text-transform:uppercase;">✏️ Орчуулга засах</span>'+
+      '<div class="d-flex gap-1">'+
+        '<button class="btn btn-sm btn-primary py-0 px-2" style="font-size:11px;" onclick="wsTransSave(this.closest(\'.ws-trans-box\'))"><i class="bi bi-check-lg me-1"></i>Хадгалах</button>'+
+        '<button class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size:11px;" onclick="wsTransCancel(this.closest(\'.ws-trans-box\'))">Цуцлах</button>'+
+      '</div>'+
+    '</div>'+
+    '<textarea class="form-control form-control-sm ws-trans-input" rows="3" style="font-size:13px;line-height:1.5;">'+wsEsc(val)+'</textarea>'+
+    '<div class="text-muted mt-1" style="font-size:10px;">Зөв орчуулгыг энд бичнэ үү. Хадгалсны дараа автоматаар санагдана.</div>';
+}
+
+/* Save manual translation */
+function wsTransSave(box){
+  const ta=box.querySelector('.ws-trans-input');
+  const newText=(ta?ta.value:'').trim();
+  if(!newText)return;
+  const key=box.dataset.key;
+  _wsTCache[key]=newText;
+  try{localStorage.setItem('wsTransCache',JSON.stringify(_wsTCache));}catch(e){}
+  _wsTransShow(box,newText);
+}
+
+/* Cancel editing */
+function wsTransCancel(box){
+  const key=box.dataset.key;
+  const cached=_wsTCache[key];
+  if(cached)_wsTransShow(box,cached);
+  else box.style.display='none';
+}
+
+/* ═══════════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════════ */
 wsPopGrammar();wsRenderList();wsRenderTerms();wsRenderReading();wsFcRender();wsOpen(1);wsUpdateProg();
+const _wsTab=new URLSearchParams(location.search).get('tab');
+if(_wsTab==='vocabulary'){const b=document.getElementById('wt-terms');if(b)wsShow('terms',b);}
+else if(_wsTab==='reading'){const b=document.getElementById('wt-reading');if(b)wsShow('reading',b);}
 </script>
 {% endblock %}

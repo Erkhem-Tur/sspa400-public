@@ -186,7 +186,7 @@ def logbook_view(request):
         'today_entries': today_entries,
         'success': success,
         'error': error,
-        'RANK_CHOICES': [r for r, _ in RANK_CHOICES if r],
+        'RANK_CHOICES': [(r, l) for r, l in RANK_CHOICES if r],
     })
 
 

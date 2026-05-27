@@ -252,9 +252,9 @@
           <div class="d-flex gap-2 justify-content-center flex-wrap">
             <button class="btn btn-sm btn-outline-secondary" onclick="wsFcPrev()"><i class="bi bi-arrow-left"></i> Prev</button>
             <button class="btn btn-sm btn-outline-secondary" onclick="wsFcNext()">Next <i class="bi bi-arrow-right"></i></button>
-            <button class="btn btn-sm btn-primary" onclick="speak(wsFlashCards[wsFcIdx])"><i class="bi bi-volume-up"></i> Speak</button>
+            <button class="btn btn-sm btn-primary" onclick="speak(wsFlashCards[wsFcIdx].en,this)"><i class="bi bi-volume-up"></i> Speak</button>
           </div>
-          <p class="text-muted small mt-2 mb-0">Click card for repeat drill</p>
+          <p class="text-muted small mt-2 mb-0">Картыг дарж монгол орчуулгыг харна уу</p>
         </div>
       </div>
     </div>
@@ -331,7 +331,88 @@ const wsGrammarBank=[
 ];
 const wsScenarios=[["Gate 1 badge inspection","At Gate 1, a visitor shows a badge. The officer checks the name, badge color, and access zone."],["Blue Zone access denial","An unaccredited person approaches the Blue Zone. The officer explains the rule and redirects the person to accreditation."],["VIP escort route","A delegate arrives at the main entrance. The officer escorts the delegate to the holding room using clear route language."],["Radio communication","Alpha-2 reports to Control. The officer confirms post, reports status, and requests backup when needed."],["Suspicious vehicle","A vehicle stops near Gate 3 for several minutes. Officers observe, report, and wait for instructions."],["Media zone control","A journalist attempts to enter a restricted VIP zone. The officer checks the press pass and explains the media route."],["Emergency exit control","A crowd gathers near the emergency exit. Officers give calm commands and move people to a safe area."],["Motorcade arrival","The point car, principal car, escort team, rear vehicle, and ambulance arrive at the venue."],["Equipment checklist","Before the shift, officers check the radio, metal detector, X-ray machine, baskets, and duty log."],["Diplomatic access","A senior delegate claims diplomatic status. The officer verifies credentials and contacts the supervisor."],["Shift handover","The outgoing shift leader briefs the incoming team about incidents, route changes, and persons of interest."],["Hotel security support","SSPA officers support a VIP hotel movement and coordinate with reception and protocol staff."],["Food service protection","A special catering delivery arrives. Officers verify the delivery list, driver, and package seal."],["Airport arrival support","A foreign delegation arrives at the airport. Officers guide them to transport and check credentials."],["Public demonstration","A public gathering forms near the venue. Officers observe behavior and report crowd movement."]];
 const wsVocabBank=["badge","ID","checkpoint","restricted area","accreditation desk","duty log","shift leader","close protection agent","checkpoint protection officer","radio check","roger that","say again","stand by","requesting backup","suspicious vehicle","emergency exit","metal detector","X-ray machine","conveyor belt","basket","screening","pat down","principal car","point car","rear vehicle","protection escort team","diplomatic status","verify credentials","access policy","Your Excellency","holding room","media zone","press pass","incident report","formal memo","de-escalation","route change","all clear","unauthorized person","valid badge","expired badge"];
-const wsTerms={"Core checkpoint phrases":["Please show me your ID.","May I see your badge, please?","Please proceed.","This is a restricted area.","Please go to the accreditation desk.","Please keep your permission exposed."],"Radio phrases":["Radio check.","Roger that.","Say again.","Stand by.","Requesting backup.","Over.","Out.","Read you loud and clear."],"Motorcade":["point car","principal car","protection escort team","pilot vehicle","rear vehicle","counter assault team vehicle","ambulance"],"Equipment":["metal detector","X-ray machine","conveyor belt","basket","radio","handcuffs","bulletproof vest","tactical vest"],"Diplomatic language":["Your Excellency","I am required to verify your credentials.","According to our access policy...","I am not able to make exceptions.","I will contact my supervisor immediately."]};
+const wsTerms={
+"Checkpoint phrases · Хяналтын хэллэг":[
+  {en:"Please show me your ID.",mn:"Бичиг баримтаа үзүүлнэ үү."},
+  {en:"May I see your badge, please?",mn:"Таны тэмдэгт харж болох уу?"},
+  {en:"Please proceed.",mn:"Явж болно."},
+  {en:"This is a restricted area.",mn:"Энэ хязгаарлагдмал бүс юм."},
+  {en:"Please go to the accreditation desk.",mn:"Итгэмжлэлийн тойрогт явна уу."},
+  {en:"Please keep your permission visible.",mn:"Зөвшөөрлөө харагдуулж яваарай."},
+  {en:"Access denied.",mn:"Нэвтрэхийг хориглоно."},
+  {en:"Please wait here.",mn:"Энд хүлээнэ үү."},
+  {en:"Do you have an appointment?",mn:"Та уулзалт товлосон уу?"},
+  {en:"I need to contact my supervisor.",mn:"Би дарга руугаа холбогдох хэрэгтэй."},
+],
+"Radio communication · Радио харилцаа":[
+  {en:"Radio check.",mn:"Радио шалгалт."},
+  {en:"Roger that.",mn:"Ойлгосон / Зөв."},
+  {en:"Say again.",mn:"Давтана уу."},
+  {en:"Stand by.",mn:"Хүлээнэ үү."},
+  {en:"Requesting backup.",mn:"Нэмэлт хүч хүсэж байна."},
+  {en:"Over.",mn:"Дууслаа (хариу хүлээж байна)."},
+  {en:"Out.",mn:"Холбоо тасалж байна."},
+  {en:"Read you loud and clear.",mn:"Тодорхой сонсож байна."},
+  {en:"All clear.",mn:"Аюулгүй. Цэвэр."},
+  {en:"Copy that.",mn:"Хүлээж авлаа."},
+  {en:"Negative.",mn:"Үгүй / Тийм биш."},
+  {en:"Affirmative.",mn:"Тийм / Зөв."},
+],
+"Motorcade · Мотодэслэл":[
+  {en:"point car",mn:"урдчилан явах тэрэг"},
+  {en:"principal car",mn:"үндсэн тэрэг (хамгаалуулагчийн)"},
+  {en:"protection escort team",mn:"хамгаалалтын дагалдах баг"},
+  {en:"pilot vehicle",mn:"замчин тэрэг"},
+  {en:"rear vehicle",mn:"арын хамгаалалтын тэрэг"},
+  {en:"counter assault team vehicle",mn:"дайралтанд эсэргүүцэх багийн тэрэг"},
+  {en:"ambulance",mn:"түргэн тусламжийн машин"},
+  {en:"motorcade route",mn:"мотодэслэлийн зам"},
+  {en:"advance team",mn:"урьдчилсан шалгалтын баг"},
+],
+"Equipment · Тоног төхөөрөмж":[
+  {en:"metal detector",mn:"металл илрүүлэгч"},
+  {en:"X-ray machine",mn:"рентген аппарат"},
+  {en:"conveyor belt",mn:"дамжуулах зурвас"},
+  {en:"basket",mn:"сагс (эд зүйл тавих)"},
+  {en:"radio",mn:"радио / дуут холбоо"},
+  {en:"handcuffs",mn:"гав"},
+  {en:"bulletproof vest",mn:"сум нэвтрүүлэхгүй хантааз"},
+  {en:"tactical vest",mn:"тактикийн хантааз"},
+  {en:"earpiece",mn:"чихний гарнитур"},
+  {en:"duty log",mn:"жижүүрийн бүртгэл"},
+],
+"Diplomatic language · Дипломат хэллэг":[
+  {en:"Your Excellency",mn:"Ноёт ноён / Ноёт хатагтай"},
+  {en:"I am required to verify your credentials.",mn:"Би таны итгэмжлэлийг шалгах үүрэгтэй."},
+  {en:"According to our access policy...",mn:"Манай нэвтрэх журмын дагуу..."},
+  {en:"I am not able to make exceptions.",mn:"Би онцгой зөвшөөрөл олгох эрхгүй."},
+  {en:"I will contact my supervisor immediately.",mn:"Би дарга руугаа нэн даруй холбогдоно."},
+  {en:"Please follow me.",mn:"Намайг дагана уу."},
+  {en:"For your security, please...",mn:"Таны аюулгүй байдлын үүднээс..."},
+],
+"Protection duties · Хамгаалалтын үүрэг":[
+  {en:"close protection",mn:"биечлэн хамгаалах"},
+  {en:"advance security check",mn:"урьдчилсан аюулгүй байдлын шалгалт"},
+  {en:"threat assessment",mn:"аюулын үнэлгээ"},
+  {en:"secure the perimeter",mn:"хашааг хамгаалах"},
+  {en:"evacuation plan",mn:"нүүлгэн шилжүүлэлтийн төлөвлөгөө"},
+  {en:"shift handover",mn:"жижүүр хүлээлцэх"},
+  {en:"incident report",mn:"ослын тайлан"},
+  {en:"suspicious person",mn:"сэжигтэй хүн"},
+  {en:"unauthorized access",mn:"зөвшөөрөлгүй нэвтрэлт"},
+  {en:"VIP movement",mn:"ВИП хүний хөдөлгөөн"},
+],
+"Emergency phrases · Яаралтай хэллэг":[
+  {en:"Evacuate now!",mn:"Яараад гарна уу!"},
+  {en:"Get down!",mn:"Бөхий!"},
+  {en:"Stay back!",mn:"Ухраа!"},
+  {en:"Do not move!",mn:"Хөдлөхгүй байна уу!"},
+  {en:"Medical assistance needed.",mn:"Эмнэлгийн тусламж хэрэгтэй байна."},
+  {en:"Secure the area.",mn:"Талбайг хааж хамгаалах."},
+  {en:"Code red.",mn:"Улаан код — аюулын дохио."},
+  {en:"All units respond.",mn:"Бүх нэгж хариу арга хэмжээ ав."},
+],
+};
 const wsSubjects=["The officer","The visitor","Control","The shift leader","The delegate","The team","The journalist","The driver"];
 const wsObjects=["the badge","the ID","the route","the radio message","the access list","the vehicle","the bag","the report"];
 const wsPlaces=["Gate 1","Blue Zone","Gate 3","the holding room","the media zone","the checkpoint"];
@@ -535,37 +616,53 @@ function wsCheck(box){
    VOCABULARY / FLASHCARD
 ═══════════════════════════════════════════════════ */
 let wsFlashCards=[];Object.values(wsTerms).forEach(a=>a.forEach(x=>wsFlashCards.push(x)));
-let wsFcIdx=0,wsFcBack=false;
+let wsFcIdx=0,_wsFcFlipped=false;
 function wsFcRender(){
   const t=wsFlashCards[wsFcIdx];
-  document.getElementById('wsFcFront').innerHTML=`<div class="h5 fw-bold mb-1">${t}</div><div class="small opacity-75">Click to drill</div>`;
-  document.getElementById('wsFcBack').innerHTML=`<div class="small fw-bold mb-2 opacity-75">Repeat after me</div><div class="h5 mb-1">${t}</div><div class="small opacity-60">${t} · ${t}</div>`;
-  document.getElementById('wsFcOuter').classList.remove('flipped');wsFcBack=false;
+  const total=wsFlashCards.length;
+  document.getElementById('wsFcFront').innerHTML=
+    `<div style="font-size:11px;opacity:.5;margin-bottom:6px;">${wsFcIdx+1} / ${total}</div>`+
+    `<div class="h5 fw-bold mb-2">${t.en}</div>`+
+    `<div class="small opacity-75">Картыг дарж монгол орчуулгыг харна уу</div>`;
+  document.getElementById('wsFcBack').innerHTML=
+    `<div style="font-size:11px;opacity:.5;margin-bottom:6px;">🇲🇳 Монгол орчуулга</div>`+
+    `<div class="h5 fw-bold mb-2">${t.mn}</div>`+
+    `<div class="small opacity-75">${t.en}</div>`;
+  document.getElementById('wsFcOuter').classList.remove('flipped');_wsFcFlipped=false;
 }
-function wsFcFlip(){wsFcBack=!wsFcBack;document.getElementById('wsFcOuter').classList.toggle('flipped');}
+function wsFcFlip(){_wsFcFlipped=!_wsFcFlipped;document.getElementById('wsFcOuter').classList.toggle('flipped');}
 function wsFcNext(){wsFcIdx=(wsFcIdx+1)%wsFlashCards.length;wsFcRender();}
 function wsFcPrev(){wsFcIdx=(wsFcIdx-1+wsFlashCards.length)%wsFlashCards.length;wsFcRender();}
+function wsFcGoTo(idx){wsFcIdx=idx;wsFcRender();}
 
 function wsRenderTerms(){
-  const items=Object.entries(wsTerms).map(([name,arr],idx)=>`
-    <div class="accordion-item">
+  let flatIdx=0;
+  const items=Object.entries(wsTerms).map(([name,arr],idx)=>{
+    const rows=arr.map(t=>{
+      const fi=flatIdx++;
+      return `<div class="d-flex align-items-center gap-2 py-2" style="border-bottom:1px solid #f1f5f9;">
+        <div class="flex-grow-1" style="min-width:0;">
+          <div class="fw-semibold" style="font-size:13px;">${t.en}</div>
+          <div style="font-size:12px;color:#1b3a6b;font-weight:500;">🇲🇳 ${t.mn}</div>
+        </div>
+        <button class="btn btn-sm btn-outline-primary py-0 px-2 flex-shrink-0" style="font-size:11px;"
+                onclick="wsFcGoTo(${fi});speak(${JSON.stringify(t.en)},this)">
+          <i class="bi bi-volume-up"></i>
+        </button>
+      </div>`;
+    }).join('');
+    return `<div class="accordion-item">
       <h2 class="accordion-header">
-        <button class="accordion-button small py-2 ${idx>0?'collapsed':''}" type="button" data-bs-toggle="collapse" data-bs-target="#wsTG${idx}">
-          ${name}
+        <button class="accordion-button small py-2 ${idx>0?'collapsed':''}" type="button"
+                data-bs-toggle="collapse" data-bs-target="#wsTG${idx}">
+          ${name} <span class="badge ms-2" style="background:#e8f4fd;color:#1b3a6b;font-size:10px;">${arr.length}</span>
         </button>
       </h2>
       <div id="wsTG${idx}" class="accordion-collapse collapse ${idx===0?'show':''}">
-        <div class="accordion-body py-2">
-          ${arr.map(t=>`
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <span class="fw-semibold small">${t}</span>
-              <button class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size:11px;" onclick="speak(${JSON.stringify(t)},this)">
-                <i class="bi bi-volume-up"></i>
-              </button>
-            </div>`).join('')}
-        </div>
+        <div class="accordion-body py-1 px-3">${rows}</div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   document.getElementById('wsTermsBox').innerHTML=`<div class="accordion">${items}</div>`;
 }
 

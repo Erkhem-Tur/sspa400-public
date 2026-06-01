@@ -25,23 +25,25 @@ def extract_youtube_id(raw):
 
 
 class VideoAdminForm(forms.ModelForm):
+    # Override the field so full URLs (> 20 chars) pass field-level validation;
+    # clean_youtube_id() then extracts the 11-char ID before saving to the model.
+    youtube_id = forms.CharField(
+        max_length=500,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'URL эсвэл ID — жишээ: https://youtu.be/qRiL9lnpAO8',
+            'style': 'width:100%;max-width:520px;',
+        }),
+        help_text=(
+            'Бүтэн YouTube URL эсвэл зөвхөн ID хэлбэрээр оруулж болно.<br>'
+            '✅ https://youtu.be/qRiL9lnpAO8<br>'
+            '✅ https://www.youtube.com/watch?v=qRiL9lnpAO8<br>'
+            '✅ qRiL9lnpAO8'
+        ),
+    )
+
     class Meta:
         model = Video
         fields = '__all__'
-        widgets = {
-            'youtube_id': forms.TextInput(attrs={
-                'placeholder': 'URL эсвэл ID — жишээ: https://youtu.be/qRiL9lnpAO8',
-                'style': 'width:100%;max-width:520px;',
-            }),
-        }
-        help_texts = {
-            'youtube_id': (
-                'Бүтэн YouTube URL эсвэл зөвхөн ID хэлбэрээр оруулж болно.<br>'
-                '✅ https://youtu.be/qRiL9lnpAO8<br>'
-                '✅ https://www.youtube.com/watch?v=qRiL9lnpAO8<br>'
-                '✅ qRiL9lnpAO8'
-            ),
-        }
 
     def clean_youtube_id(self):
         raw = self.cleaned_data.get('youtube_id', '')

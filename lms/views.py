@@ -1,11 +1,13 @@
 import json
-from django.shortcuts import render, redirect, get_object_or_404
+from django.conf import settings
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
+from django.contrib.auth.models import User
 from django.db.models import Avg, Sum
+from django.http import JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
+from django.views.decorators.http import require_POST
 
 from .models import Lesson, QuizResult, UserProgress, Department, Video, LogEntry, TlOverride, WallPost, RANK_CHOICES, PROMPT_CHOICES
 
@@ -286,7 +288,53 @@ def padlet_delete_view(request, post_id):
 
 
 def login_view(request):
-    return redirect('dashboard')
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    from .forms import LoginForm
+    form = LoginForm(request, data=request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        login(request, form.get_user())
+        return redirect(request.GET.get('next') or 'dashboard')
+    return render(request, 'lms/login.html', {
+        'form': form,
+        'firebase_config': settings.FIREBASE_WEB_CONFIG,
+    })
+
+
+@require_POST
+def firebase_auth_view(request):
+    """Verify a Firebase ID token and establish a Django session."""
+    from .firebase_utils import verify_id_token
+    try:
+        body = json.loads(request.body)
+        id_token = body.get('idToken', '')
+        if not id_token:
+            return JsonResponse({'ok': False, 'error': 'idToken missing'}, status=400)
+
+        decoded = verify_id_token(id_token)
+        uid   = decoded['uid']
+        email = decoded.get('email', '')
+        name  = decoded.get('name', '')
+
+        # Use a prefixed UID as the Django username so it never collides with
+        # manually-created accounts.  UIDs are 28 chars; prefix keeps us < 150.
+        username = f'fb_{uid}'
+        user, created = User.objects.get_or_create(
+            username=username,
+            defaults={'email': email, 'first_name': name.split()[0] if name else ''},
+        )
+        if not created and email and user.email != email:
+            user.email = email
+            user.save(update_fields=['email'])
+        if created:
+            user.set_unusable_password()
+            user.save(update_fields=['password'])
+
+        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+        return JsonResponse({'ok': True, 'created': created})
+    except Exception as e:
+        return JsonResponse({'ok': False, 'error': str(e)}, status=400)
+
 
 def logout_view(request):
     logout(request)

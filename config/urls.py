@@ -20,6 +20,7 @@ urlpatterns = [
     path('dept-manage/<int:dept_id>/edit/', views.dept_edit_view, name='dept_edit'),
     path('logbook/', views.logbook_view, name='logbook'),
     path('logbook/admin/', views.logbook_admin_view, name='logbook_admin'),
+    path('api/auth/firebase/', views.firebase_auth_view, name='firebase_auth'),
     path('api/tl/fetch/', views.tl_fetch, name='tl_fetch'),
     path('api/tl/save/', views.tl_save, name='tl_save'),
     path('past-tense/', views.past_tense_view, name='past_tense'),

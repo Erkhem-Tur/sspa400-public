@@ -99,11 +99,40 @@ class PublicViewsTest(TestCase):
 
 # ── Stub views ────────────────────────────────────────────────────────────────
 
-class StubViewsTest(TestCase):
-    """Stub views kept for URL reverse compatibility should redirect to dashboard."""
+class LoginViewTest(TestCase):
+    """login_view now renders a real page with Google + password options."""
 
-    def test_login_redirects_to_dashboard(self):
+    def test_get_returns_login_page(self):
+        response = self.client.get(reverse("login"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "lms/login.html")
+
+    def test_get_when_already_authenticated_redirects_to_dashboard(self):
+        user = User.objects.create_user(username="u", password="p")
+        self.client.force_login(user)
         self.assertRedirects(self.client.get(reverse("login")), reverse("dashboard"))
+
+    def test_post_valid_credentials_redirects_to_dashboard(self):
+        User.objects.create_user(username="validuser", password="validpass")
+        response = self.client.post(reverse("login"), {
+            "username": "validuser", "password": "validpass",
+        })
+        self.assertRedirects(response, reverse("dashboard"))
+
+    def test_post_invalid_credentials_shows_error(self):
+        response = self.client.post(reverse("login"), {
+            "username": "nobody", "password": "wrong",
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "lms/login.html")
+
+    def test_firebase_config_in_context(self):
+        response = self.client.get(reverse("login"))
+        self.assertIn("firebase_config", response.context)
+
+
+class StubViewsTest(TestCase):
+    """Remaining stub views should redirect to dashboard."""
 
     def test_register_redirects_to_dashboard(self):
         self.assertRedirects(self.client.get(reverse("register")), reverse("dashboard"))

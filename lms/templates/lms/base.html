@@ -154,11 +154,22 @@
       style="display:none;align-items:center;gap:6px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:5px 12px;border-radius:8px;font-size:12px;cursor:pointer;">
       <i class="bi bi-download"></i> Апп суулгах
     </button>
-    {% if user.is_authenticated and user.is_staff %}
-    <a href="/admin/" class="user-badge">
-      <div class="avatar"><i class="bi bi-shield-lock" style="font-size:13px;"></i></div>
-      <span class="d-none d-sm-inline">Admin</span>
-    </a>
+    {% if user.is_authenticated %}
+      {% if user.is_staff %}
+      <a href="/admin/" class="user-badge" title="Django admin">
+        <div class="avatar"><i class="bi bi-shield-lock" style="font-size:13px;"></i></div>
+        <span class="d-none d-sm-inline">Admin</span>
+      </a>
+      {% else %}
+      <span class="user-badge">
+        <div class="avatar" style="background:var(--gold);">
+          {{ user.first_name|first|upper|default:user.username|first|upper }}
+        </div>
+        <span class="d-none d-sm-inline">
+          {{ user.first_name|default:user.username }}
+        </span>
+      </span>
+      {% endif %}
     {% endif %}
   </div>
 </header>
@@ -222,7 +233,7 @@
     {% if user.is_authenticated %}
     <a href="{% url 'logout' %}"><i class="bi bi-box-arrow-left"></i> Гарах</a>
     {% else %}
-    <a href="/admin/"><i class="bi bi-shield-lock"></i> Admin нэвтрэх</a>
+    <a href="{% url 'login' %}"><i class="bi bi-box-arrow-in-right"></i> Нэвтрэх</a>
     {% endif %}
   </div>
 </aside>

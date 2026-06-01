@@ -1,4 +1,4 @@
-﻿{% load static %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="mn">
 <head>
@@ -13,14 +13,24 @@
     .logo-section { text-align: center; margin-bottom: 28px; }
     .logo-section img { width: 90px; height: 90px; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(0,0,0,.2)); }
     .logo-section .org-name { font-size: 17px; font-weight: 800; color: #1b3a6b; margin-top: 10px; }
-    .logo-section .org-sub  { font-size: 12px; color: #64748b; margin-top: 3px; }
     .form-control { border-radius: 8px; border: 1.5px solid #e2e8f0; padding: 11px 14px; font-size: 14px; }
     .form-control:focus { border-color: #1b3a6b; box-shadow: 0 0 0 3px rgba(27,58,107,.1); }
     .form-label { font-weight: 600; font-size: 13px; color: #475569; }
     .btn-login { background: linear-gradient(135deg, #0f2744, #1b3a6b); border: none; border-radius: 8px; padding: 12px; font-size: 15px; font-weight: 700; width: 100%; color: #fff; }
     .btn-login:hover { opacity: .9; color: #fff; }
-    .divider { text-align: center; color: #94a3b8; font-size: 13px; margin: 16px 0; }
+    .btn-google {
+      width: 100%; border: 1.5px solid #e2e8f0; background: #fff; border-radius: 8px;
+      padding: 11px 16px; font-size: 14px; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      color: #374151; transition: border-color .15s, box-shadow .15s;
+    }
+    .btn-google:hover { border-color: #4285F4; box-shadow: 0 0 0 3px rgba(66,133,244,.1); }
+    .btn-google:disabled { opacity: .6; cursor: not-allowed; }
+    .divider { text-align: center; color: #94a3b8; font-size: 13px; margin: 16px 0; position: relative; }
+    .divider::before, .divider::after { content:''; position:absolute; top:50%; width:42%; height:1px; background:#e2e8f0; }
+    .divider::before { left:0; } .divider::after { right:0; }
     .error-msg { background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 16px; }
+    .firebase-error { background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-top: 10px; display: none; }
   </style>
 </head>
 <body>
@@ -28,10 +38,24 @@
   <div class="logo-section">
     <img src="{% static 'lms/logo.png' %}" alt="ТТХГ">
     <div class="org-name">ТӨРИЙН ТУСГАЙ ХАМГААЛАЛТЫН АЛБА ХААГЧИЙН АНГЛИ ХЭЛНИЙ ЦАХИМ СУРГАЛТЫН СИСТЕМ</div>
-    <div class="org-sub"></div>
   </div>
 
-  <h5 class="fw-bold text-center mb-3" style="color:#1b3a6b;">Нэвтрэх</h5>
+  <!-- ── Google Sign-In ──────────────────────────────────────────────── -->
+  <button id="googleBtn" type="button" class="btn-google" onclick="googleSignIn()">
+    <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
+      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+      <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+      <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+    </svg>
+    Google-ээр нэвтрэх
+  </button>
+  <div id="firebaseError" class="firebase-error"></div>
+
+  <div class="divider">эсвэл</div>
+
+  <!-- ── Username / password (admin) ────────────────────────────────── -->
+  <h5 class="fw-bold text-center mb-3" style="color:#1b3a6b; font-size:14px;">Хэрэглэгчийн нэрээр нэвтрэх</h5>
 
   {% if form.non_field_errors %}
   <div class="error-msg"><i class="bi bi-exclamation-triangle me-1"></i>{{ form.non_field_errors }}</div>
@@ -41,31 +65,93 @@
     {% csrf_token %}
     <div class="mb-3">
       <label class="form-label"><i class="bi bi-person me-1"></i>Хэрэглэгчийн нэр</label>
-      <input type="text" name="username" class="form-control" placeholder="Нэрээ оруулна уу" autofocus>
+      <input type="text" name="username" class="form-control" placeholder="Нэрээ оруулна уу" autocomplete="username">
       {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors }}</div>{% endif %}
     </div>
     <div class="mb-4">
       <label class="form-label"><i class="bi bi-lock me-1"></i>Нууц үг</label>
-      <input type="password" name="password" class="form-control" placeholder="Нууц үгээ оруулна уу">
+      <input type="password" name="password" class="form-control" placeholder="Нууц үгээ оруулна уу" autocomplete="current-password">
       {% if form.password.errors %}<div class="text-danger small mt-1">{{ form.password.errors }}</div>{% endif %}
     </div>
     <button type="submit" class="btn-login btn">Нэвтрэх <i class="bi bi-arrow-right ms-1"></i></button>
   </form>
 
-  <div class="divider">эсвэл</div>
-  <div class="text-center" style="font-size:13px;color:#64748b;">
-    Бүртгэл байхгүй юу? <a href="{% url 'register' %}" style="color:#1b3a6b;font-weight:700;">Бүртгүүлэх</a>
-  </div>
-
   <div class="text-center mt-4 pt-3" style="border-top:1px solid #f1f5f9;">
-    <button type="button" onclick="fillAdmin()" style="background:none;border:1px solid #e2e8f0;color:#94a3b8;font-size:11px;cursor:pointer;padding:5px 14px;border-radius:6px;transition:all .15s;" onmouseover="this.style.borderColor='#1b3a6b';this.style.color='#1b3a6b';" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#94a3b8';">
+    <button type="button" onclick="fillAdmin()"
+            style="background:none;border:1px solid #e2e8f0;color:#94a3b8;font-size:11px;
+                   cursor:pointer;padding:5px 14px;border-radius:6px;transition:all .15s;"
+            onmouseover="this.style.borderColor='#1b3a6b';this.style.color='#1b3a6b';"
+            onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#94a3b8';">
       <i class="bi bi-shield-lock me-1"></i>Удирдлагын нэвтрэх
     </button>
   </div>
 </div>
+
+<!-- Firebase SDK (compat) -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script>
-function fillAdmin(){
-  document.querySelector('[name=username]').value='admin';
+// Firebase web config — injected from Django settings
+const FIREBASE_CONFIG = {{ firebase_config|safe }};
+
+if (FIREBASE_CONFIG.apiKey) {
+  firebase.initializeApp(FIREBASE_CONFIG);
+} else {
+  // Hide Google button if Firebase is not configured yet
+  document.getElementById('googleBtn').style.display = 'none';
+}
+
+async function googleSignIn() {
+  const btn = document.getElementById('googleBtn');
+  const errEl = document.getElementById('firebaseError');
+  const originalHtml = btn.innerHTML;
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Холбогдож байна...';
+  errEl.style.display = 'none';
+
+  try {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    const result = await firebase.auth().signInWithPopup(provider);
+    const idToken = await result.user.getIdToken();
+
+    // Read Django CSRF token from cookie
+    const csrf = (document.cookie.match(/csrftoken=([^;]+)/) || [])[1] || '';
+
+    const res = await fetch('/api/auth/firebase/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrf },
+      body: JSON.stringify({ idToken }),
+    });
+    const data = await res.json();
+
+    if (data.ok) {
+      window.location.href = '/';
+    } else {
+      showError('Серверийн алдаа: ' + data.error);
+    }
+  } catch (err) {
+    if (err.code === 'auth/popup-closed-by-user') {
+      // User dismissed — silent
+    } else if (err.code === 'auth/popup-blocked') {
+      showError('Попап хаагдсан байна. Браузерийн тохиргооноос зөвшөөр.');
+    } else {
+      showError('Google нэвтрэх алдаа: ' + (err.message || err.code));
+    }
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalHtml;
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('firebaseError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function fillAdmin() {
+  document.querySelector('[name=username]').value = 'admin';
   document.querySelector('[name=password]').focus();
 }
 </script>

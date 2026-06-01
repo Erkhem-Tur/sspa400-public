@@ -11,8 +11,19 @@ DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['*']
 
-LOGIN_URL = '/admin/login/'
+LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
+
+# Firebase web SDK config – set these on Render as env vars.
+# Get them from Firebase console → Project settings → Your apps → SDK setup.
+FIREBASE_WEB_CONFIG = {
+    'apiKey':            os.environ.get('FIREBASE_API_KEY',      ''),
+    'authDomain':        os.environ.get('FIREBASE_AUTH_DOMAIN',  ''),
+    'projectId':         os.environ.get('FIREBASE_PROJECT_ID',   ''),
+    'storageBucket':     os.environ.get('FIREBASE_STORAGE_BUCKET', ''),
+    'messagingSenderId': os.environ.get('FIREBASE_MESSAGING_SENDER_ID', ''),
+    'appId':             os.environ.get('FIREBASE_APP_ID',       ''),
+}
 
 INSTALLED_APPS = [
     'django.contrib.admin',

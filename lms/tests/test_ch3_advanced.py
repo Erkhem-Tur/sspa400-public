@@ -2,8 +2,9 @@
 Chapter 3 – Advanced: Auth boundaries, edge cases, and integration tests
 =========================================================================
 These tests cover staff-only views, cascade behaviour, complex filtering,
-IP detection, and cross-cutting concerns that require multiple components
-to work together correctly.
+IP detection, cross-cutting concerns, and the Firebase auth endpoint.
+firebase_auth_view tests mock lms.firebase_utils.verify_id_token so they
+run without real Firebase credentials.
 
 Topics covered
 --------------
@@ -16,9 +17,11 @@ Topics covered
 - IP address capture from X-Forwarded-For proxy header
 - UserProgress.study_days() calculation
 - WallPost IP capture
+- firebase_auth_view: token verification, user creation, login, error paths
 """
 
 import json
+from unittest.mock import patch
 
 from django.contrib.auth.models import User
 from django.test import TestCase
@@ -588,3 +591,104 @@ class DemoCommandTest(TestCase):
         call_command("demo", verbosity=0)
         user_count_2 = User.objects.exclude(is_staff=True).count()
         self.assertEqual(user_count_1, user_count_2)
+
+
+# ── firebase_auth_view ────────────────────────────────────────────────────────
+
+MOCK_DECODED = {
+    'uid':   'testuid12345678901234567',
+    'email': 'test@example.com',
+    'name':  'Bat Erdene',
+}
+
+
+class FirebaseAuthViewTest(TestCase):
+    """
+    Tests for /api/auth/firebase/.
+    verify_id_token is patched so no real Firebase credentials are needed.
+    """
+
+    def _post(self, body, verify_return=None, verify_raises=None):
+        target = 'lms.firebase_utils.verify_id_token'
+        if verify_raises:
+            with patch(target, side_effect=verify_raises):
+                return self.client.post(
+                    reverse('firebase_auth'),
+                    data=json.dumps(body),
+                    content_type='application/json',
+                )
+        with patch(target, return_value=verify_return or MOCK_DECODED):
+            return self.client.post(
+                reverse('firebase_auth'),
+                data=json.dumps(body),
+                content_type='application/json',
+            )
+
+    def test_valid_token_returns_ok(self):
+        response = self._post({'idToken': 'valid-token'})
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()['ok'])
+
+    def test_valid_token_creates_django_user(self):
+        self._post({'idToken': 'valid-token'})
+        self.assertTrue(User.objects.filter(username='fb_testuid12345678901234567').exists())
+
+    def test_valid_token_sets_email(self):
+        self._post({'idToken': 'valid-token'})
+        user = User.objects.get(username='fb_testuid12345678901234567')
+        self.assertEqual(user.email, 'test@example.com')
+
+    def test_valid_token_sets_first_name(self):
+        self._post({'idToken': 'valid-token'})
+        user = User.objects.get(username='fb_testuid12345678901234567')
+        self.assertEqual(user.first_name, 'Bat')
+
+    def test_valid_token_logs_user_in(self):
+        response = self._post({'idToken': 'valid-token'})
+        # Session should now have _auth_user_id
+        self.assertIn('_auth_user_id', self.client.session)
+
+    def test_second_sign_in_does_not_create_duplicate_user(self):
+        self._post({'idToken': 'valid-token'})
+        self._post({'idToken': 'valid-token'})
+        self.assertEqual(
+            User.objects.filter(username='fb_testuid12345678901234567').count(), 1
+        )
+
+    def test_second_sign_in_updates_email_if_changed(self):
+        self._post({'idToken': 'valid-token'})
+        new_decoded = {**MOCK_DECODED, 'email': 'new@example.com'}
+        self._post({'idToken': 'valid-token'}, verify_return=new_decoded)
+        user = User.objects.get(username='fb_testuid12345678901234567')
+        self.assertEqual(user.email, 'new@example.com')
+
+    def test_firebase_user_has_unusable_password(self):
+        self._post({'idToken': 'valid-token'})
+        user = User.objects.get(username='fb_testuid12345678901234567')
+        self.assertFalse(user.has_usable_password())
+
+    def test_missing_id_token_returns_400(self):
+        response = self._post({})
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(response.json()['ok'])
+
+    def test_invalid_token_returns_400(self):
+        response = self._post(
+            {'idToken': 'bad-token'},
+            verify_raises=Exception('Token invalid'),
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(response.json()['ok'])
+
+    def test_malformed_json_body_returns_400(self):
+        with patch('lms.firebase_utils.verify_id_token', return_value=MOCK_DECODED):
+            response = self.client.post(
+                reverse('firebase_auth'),
+                data='not json {{{',
+                content_type='application/json',
+            )
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_returns_405(self):
+        response = self.client.get(reverse('firebase_auth'))
+        self.assertEqual(response.status_code, 405)

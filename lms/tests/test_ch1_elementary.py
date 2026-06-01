@@ -271,3 +271,68 @@ class ExtractYoutubeIdTest(TestCase):
 
     def test_id_with_underscore_and_hyphen(self):
         self.assertEqual(extract_youtube_id("Ab1-Cd2_Ef3"), "Ab1-Cd2_Ef3")
+
+
+# ── Model ordering ────────────────────────────────────────────────────────────
+
+class QuizResultOrderingTest(TestCase):
+    """QuizResult.Meta.ordering = ['-taken_at'] — newest first."""
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="u", password="p")
+        self.lesson = Lesson.objects.create(title="L", order=1)
+
+    def test_newest_result_first(self):
+        r1 = QuizResult.objects.create(
+            user=self.user, lesson=self.lesson, batch_index=0, score=5, total=10
+        )
+        r2 = QuizResult.objects.create(
+            user=self.user, lesson=self.lesson, batch_index=1, score=8, total=10
+        )
+        results = list(QuizResult.objects.all())
+        # r2 was created after r1 so it should appear first
+        self.assertEqual(results[0].pk, r2.pk)
+        self.assertEqual(results[1].pk, r1.pk)
+
+
+class VideoOrderingTest(TestCase):
+    """Video.Meta.ordering = ['order', 'created_at'] — lower order first."""
+
+    def test_lower_order_comes_first(self):
+        v2 = Video.objects.create(title="B", youtube_id="bbbbbbbbbbb", order=2)
+        v1 = Video.objects.create(title="A", youtube_id="aaaaaaaaaaa", order=1)
+        pks = list(Video.objects.filter(pk__in=[v1.pk, v2.pk]).values_list("pk", flat=True))
+        self.assertEqual(pks, [v1.pk, v2.pk])
+
+
+class WallPostOrderingTest(TestCase):
+    """WallPost.Meta.ordering = ['-created_at'] — newest first."""
+
+    def test_newest_post_first(self):
+        p1 = WallPost.objects.create(author_name="A", prompt="learned", content="first")
+        p2 = WallPost.objects.create(author_name="B", prompt="learned", content="second")
+        posts = list(WallPost.objects.filter(pk__in=[p1.pk, p2.pk]))
+        self.assertEqual(posts[0].pk, p2.pk)
+
+
+# ── Department DB-level unique name ──────────────────────────────────────────
+
+class DepartmentUniqueNameTest(TestCase):
+    def test_duplicate_name_raises_integrity_error(self):
+        Department.objects.create(name="Alpha", order=1)
+        with self.assertRaises(Exception):  # IntegrityError at DB level
+            Department.objects.create(name="Alpha", order=2)
+
+
+# ── UserProgress default values ───────────────────────────────────────────────
+
+class UserProgressDefaultValuesTest(TestCase):
+    def test_defaults_are_zero_on_creation(self):
+        user = User.objects.create_user(username="fresh", password="pass")
+        progress = UserProgress.objects.create(user=user)
+        self.assertEqual(progress.total_score, 0)
+        self.assertEqual(progress.missions_completed, 0)
+        self.assertEqual(progress.study_minutes, 0)
+        self.assertFalse(progress.profile_complete)
+        self.assertIsNone(progress.department)
+        self.assertEqual(progress.full_name, "")

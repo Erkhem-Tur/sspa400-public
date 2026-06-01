@@ -421,3 +421,170 @@ class UserProgressStudyDaysTest(TestCase):
         user = User.objects.create_user(username="new2", password="pass")
         progress = UserProgress.objects.create(user=user)
         self.assertGreaterEqual(progress.study_days(), 0)
+
+
+# ── logbook today_entries scope ───────────────────────────────────────────────
+
+class LogbookTodayOnlyTest(TestCase):
+    """today_entries must only include entries logged today, not yesterday."""
+
+    def test_yesterday_entry_is_not_shown(self):
+        from datetime import timedelta
+        from django.utils import timezone
+
+        # Create an entry dated yesterday
+        yesterday_entry = LogEntry.objects.create(full_name="Old")
+        LogEntry.objects.filter(pk=yesterday_entry.pk).update(
+            logged_at=timezone.now() - timedelta(days=1)
+        )
+        # Create today's entry via the view
+        self.client.post(reverse("logbook"), {"full_name": "Today"})
+
+        response = self.client.get(reverse("logbook"))
+        names = [e.full_name for e in response.context["today_entries"]]
+        self.assertIn("Today", names)
+        self.assertNotIn("Old", names)
+
+    def test_todays_entry_is_shown(self):
+        self.client.post(reverse("logbook"), {"full_name": "Present"})
+        response = self.client.get(reverse("logbook"))
+        names = [e.full_name for e in response.context["today_entries"]]
+        self.assertIn("Present", names)
+
+
+# ── logbook_admin valid date and month filters ────────────────────────────────
+
+class LogbookAdminValidFilterTest(TestCase):
+    def setUp(self):
+        self.staff = User.objects.create_user(
+            username="staff", password="pass", is_staff=True
+        )
+        from datetime import date, timedelta
+        from django.utils import timezone
+        self.today = timezone.now().date()
+        self.entry_today = LogEntry.objects.create(full_name="Today")
+        self.entry_old = LogEntry.objects.create(full_name="Old")
+        LogEntry.objects.filter(pk=self.entry_old.pk).update(
+            logged_at=timezone.now() - timedelta(days=40)
+        )
+
+    def test_date_filter_today_shows_only_todays_entries(self):
+        self.client.force_login(self.staff)
+        response = self.client.get(
+            reverse("logbook_admin"),
+            {"date": self.today.isoformat()},
+        )
+        names = [e.full_name for e in response.context["entries"]]
+        self.assertIn("Today", names)
+        self.assertNotIn("Old", names)
+
+    def test_month_filter_current_month_excludes_old_entries(self):
+        from django.utils import timezone
+        month_str = timezone.now().strftime("%Y-%m")
+        self.client.force_login(self.staff)
+        response = self.client.get(
+            reverse("logbook_admin"),
+            {"month": month_str},
+        )
+        names = [e.full_name for e in response.context["entries"]]
+        self.assertIn("Today", names)
+        self.assertNotIn("Old", names)
+
+
+# ── dept_manage order assignment ──────────────────────────────────────────────
+
+class DeptManageOrderAssignmentTest(TestCase):
+    """New department order is set to Department.objects.count() at creation."""
+
+    def setUp(self):
+        self.staff = User.objects.create_user(
+            username="staff", password="pass", is_staff=True
+        )
+
+    def test_new_dept_order_equals_count_at_creation_time(self):
+        self.client.force_login(self.staff)
+        count_before = Department.objects.count()
+        self.client.post(reverse("dept_manage"), {"name": "TestNewDept"})
+        new_dept = Department.objects.get(name="TestNewDept")
+        self.assertEqual(new_dept.order, count_before)
+
+
+# ── Management command: seed ──────────────────────────────────────────────────
+
+class SeedCommandTest(TestCase):
+    """The seed management command creates expected departments, lesson, and admin."""
+
+    def test_seed_creates_lesson(self):
+        from django.core.management import call_command
+        call_command("seed", verbosity=0)
+        from lms.models import Lesson
+        self.assertTrue(
+            Lesson.objects.filter(title__icontains="400").exists()
+        )
+
+    def test_seed_creates_departments(self):
+        from django.core.management import call_command
+        call_command("seed", verbosity=0)
+        self.assertTrue(
+            Department.objects.filter(name__icontains="Хамгаалалтын").exists()
+        )
+
+    def test_seed_creates_admin_superuser(self):
+        from django.core.management import call_command
+        from django.contrib.auth.models import User
+        call_command("seed", verbosity=0)
+        admin = User.objects.filter(username="admin").first()
+        self.assertIsNotNone(admin)
+        self.assertTrue(admin.is_superuser)
+
+    def test_seed_is_idempotent(self):
+        from django.core.management import call_command
+        from lms.models import Lesson
+        call_command("seed", verbosity=0)
+        dept_count_1 = Department.objects.filter(
+            name__icontains="Хамгаалалтын"
+        ).count()
+        lesson_count_1 = Lesson.objects.count()
+        call_command("seed", verbosity=0)
+        dept_count_2 = Department.objects.filter(
+            name__icontains="Хамгаалалтын"
+        ).count()
+        lesson_count_2 = Lesson.objects.count()
+        self.assertEqual(dept_count_1, dept_count_2)
+        self.assertEqual(lesson_count_1, lesson_count_2)
+
+
+# ── Management command: demo ──────────────────────────────────────────────────
+
+class DemoCommandTest(TestCase):
+    """The demo command requires seed data and creates 12 realistic student profiles."""
+
+    def setUp(self):
+        from django.core.management import call_command
+        call_command("seed", verbosity=0)
+
+    def test_demo_creates_twelve_students(self):
+        from django.core.management import call_command
+        call_command("demo", verbosity=0)
+        # 12 students from the STUDENTS list
+        self.assertEqual(
+            User.objects.filter(username__regex=r"^\w+\d{3}$").count(), 12
+        )
+
+    def test_demo_creates_quiz_results_for_students(self):
+        from django.core.management import call_command
+        call_command("demo", verbosity=0)
+        self.assertGreater(QuizResult.objects.count(), 0)
+
+    def test_demo_creates_user_progress_records(self):
+        from django.core.management import call_command
+        call_command("demo", verbosity=0)
+        self.assertEqual(UserProgress.objects.count(), 12)
+
+    def test_demo_is_idempotent(self):
+        from django.core.management import call_command
+        call_command("demo", verbosity=0)
+        user_count_1 = User.objects.exclude(is_staff=True).count()
+        call_command("demo", verbosity=0)
+        user_count_2 = User.objects.exclude(is_staff=True).count()
+        self.assertEqual(user_count_1, user_count_2)

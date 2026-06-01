@@ -394,3 +394,120 @@ class VideoAdminFormTest(TestCase):
     def test_empty_string_is_invalid(self):
         form = self._form("")
         self.assertFalse(form.is_valid())
+
+
+# ── worksheets ?tab= query params ────────────────────────────────────────────
+
+class WorksheetsTabParamTest(TestCase):
+    """The worksheets view ignores tab params server-side (JS handles tabs)."""
+
+    def test_tab_vocabulary_returns_200(self):
+        response = self.client.get(reverse("worksheets"), {"tab": "vocabulary"})
+        self.assertEqual(response.status_code, 200)
+
+    def test_tab_reading_returns_200(self):
+        response = self.client.get(reverse("worksheets"), {"tab": "reading"})
+        self.assertEqual(response.status_code, 200)
+
+    def test_unknown_tab_still_returns_200(self):
+        response = self.client.get(reverse("worksheets"), {"tab": "nonexistent"})
+        self.assertEqual(response.status_code, 200)
+
+
+# ── Dashboard hero counts ─────────────────────────────────────────────────────
+
+class DashboardHeroCountsTest(TestCase):
+    def setUp(self):
+        Video.objects.create(title="V1", youtube_id="aaaaaaaaaaa", order=99, is_published=True)
+        Video.objects.create(title="V2", youtube_id="bbbbbbbbbbb", order=100, is_published=True)
+        self.lesson = Lesson.objects.create(title="L1", order=99)
+
+    def test_context_has_lessons_key(self):
+        response = self.client.get(reverse("dashboard"))
+        self.assertIn("lessons", response.context)
+
+    def test_context_has_videos_key(self):
+        response = self.client.get(reverse("dashboard"))
+        self.assertIn("videos", response.context)
+
+    def test_new_lesson_appears_in_context(self):
+        response = self.client.get(reverse("dashboard"))
+        lesson_pks = [l.pk for l in response.context["lessons"]]
+        self.assertIn(self.lesson.pk, lesson_pks)
+
+    def test_new_published_videos_appear_in_context(self):
+        response = self.client.get(reverse("dashboard"))
+        video_pks = [v.pk for v in response.context["videos"]]
+        self.assertIn(
+            Video.objects.get(youtube_id="aaaaaaaaaaa").pk, video_pks
+        )
+
+
+# ── submit_quiz malformed JSON ────────────────────────────────────────────────
+
+class SubmitQuizEdgeCasesTest(TestCase):
+    def test_malformed_json_returns_400(self):
+        response = self.client.post(
+            reverse("submit_quiz"),
+            data="{ not valid json ::::",
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["status"], "error")
+
+    def test_score_defaults_to_zero_when_absent(self):
+        response = self.client.post(
+            reverse("submit_quiz"),
+            data="{}",
+            content_type="application/json",
+        )
+        self.assertEqual(response.json()["score"], 0)
+        self.assertEqual(response.json()["total"], 10)
+
+
+# ── padlet all 4 prompt keys ──────────────────────────────────────────────────
+
+class PadletAllPromptsTest(TestCase):
+    def _post(self, prompt):
+        return self.client.post(reverse("padlet"), {
+            "author_name": "Naran",
+            "prompt": prompt,
+            "content": "Some content here",
+        })
+
+    def test_prompt_learned_is_valid(self):
+        self._post("learned")
+        self.assertEqual(WallPost.objects.filter(prompt="learned").count(), 1)
+
+    def test_prompt_difficult_is_valid(self):
+        self._post("difficult")
+        self.assertEqual(WallPost.objects.filter(prompt="difficult").count(), 1)
+
+    def test_prompt_question_is_valid(self):
+        self._post("question")
+        self.assertEqual(WallPost.objects.filter(prompt="question").count(), 1)
+
+    def test_prompt_next_is_valid(self):
+        self._post("next")
+        self.assertEqual(WallPost.objects.filter(prompt="next").count(), 1)
+
+
+# ── logbook dept FK saved ─────────────────────────────────────────────────────
+
+class LogbookDeptFkTest(TestCase):
+    def test_department_fk_set_when_valid_dept_id_submitted(self):
+        dept = Department.objects.create(name="TestDept", order=999)
+        self.client.post(reverse("logbook"), {
+            "full_name": "Bat",
+            "department": str(dept.pk),
+        })
+        entry = LogEntry.objects.get(full_name="Bat")
+        self.assertEqual(entry.department_id, dept.pk)
+
+    def test_department_fk_is_none_when_no_dept_submitted(self):
+        self.client.post(reverse("logbook"), {
+            "full_name": "Saran",
+            "department": "",
+        })
+        entry = LogEntry.objects.get(full_name="Saran")
+        self.assertIsNone(entry.department)

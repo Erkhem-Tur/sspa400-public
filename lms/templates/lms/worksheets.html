@@ -232,11 +232,36 @@
 
 <!-- ══ VOCABULARY ══ -->
 <div id="terms" class="ws-sec">
+
+  <!-- Level selector -->
+  <div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
+    <span class="fw-semibold small me-1" style="color:#1b3a6b;">Түвшин сонгох:</span>
+    <button class="ws-lvl-btn btn btn-sm active" data-level="beginner"
+            onclick="wsSetLevel('beginner',this)"
+            style="border-radius:20px;background:#dcfce7;color:#14532d;border:1.5px solid #16a34a;font-size:12px;font-weight:700;">
+      🟢 Beginner &nbsp;<span style="opacity:.65;">A1–A2</span>
+    </button>
+    <button class="ws-lvl-btn btn btn-sm" data-level="intermediate"
+            onclick="wsSetLevel('intermediate',this)"
+            style="border-radius:20px;background:#fef9c3;color:#713f12;border:1.5px solid #ca8a04;font-size:12px;">
+      🟡 Intermediate &nbsp;<span style="opacity:.65;">B1–B2</span>
+    </button>
+    <button class="ws-lvl-btn btn btn-sm" data-level="advanced"
+            onclick="wsSetLevel('advanced',this)"
+            style="border-radius:20px;background:#fee2e2;color:#7f1d1d;border:1.5px solid #dc2626;font-size:12px;">
+      🔴 Advanced &nbsp;<span style="opacity:.65;">B2–C1</span>
+    </button>
+    <span id="wsLvlCount" class="ms-auto badge" style="background:#e8f4fd;color:#1b3a6b;font-size:11px;"></span>
+  </div>
+
   <div class="row g-3">
     <div class="col-md-7">
       <div class="card">
-        <div class="card-header"><i class="bi bi-book me-2" style="color:#1b3a6b;"></i>Vocabulary groups</div>
-        <div class="card-body" id="wsTermsBox"></div>
+        <div class="card-header d-flex align-items-center gap-2">
+          <i class="bi bi-book" style="color:#1b3a6b;"></i>
+          <span id="wsLvlTitle" class="fw-semibold small">Beginner — Basic vocabulary</span>
+        </div>
+        <div class="card-body p-2" id="wsTermsBox"></div>
       </div>
     </div>
     <div class="col-md-5">
@@ -331,88 +356,140 @@ const wsGrammarBank=[
 ];
 const wsScenarios=[["Gate 1 badge inspection","At Gate 1, a visitor shows a badge. The officer checks the name, badge color, and access zone."],["Blue Zone access denial","An unaccredited person approaches the Blue Zone. The officer explains the rule and redirects the person to accreditation."],["VIP escort route","A delegate arrives at the main entrance. The officer escorts the delegate to the holding room using clear route language."],["Radio communication","Alpha-2 reports to Control. The officer confirms post, reports status, and requests backup when needed."],["Suspicious vehicle","A vehicle stops near Gate 3 for several minutes. Officers observe, report, and wait for instructions."],["Media zone control","A journalist attempts to enter a restricted VIP zone. The officer checks the press pass and explains the media route."],["Emergency exit control","A crowd gathers near the emergency exit. Officers give calm commands and move people to a safe area."],["Motorcade arrival","The point car, principal car, escort team, rear vehicle, and ambulance arrive at the venue."],["Equipment checklist","Before the shift, officers check the radio, metal detector, X-ray machine, baskets, and duty log."],["Diplomatic access","A senior delegate claims diplomatic status. The officer verifies credentials and contacts the supervisor."],["Shift handover","The outgoing shift leader briefs the incoming team about incidents, route changes, and persons of interest."],["Hotel security support","SSPA officers support a VIP hotel movement and coordinate with reception and protocol staff."],["Food service protection","A special catering delivery arrives. Officers verify the delivery list, driver, and package seal."],["Airport arrival support","A foreign delegation arrives at the airport. Officers guide them to transport and check credentials."],["Public demonstration","A public gathering forms near the venue. Officers observe behavior and report crowd movement."]];
 const wsVocabBank=["badge","ID","checkpoint","restricted area","accreditation desk","duty log","shift leader","close protection agent","checkpoint protection officer","radio check","roger that","say again","stand by","requesting backup","suspicious vehicle","emergency exit","metal detector","X-ray machine","conveyor belt","basket","screening","pat down","principal car","point car","rear vehicle","protection escort team","diplomatic status","verify credentials","access policy","Your Excellency","holding room","media zone","press pass","incident report","formal memo","de-escalation","route change","all clear","unauthorized person","valid badge","expired badge"];
-const wsTerms={
-"Checkpoint phrases · Хяналтын хэллэг":[
-  {en:"Please show me your ID.",mn:"Бичиг баримтаа үзүүлнэ үү."},
-  {en:"May I see your badge, please?",mn:"Таны тэмдэгт харж болох уу?"},
-  {en:"Please proceed.",mn:"Явж болно."},
-  {en:"This is a restricted area.",mn:"Энэ хязгаарлагдмал бүс юм."},
-  {en:"Please go to the accreditation desk.",mn:"Итгэмжлэлийн ширээнд явна уу."},
-  {en:"Please keep your permission visible.",mn:"Зөвшөөрлөө харагдуулж яваарай."},
-  {en:"Access denied.",mn:"Нэвтрэхийг хориглоно."},
-  {en:"Please wait here.",mn:"Энд хүлээнэ үү."},
-  {en:"Do you have an appointment?",mn:"Та уулзалт товлосон уу?"},
-  {en:"I need to contact my supervisor.",mn:"Би дарга руугаа холбогдох хэрэгтэй."},
-],
-"Radio communication · Радио харилцаа":[
-  {en:"Radio check.",mn:"Радио шалгалт."},
-  {en:"Roger that.",mn:"Ойлгосон / Зөв."},
-  {en:"Say again.",mn:"Давтана уу."},
-  {en:"Stand by.",mn:"Хүлээнэ үү."},
-  {en:"Requesting backup.",mn:"Нэмэлт хүч хүсэж байна."},
-  {en:"Over.",mn:"Дууслаа (хариу хүлээж байна)."},
-  {en:"Out.",mn:"Холбоо тасалж байна."},
-  {en:"Read you loud and clear.",mn:"Тодорхой сонсож байна."},
-  {en:"All clear.",mn:"Аюулгүй. Цэвэр."},
-  {en:"Copy that.",mn:"Хүлээж авлаа."},
-  {en:"Negative.",mn:"Үгүй / Тийм биш."},
-  {en:"Affirmative.",mn:"Тийм / Зөв."},
-],
-"Motorcade · Мотодэслэл":[
-  {en:"point car",mn:"урдчилан явах тэрэг"},
-  {en:"principal car",mn:"үндсэн тэрэг (хамгаалуулагчийн)"},
-  {en:"protection escort team",mn:"хамгаалалтын дагалдах баг"},
-  {en:"pilot vehicle",mn:"замчин тэрэг"},
-  {en:"rear vehicle",mn:"арын хамгаалалтын тэрэг"},
-  {en:"counter assault team vehicle",mn:"дайралтанд эсэргүүцэх багийн тэрэг"},
-  {en:"ambulance",mn:"түргэн тусламжийн машин"},
-  {en:"motorcade route",mn:"мотодэслэлийн зам"},
-  {en:"advance team",mn:"урьдчилсан шалгалтын баг"},
-],
-"Equipment · Тоног төхөөрөмж":[
-  {en:"metal detector",mn:"металл илрүүлэгч"},
-  {en:"X-ray machine",mn:"рентген аппарат"},
-  {en:"conveyor belt",mn:"дамжуулах тууз"},
-  {en:"basket",mn:"сагс (эд зүйл тавих)"},
-  {en:"radio",mn:"радио / дуут холбоо"},
-  {en:"handcuffs",mn:"гав"},
-  {en:"bulletproof vest",mn:"сум нэвтрүүлэхгүй хантааз"},
-  {en:"tactical vest",mn:"тактикийн хантааз"},
-  {en:"earpiece",mn:"чихний гарнитур"},
-  {en:"duty log",mn:"жижүүрийн бүртгэл"},
-],
-"Diplomatic language · Дипломат хэллэг":[
-  {en:"Your Excellency",mn:"Ноёт ноён / Ноёт хатагтай"},
-  {en:"I am required to verify your credentials.",mn:"Би таны итгэмжлэлийг шалгах үүрэгтэй."},
-  {en:"According to our access policy...",mn:"Манай нэвтрэх журмын дагуу..."},
-  {en:"I am not able to make exceptions.",mn:"Би онцгой зөвшөөрөл олгох эрхгүй."},
-  {en:"I will contact my supervisor immediately.",mn:"Би дарга руугаа нэн даруй холбогдоно."},
-  {en:"Please follow me.",mn:"Намайг дагана уу."},
-  {en:"For your security, please...",mn:"Таны аюулгүй байдлын үүднээс..."},
-],
-"Protection duties · Хамгаалалтын үүрэг":[
-  {en:"close protection",mn:"биечлэн хамгаалах"},
-  {en:"advance security check",mn:"урьдчилсан аюулгүй байдлын шалгалт"},
-  {en:"threat assessment",mn:"аюулын үнэлгээ"},
-  {en:"secure the perimeter",mn:"хашааг хамгаалах"},
-  {en:"evacuation plan",mn:"нүүлгэн шилжүүлэлтийн төлөвлөгөө"},
-  {en:"shift handover",mn:"жижүүр хүлээлцэх"},
-  {en:"incident report",mn:"ослын тайлан"},
-  {en:"suspicious person",mn:"сэжигтэй хүн"},
-  {en:"unauthorized access",mn:"зөвшөөрөлгүй нэвтрэлт"},
-  {en:"VIP movement",mn:"ВИП хүний хөдөлгөөн"},
-],
-"Emergency phrases · Яаралтай хэллэг":[
-  {en:"Evacuate now!",mn:"Яараад гарна уу!"},
-  {en:"Get down!",mn:"Бөхий!"},
-  {en:"Stay back!",mn:"Ухраа!"},
-  {en:"Do not move!",mn:"Хөдлөхгүй байна уу!"},
-  {en:"Medical assistance needed.",mn:"Эмнэлгийн тусламж хэрэгтэй байна."},
-  {en:"Secure the area.",mn:"Талбайг хааж хамгаал."},
-  {en:"Code red.",mn:"Улаан код — аюулын дохио."},
-  {en:"All units respond.",mn:"Бүх нэгж хариу арга хэмжээ ав."},
-],
+const wsTermsByLevel={
+/* ─────────── BEGINNER A1-A2 ─────────── */
+beginner:{
+  "Basic Words · Үндсэн үгс (A1-A2)":[
+    {en:"incident",mn:"явдал, тохиолдол"},
+    {en:"weapon",mn:"зэвсэг"},
+    {en:"safe",mn:"аюулгүй"},
+    {en:"protect",mn:"хамгаалах"},
+    {en:"hospital",mn:"эмнэлэг"},
+    {en:"hurt",mn:"гэмтэх, бэртэх"},
+    {en:"serious",mn:"ноцтой, чухал"},
+    {en:"shooting",mn:"буудлага"},
+    {en:"blocked",mn:"хаагдсан, зогсоогдсон"},
+    {en:"journalist",mn:"сэтгүүлч"},
+    {en:"investigate",mn:"мөрдөн байцаах, шалгах"},
+    {en:"motive",mn:"сэдэл, шалтгаан"},
+    {en:"security checkpoint",mn:"аюулгүй байдлын хяналтын цэг"},
+    {en:"Secret Service",mn:"Нууц алба (Ерөнхийлөгчийг хамгаалах)"},
+    {en:"White House",mn:"Цагаан ордон"},
+  ],
+  "Elementary Commands · Энгийн тушаал (A1-A2)":[
+    {en:"Stop!",mn:"Зогс!"},
+    {en:"Go!",mn:"Яв!"},
+    {en:"Wait here.",mn:"Энд хүлээ."},
+    {en:"Do not move.",mn:"Хөдлөхгүй байна уу."},
+    {en:"Come with me.",mn:"Надтай ир."},
+    {en:"Show your ID.",mn:"Бичиг баримтаа үзүүл."},
+    {en:"Please follow me.",mn:"Намайг дагана уу."},
+    {en:"You are safe.",mn:"Та аюулгүй байна."},
+    {en:"This area is closed.",mn:"Энэ талбай хаалттай."},
+    {en:"Call for help.",mn:"Тусламж дуудах."},
+  ],
+  "Simple Sentences · Энгийн өгүүлбэр (A1-A2)":[
+    {en:"The incident happened near the White House.",mn:"Явдал Цагаан ордны ойролцоо болсон."},
+    {en:"The man had a weapon in his bag.",mn:"Тухайн хүн цүнхэндээ зэвсэг байрлуулсан байв."},
+    {en:"Security officers stopped the man.",mn:"Аюулгүй байдлын ажилтнууд тухайн хүнийг зогсоов."},
+    {en:"The President was safe.",mn:"Ерөнхийлөгч аюулгүй байсан."},
+    {en:"The police are investigating the incident.",mn:"Цагдаа нар тохиолдлыг шалгаж байна."},
+    {en:"One person was hurt.",mn:"Нэг хүн гэмтсэн."},
+    {en:"The area was blocked.",mn:"Тухайн газар хаагдсан байв."},
+    {en:"The FBI came to help.",mn:"ТНТ-ын алба тусламж үзүүлэхээр ирсэн."},
+  ],
+},
+/* ─────────── INTERMEDIATE B1-B2 ─────────── */
+intermediate:{
+  "Checkpoint phrases · Хяналтын хэллэг (B1)":[
+    {en:"Please show me your ID.",mn:"Бичиг баримтаа үзүүлнэ үү."},
+    {en:"May I see your badge, please?",mn:"Таны тэмдэгт харж болох уу?"},
+    {en:"Please proceed.",mn:"Явж болно."},
+    {en:"This is a restricted area.",mn:"Энэ хязгаарлагдмал бүс юм."},
+    {en:"Please go to the accreditation desk.",mn:"Итгэмжлэлийн ширээнд явна уу."},
+    {en:"Please keep your permission visible.",mn:"Зөвшөөрлөө харагдуулж яваарай."},
+    {en:"Access denied.",mn:"Нэвтрэхийг хориглоно."},
+    {en:"Please wait here.",mn:"Энд хүлээнэ үү."},
+    {en:"Do you have an appointment?",mn:"Та уулзалт товлосон уу?"},
+    {en:"I need to contact my supervisor.",mn:"Би дарга руугаа холбогдох хэрэгтэй."},
+  ],
+  "Radio communication · Радио харилцаа (B1)":[
+    {en:"Radio check.",mn:"Радио шалгалт."},
+    {en:"Roger that.",mn:"Ойлгосон / Зөв."},
+    {en:"Say again.",mn:"Давтана уу."},
+    {en:"Stand by.",mn:"Хүлээнэ үү."},
+    {en:"Requesting backup.",mn:"Нэмэлт хүч хүсэж байна."},
+    {en:"Over.",mn:"Дууслаа (хариу хүлээж байна)."},
+    {en:"Out.",mn:"Холбоо тасалж байна."},
+    {en:"Read you loud and clear.",mn:"Тодорхой сонсож байна."},
+    {en:"All clear.",mn:"Аюулгүй. Цэвэр."},
+    {en:"Copy that.",mn:"Хүлээж авлаа."},
+    {en:"Negative.",mn:"Үгүй / Тийм биш."},
+    {en:"Affirmative.",mn:"Тийм / Зөв."},
+  ],
+  "Equipment · Тоног төхөөрөмж (B1)":[
+    {en:"metal detector",mn:"металл илрүүлэгч"},
+    {en:"X-ray machine",mn:"рентген аппарат"},
+    {en:"conveyor belt",mn:"дамжуулах тууз"},
+    {en:"basket",mn:"сагс (эд зүйл тавих)"},
+    {en:"radio",mn:"радио / дуут холбоо"},
+    {en:"handcuffs",mn:"гав"},
+    {en:"bulletproof vest",mn:"сум нэвтрүүлэхгүй хантааз"},
+    {en:"tactical vest",mn:"тактикийн хантааз"},
+    {en:"earpiece",mn:"чихний гарнитур"},
+    {en:"duty log",mn:"жижүүрийн бүртгэл"},
+  ],
+  "Diplomatic language · Дипломат хэллэг (B2)":[
+    {en:"Your Excellency",mn:"Ноёт ноён / Ноёт хатагтай"},
+    {en:"I am required to verify your credentials.",mn:"Би таны итгэмжлэлийг шалгах үүрэгтэй."},
+    {en:"According to our access policy...",mn:"Манай нэвтрэх журмын дагуу..."},
+    {en:"I am not able to make exceptions.",mn:"Би онцгой зөвшөөрөл олгох эрхгүй."},
+    {en:"I will contact my supervisor immediately.",mn:"Би дарга руугаа нэн даруй холбогдоно."},
+    {en:"Please follow me.",mn:"Намайг дагана уу."},
+    {en:"For your security, please...",mn:"Таны аюулгүй байдлын үүднээс..."},
+  ],
+},
+/* ─────────── ADVANCED B2-C1 ─────────── */
+advanced:{
+  "Motorcade · Мотодэслэл (B2)":[
+    {en:"point car",mn:"урдчилан явах тэрэг"},
+    {en:"principal car",mn:"үндсэн тэрэг (хамгаалуулагчийн)"},
+    {en:"protection escort team",mn:"хамгаалалтын дагалдах баг"},
+    {en:"pilot vehicle",mn:"замчин тэрэг"},
+    {en:"rear vehicle",mn:"арын хамгаалалтын тэрэг"},
+    {en:"counter assault team vehicle",mn:"дайралтанд эсэргүүцэх багийн тэрэг"},
+    {en:"ambulance",mn:"түргэн тусламжийн машин"},
+    {en:"motorcade route",mn:"мотодэслэлийн зам"},
+    {en:"advance team",mn:"урьдчилсан шалгалтын баг"},
+  ],
+  "Protection duties · Хамгаалалтын үүрэг (B2-C1)":[
+    {en:"close protection",mn:"биечлэн хамгаалах"},
+    {en:"advance security check",mn:"урьдчилсан аюулгүй байдлын шалгалт"},
+    {en:"threat assessment",mn:"аюулын үнэлгээ"},
+    {en:"secure the perimeter",mn:"хашааг хамгаалах"},
+    {en:"evacuation plan",mn:"нүүлгэн шилжүүлэлтийн төлөвлөгөө"},
+    {en:"shift handover",mn:"жижүүр хүлээлцэх"},
+    {en:"incident report",mn:"ослын тайлан"},
+    {en:"suspicious person",mn:"сэжигтэй хүн"},
+    {en:"unauthorized access",mn:"зөвшөөрөлгүй нэвтрэлт"},
+    {en:"VIP movement",mn:"ВИП хүний хөдөлгөөн"},
+  ],
+  "Emergency phrases · Яаралтай хэллэг (C1)":[
+    {en:"Evacuate now!",mn:"Яараад гарна уу!"},
+    {en:"Get down!",mn:"Бөхий!"},
+    {en:"Stay back!",mn:"Ухраа!"},
+    {en:"Do not move!",mn:"Хөдлөхгүй байна уу!"},
+    {en:"Medical assistance needed.",mn:"Эмнэлгийн тусламж хэрэгтэй байна."},
+    {en:"Secure the area.",mn:"Талбайг хааж хамгаал."},
+    {en:"Code red.",mn:"Улаан код — аюулын дохио."},
+    {en:"All units respond.",mn:"Бүх нэгж хариу арга хэмжээ ав."},
+  ],
+},
 };
+// Active level — start on beginner
+let wsCurrentLevel='beginner';
+// Flat list for current level (used by flashcard)
+let wsTerms=wsTermsByLevel[wsCurrentLevel];
 const wsSubjects=["The officer","The visitor","Control","The shift leader","The delegate","The team","The journalist","The driver"];
 const wsObjects=["the badge","the ID","the route","the radio message","the access list","the vehicle","the bag","the report"];
 const wsPlaces=["Gate 1","Blue Zone","Gate 3","the holding room","the media zone","the checkpoint"];
@@ -615,8 +692,25 @@ function wsCheck(box){
 /* ═══════════════════════════════════════════════════
    VOCABULARY / FLASHCARD
 ═══════════════════════════════════════════════════ */
-let wsFlashCards=[];Object.values(wsTerms).forEach(a=>a.forEach(x=>wsFlashCards.push(x)));
+let wsFlashCards=[];
+function wsRebuildFlashCards(){wsFlashCards=[];Object.values(wsTerms).forEach(a=>a.forEach(x=>wsFlashCards.push(x)));}
+wsRebuildFlashCards();
 let wsFcIdx=0,_wsFcFlipped=false;
+
+function wsSetLevel(level,btn){
+  wsCurrentLevel=level;
+  wsTerms=wsTermsByLevel[level];
+  document.querySelectorAll('.ws-lvl-btn').forEach(b=>{
+    b.classList.remove('active');
+    b.style.fontWeight='';
+  });
+  btn.classList.add('active');
+  btn.style.fontWeight='700';
+  wsRebuildFlashCards();
+  wsFcIdx=0;
+  wsFcRender();
+  wsRenderTerms();
+}
 function wsFcRender(){
   const t=wsFlashCards[wsFcIdx];
   const total=wsFlashCards.length;
@@ -637,6 +731,13 @@ function wsFcGoTo(idx){wsFcIdx=idx;wsFcRender();}
 
 function wsRenderTerms(){
   let flatIdx=0;
+  const lvlLabels={beginner:'🟢 Beginner — A1-A2',intermediate:'🟡 Intermediate — B1-B2',advanced:'🔴 Advanced — B2-C1'};
+  const totalItems=wsFlashCards.length;
+  const titleEl=document.getElementById('wsLvlTitle');
+  const countEl=document.getElementById('wsLvlCount');
+  if(titleEl) titleEl.textContent=lvlLabels[wsCurrentLevel]||'';
+  if(countEl) countEl.textContent=totalItems+' үг';
+
   const items=Object.entries(wsTerms).map(([name,arr],idx)=>{
     const rows=arr.map(t=>{
       const fi=flatIdx++;

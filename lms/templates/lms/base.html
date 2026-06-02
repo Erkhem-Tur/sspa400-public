@@ -134,6 +134,53 @@
       .app-sidebar.mobile-open { transform: translateX(0); }
       .app-main { margin-left: 0; }
     }
+
+    /* ── GLOBAL SMOOTHNESS ── */
+
+    /* Page entrance fade */
+    .app-main { animation: _pageIn .22s ease-out both; }
+    @keyframes _pageIn {
+      from { opacity: 0; transform: translateY(7px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Top navigation progress bar */
+    #_navBar {
+      position: fixed; top: 0; left: 0; height: 3px; width: 0;
+      background: linear-gradient(90deg, var(--gold), #f5d76e);
+      z-index: 9999; pointer-events: none;
+      transition: width .18s ease-out, opacity .3s;
+      opacity: 0;
+    }
+    #_navBar.going  { opacity: 1; width: 75%; transition: width 1.8s cubic-bezier(.1,.6,.3,1), opacity .1s; }
+    #_navBar.done   { opacity: 1; width: 100%; transition: width .12s ease-out; }
+    #_navBar.hiding { opacity: 0; width: 100%; transition: opacity .35s .1s; }
+
+    /* Mobile sidebar overlay */
+    #_sideOverlay {
+      display: none; position: fixed; inset: 0; z-index: 1015;
+      background: rgba(0,0,0,.35); backdrop-filter: blur(2px);
+      opacity: 0; transition: opacity .25s;
+    }
+    #_sideOverlay.visible { display: block; opacity: 1; }
+
+    /* Button press feel */
+    .btn { transition: background .15s, border-color .15s, color .15s, box-shadow .15s, transform .08s !important; }
+    .btn:active:not(:disabled) { transform: scale(.95) !important; }
+
+    /* Card hover lift */
+    .card { transition: box-shadow .22s, transform .22s; }
+    .card:hover { box-shadow: 0 6px 20px rgba(0,0,0,.11); transform: translateY(-1px); }
+
+    /* Sidebar link ripple feel */
+    .sidebar-nav a { transition: all .15s ease, background .1s; }
+    .sidebar-nav a:active { opacity: .7; }
+
+    /* Form focus ring */
+    .form-control:focus, .form-select:focus {
+      border-color: var(--primary); box-shadow: 0 0 0 3px rgba(27,58,107,.12);
+      transition: box-shadow .15s, border-color .15s;
+    }
   </style>
   {% block extra_head %}{% endblock %}
 </head>
@@ -232,20 +279,50 @@
   {% block content %}{% endblock %}
 </main>
 
+<div id="_navBar"></div>
+<div id="_sideOverlay"></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+  // ── Sidebar toggle (with mobile overlay) ─────────────────────────
   const toggle = document.getElementById('sidebarToggle');
   const sidebar = document.getElementById('sidebar');
   const main = document.getElementById('mainContent');
+  const overlay = document.getElementById('_sideOverlay');
   const isMobile = () => window.innerWidth <= 768;
+  function closeMobileSidebar(){
+    sidebar.classList.remove('mobile-open');
+    overlay.classList.remove('visible');
+  }
   toggle.addEventListener('click', () => {
     if (isMobile()) {
+      const opening = !sidebar.classList.contains('mobile-open');
       sidebar.classList.toggle('mobile-open');
+      overlay.classList.toggle('visible', opening);
     } else {
       sidebar.classList.toggle('collapsed');
       main.classList.toggle('expanded');
     }
   });
+  overlay.addEventListener('click', closeMobileSidebar);
+
+  // ── Navigation progress bar ───────────────────────────────────────
+  const _nb = document.getElementById('_navBar');
+  function _nbStart(){ _nb.className='going'; }
+  function _nbDone(){
+    _nb.className='done';
+    setTimeout(()=>{ _nb.className='hiding'; setTimeout(()=>{ _nb.className=''; },400); },120);
+  }
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a');
+    if (!a) return;
+    const href = a.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('javascript') || a.target === '_blank') return;
+    if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+    _nbStart();
+  });
+  window.addEventListener('pageshow', ()=>_nbDone());
+  // Fallback: finish bar if page load stalls
+  setTimeout(_nbDone, 3000);
 
   // PWA service worker
   if ('serviceWorker' in navigator) {

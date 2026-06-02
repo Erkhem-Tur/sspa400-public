@@ -16,7 +16,8 @@
   .ws-nav .wt.active { background: #1b3a6b; border-color: #1b3a6b; color: #fff; }
   .ws-nav .wt:hover:not(.active) { background: #f8fafc; border-color: #94a3b8; }
   .ws-sec { display: none; }
-  .ws-sec.active { display: block; }
+  .ws-sec.active { display: block; animation: _wsSecIn .2s ease-out both; }
+  @keyframes _wsSecIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
   .ws-trans-box { background:#eef5ff; border-left:3px solid #1b3a6b; border-radius:0 6px 6px 0; padding:10px 12px; margin:8px 0 6px; font-size:13px; line-height:1.6; color:#1e3a5f; }
 
   /* ── LEVEL BADGES ── */
@@ -30,7 +31,7 @@
 
   /* ── FLASHCARD ── */
   .ws-fc { perspective: 900px; cursor: pointer; min-height: 180px; }
-  .ws-fc-inner { position: relative; width: 100%; min-height: 180px; transition: transform .45s; transform-style: preserve-3d; }
+  .ws-fc-inner { position: relative; width: 100%; min-height: 180px; transition: transform .42s cubic-bezier(.175,.885,.32,1.275); transform-style: preserve-3d; }
   .ws-fc.flipped .ws-fc-inner { transform: rotateY(180deg); }
   .ws-fc-front, .ws-fc-back {
     position: absolute; width: 100%; min-height: 180px; backface-visibility: hidden;
@@ -41,8 +42,9 @@
   .ws-fc-back  { background: linear-gradient(135deg,#c9a227,#a07d10); color:#fff; transform: rotateY(180deg); }
 
   /* ── QUIZ OPTIONS ── */
-  .ws-opt { display:block; width:100%; text-align:left; border:1.5px solid #e2e8f0; background:#fff; color:#1e293b; border-radius:10px; padding:10px 14px; margin:5px 0; font-size:13px; font-weight:500; cursor:pointer; transition:all .15s; }
-  .ws-opt:hover { border-color:#1b3a6b; background:#f0f4f8; }
+  .ws-opt { display:block; width:100%; text-align:left; border:1.5px solid #e2e8f0; background:#fff; color:#1e293b; border-radius:10px; padding:10px 14px; margin:5px 0; font-size:13px; font-weight:500; cursor:pointer; transition:all .15s, transform .08s; }
+  .ws-opt:hover { border-color:#1b3a6b; background:#f0f4f8; transform:translateX(3px); }
+  .ws-opt:active { transform:scale(.97); }
   .ws-opt.selected { border-color:#1b3a6b!important; background:#e8f0fc!important; color:#1b3a6b!important; font-weight:600; }
   .ws-opt.correct { border-color:#16a34a!important; background:#dcfce7!important; color:#166534!important; font-weight:700; }
   .ws-opt.wrong   { border-color:#dc2626!important; background:#fee2e2!important; color:#991b1b!important; }
@@ -917,6 +919,7 @@ wsRebuildFlashCards();
 let wsFcIdx=0,_wsFcFlipped=false;
 
 function wsSetLevel(level,btn){
+  if(level===wsCurrentLevel) return;
   wsCurrentLevel=level;
   wsTerms=wsTermsByLevel[level];
   document.querySelectorAll('.ws-lvl-btn').forEach(b=>{
@@ -928,7 +931,20 @@ function wsSetLevel(level,btn){
   wsRebuildFlashCards();
   wsFcIdx=0;
   wsFcRender();
-  wsRenderTerms();
+  // Fade-out → update → fade-in the terms grid
+  const grid=document.getElementById('wsTermsGrid');
+  if(grid){
+    grid.style.transition='opacity .15s,transform .15s';
+    grid.style.opacity='0';
+    grid.style.transform='translateY(6px)';
+    setTimeout(()=>{
+      wsRenderTerms();
+      grid.style.opacity='1';
+      grid.style.transform='translateY(0)';
+    },160);
+  } else {
+    wsRenderTerms();
+  }
 }
 function wsFcRender(){
   const t=wsFlashCards[wsFcIdx];

@@ -932,7 +932,7 @@ function wsSetLevel(level,btn){
   wsFcIdx=0;
   wsFcRender();
   // Fade-out → update → fade-in the terms grid
-  const grid=document.getElementById('wsTermsGrid');
+  const grid=document.getElementById('wsTermsBox');
   if(grid){
     grid.style.transition='opacity .15s,transform .15s';
     grid.style.opacity='0';
@@ -947,6 +947,12 @@ function wsSetLevel(level,btn){
   }
 }
 function wsFcRender(){
+  if(!wsFlashCards.length){
+    document.getElementById('wsFcFront').innerHTML='<div class="small opacity-50">Үг олдсонгүй.</div>';
+    document.getElementById('wsFcBack').innerHTML='';
+    return;
+  }
+  if(wsFcIdx>=wsFlashCards.length) wsFcIdx=0;
   const t=wsFlashCards[wsFcIdx];
   const total=wsFlashCards.length;
   document.getElementById('wsFcFront').innerHTML=

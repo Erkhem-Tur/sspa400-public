@@ -714,27 +714,57 @@ const wsAll = Array.from({length:500},(_,i)=>wsMakeWS(i+1));
    AUDIO ENGINE
 ═══════════════════════════════════════════════════ */
 let _wsVoice=null, _wsUtt=null, _wsKeepAlive=null, _wsSpeakBtn=null;
-function _wsPick(){
-  const vv=speechSynthesis.getVoices(); if(!vv.length) return;
-  _wsVoice=vv.find(v=>v.name==='Google US English')||vv.find(v=>v.name==='Google UK English Female')||vv.find(v=>/samantha|karen/i.test(v.name))||vv.find(v=>v.lang==='en-US'&&v.localService)||vv.find(v=>v.lang&&v.lang.startsWith('en-US'))||vv.find(v=>v.lang&&v.lang.startsWith('en-GB'))||vv.find(v=>v.lang&&v.lang.startsWith('en'))||vv[0]||null;
+function _wsPickVoice(vv){
+  return vv.find(v=>v.name==='Google US English')
+    ||vv.find(v=>v.name==='Google UK English Female')
+    ||vv.find(v=>/samantha|karen/i.test(v.name))
+    ||vv.find(v=>v.lang==='en-US'&&v.localService)
+    ||vv.find(v=>v.lang&&v.lang.startsWith('en-US'))
+    ||vv.find(v=>v.lang&&v.lang.startsWith('en-GB'))
+    ||vv.find(v=>v.lang&&v.lang.startsWith('en'))
+    ||vv[0]||null;
 }
-if('speechSynthesis' in window){speechSynthesis.onvoiceschanged=_wsPick;setTimeout(_wsPick,100);setTimeout(_wsPick,700);}
+if('speechSynthesis'in window){
+  speechSynthesis.onvoiceschanged=()=>{_wsVoice=_wsPickVoice(speechSynthesis.getVoices());};
+  const _vInit=speechSynthesis.getVoices();if(_vInit.length)_wsVoice=_wsPickVoice(_vInit);
+  setTimeout(()=>{if(!_wsVoice){const v=speechSynthesis.getVoices();if(v.length)_wsVoice=_wsPickVoice(v);}},300);
+  setTimeout(()=>{if(!_wsVoice){const v=speechSynthesis.getVoices();if(v.length)_wsVoice=_wsPickVoice(v);}},1200);
+  setTimeout(()=>{if(!_wsVoice){const v=speechSynthesis.getVoices();if(v.length)_wsVoice=_wsPickVoice(v);}},3000);
+}
 function _wsSetBtn(btn,on){if(!btn)return;if(on){btn.dataset.orig=btn.innerHTML;btn.innerHTML='<i class="bi bi-stop-fill me-1"></i>Stop';}else{btn.innerHTML=btn.dataset.orig||'<i class="bi bi-volume-up me-1"></i>Speak';}}
 function wsStop(){clearInterval(_wsKeepAlive);_wsKeepAlive=null;if(_wsSpeakBtn){_wsSetBtn(_wsSpeakBtn,false);_wsSpeakBtn=null;}_wsUtt=null;if('speechSynthesis'in window)speechSynthesis.cancel();}
 function speak(text,btn){
-  if(!('speechSynthesis'in window))return;
+  if(!('speechSynthesis'in window)){
+    if(btn){btn.title='Таны браузер дуут унших боломжгүй байна.';}
+    return;
+  }
   if(btn&&btn===_wsSpeakBtn){wsStop();return;}
   wsStop();
+  // Pull voices one more time in case they loaded since page load
+  if(!_wsVoice){const vv=speechSynthesis.getVoices();if(vv.length)_wsVoice=_wsPickVoice(vv);}
   const clean=String(text||'').replace(/_____/g,'blank').replace(/\([^)]*\)/g,'').replace(/[^\w\s'.,!?;:-]/g,' ').replace(/\s+/g,' ').trim().slice(0,300);
   if(!clean)return;
   const u=new SpeechSynthesisUtterance(clean);
   if(_wsVoice){u.voice=_wsVoice;u.lang=_wsVoice.lang||'en-US';}else{u.lang='en-US';}
-  u.rate=0.90;u.pitch=1.0;u.volume=1.0;
-  u.onstart=()=>{if(btn){_wsSpeakBtn=btn;_wsSetBtn(btn,true);}_wsKeepAlive=setInterval(()=>{if(!speechSynthesis.speaking){clearInterval(_wsKeepAlive);return;}speechSynthesis.pause();speechSynthesis.resume();},12000);};
+  u.rate=0.88;u.pitch=1.0;u.volume=1.0;
+  u.onstart=()=>{
+    if(btn){_wsSpeakBtn=btn;_wsSetBtn(btn,true);}
+    _wsKeepAlive=setInterval(()=>{if(!speechSynthesis.speaking){clearInterval(_wsKeepAlive);return;}speechSynthesis.pause();speechSynthesis.resume();},10000);
+  };
   u.onend=()=>wsStop();
-  u.onerror=(e)=>{if(e.error!=='interrupted')wsStop();};
+  u.onerror=(e)=>{
+    if(e.error!=='interrupted'){
+      wsStop();
+      if(btn){btn.innerHTML='<i class="bi bi-volume-mute me-1"></i>Дуу алга';btn.classList.add('text-danger');setTimeout(()=>{btn.innerHTML=btn.dataset.orig||'<i class="bi bi-volume-up me-1"></i>Listen';btn.classList.remove('text-danger');},3000);}
+    }
+  };
   _wsUtt=u;
-  try{speechSynthesis.speak(u);requestAnimationFrame(()=>{if(speechSynthesis.paused)speechSynthesis.resume();});}catch(e){wsStop();}
+  try{
+    speechSynthesis.cancel();
+    setTimeout(()=>{
+      try{speechSynthesis.speak(u);requestAnimationFrame(()=>{if(speechSynthesis.paused)speechSynthesis.resume();});}catch(e){wsStop();}
+    },50);
+  }catch(e){wsStop();}
 }
 
 /* ═══════════════════════════════════════════════════
@@ -1131,24 +1161,33 @@ function wsTranslate(btn,text,boxId){
   }
   btn.disabled=true;
   btn.innerHTML='<span class="spinner-border spinner-border-sm me-1" role="status"></span>Орчуулж байна...';
-  fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(text.slice(0,500))+'&langpair=en|mn')
+  // Use Google Translate unofficial gtx endpoint — more reliable than MyMemory for Mongolian
+  fetch('https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=mn&dt=t&q='+encodeURIComponent(text.slice(0,500)))
     .then(r=>r.json())
     .then(d=>{
-      const t=(d.responseData&&d.responseData.translatedText)||'';
-      if(t&&d.responseStatus===200&&!t.includes('MYMEMORY WARNING')){
+      // Response: [ [ ["translated","original",...], ... ], ... ]
+      let t='';
+      try{t=d[0].map(x=>x[0]).filter(Boolean).join('');}catch(e){t='';}
+      if(t){
         _wsTCache[key]=t;
         try{localStorage.setItem('wsTransCache',JSON.stringify(_wsTCache));}catch(e){}
         _wsTransShow(box,t);
       }else{
         box.innerHTML=
-          '<span style="font-size:11px;font-weight:600;opacity:.6;">Орчуулгын лимит дүүрсэн.</span> '+
+          '<span style="font-size:11px;font-weight:600;opacity:.6;">Орчуулга амжилтгүй болсон.</span> '+
           '<a href="https://translate.google.com/?sl=en&tl=mn&text='+encodeURIComponent(text.slice(0,500))+'&op=translate" target="_blank" rel="noopener" class="small">Google Translate-д нээх ↗</a>';
       }
       box.style.display='block';
       btn.disabled=false;
       btn.innerHTML='<i class="bi bi-eye-slash me-1"></i>Нуух';
     })
-    .catch(()=>{btn.disabled=false;btn.innerHTML='<i class="bi bi-translate me-1"></i>Орчуулах';});
+    .catch(()=>{
+      // Fallback: open Google Translate directly
+      box.innerHTML='<a href="https://translate.google.com/?sl=en&tl=mn&text='+encodeURIComponent(text.slice(0,500))+'&op=translate" target="_blank" rel="noopener" class="small"><i class="bi bi-box-arrow-up-right me-1"></i>Google Translate-д нээх</a>';
+      box.style.display='block';
+      btn.disabled=false;
+      btn.innerHTML='<i class="bi bi-eye-slash me-1"></i>Нуух';
+    });
 }
 
 /* Switch box to edit mode */

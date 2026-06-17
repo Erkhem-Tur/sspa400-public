@@ -23,7 +23,20 @@ def dashboard_view(request):
 
 def lesson_view(request, lesson_id):
     lesson = get_object_or_404(Lesson, pk=lesson_id)
-    return render(request, 'lms/index.html', {'lesson': lesson})
+    if lesson.pk == 1:
+        return render(request, 'lms/index.html', {'lesson': lesson})
+
+    resource_file = ''
+    if (
+        'COP17' in lesson.title
+        or 'SSPA_COP17_A1_English_Resource_Pack.docx' in lesson.description
+    ):
+        resource_file = 'lms/resources/SSPA_COP17_A1_English_Resource_Pack.docx'
+
+    return render(request, 'lms/lesson_detail.html', {
+        'lesson': lesson,
+        'resource_file': resource_file,
+    })
 
 
 def worksheets_view(request):

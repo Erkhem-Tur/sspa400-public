@@ -64,6 +64,20 @@ class PublicViewsTest(TestCase):
         response = self.client.get(reverse("lesson", args=[self.lesson.pk]))
         self.assertEqual(response.context["lesson"], self.lesson)
 
+    def test_additional_lesson_shows_database_content(self):
+        lesson = Lesson.objects.create(
+            title="COP17 Registration & Access Control English - A1 Resource Pack",
+            description="Teacher guide\nLearner handouts\nHomework",
+            order=2,
+        )
+        response = self.client.get(reverse("lesson", args=[lesson.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "lms/lesson_detail.html")
+        self.assertContains(response, "COP17 Registration")
+        self.assertContains(response, "Teacher guide")
+        self.assertContains(response, "Learner handouts")
+        self.assertNotContains(response, "400 Questions")
+
     def test_lesson_view_returns_404_for_missing_id(self):
         response = self.client.get(reverse("lesson", args=[99999]))
         self.assertEqual(response.status_code, 404)

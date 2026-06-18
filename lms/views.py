@@ -77,7 +77,15 @@ def lesson_view(request, lesson_id):
 
 
 def worksheets_view(request):
+    if request.GET.get('tab') == 'vocabulary':
+        return redirect('terminology')
+    if request.GET.get('tab') == 'listening':
+        return redirect('/terminology/?mode=listening')
     return render(request, 'lms/worksheets.html')
+
+
+def terminology_view(request):
+    return render(request, 'lms/terminology.html')
 
 
 def course_library_view(request):

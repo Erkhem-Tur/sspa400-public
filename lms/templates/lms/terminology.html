@@ -1,0 +1,119 @@
+{% extends 'lms/base.html' %}
+{% load static %}
+{% block title %}Operational Terminology & Listening - SSPA LMS{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'lms/terminology.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="term-page" data-source="{% static 'lms/terminology.json' %}">
+  <header class="term-head">
+    <div>
+      <div class="term-kicker">SSPA Protection Operations English</div>
+      <h1>Operational Terminology</h1>
+      <p>310 verified terms and duty phrases with Mongolian support and listening practice.</p>
+    </div>
+    <div class="term-progress" aria-label="Vocabulary progress">
+      <div class="term-progress-copy"><span>Learned</span><strong id="termProgressText">0 / 310</strong></div>
+      <div class="term-progress-track"><div class="term-progress-fill" id="termProgressFill"></div></div>
+    </div>
+  </header>
+
+  <nav class="term-modebar" aria-label="Terminology sections">
+    <button class="term-mode active" type="button" data-mode="vocabulary"><i class="bi bi-book me-2"></i>Vocabulary Library</button>
+    <button class="term-mode" type="button" data-mode="listening"><i class="bi bi-headphones me-2"></i>Listening Lab</button>
+  </nav>
+
+  <section class="term-tools" aria-label="Terminology filters">
+    <div class="term-search">
+      <i class="bi bi-search" aria-hidden="true"></i>
+      <input class="form-control" id="termSearch" type="search" placeholder="Search English, Mongolian, tags..." autocomplete="off">
+    </div>
+    <div>
+      <label class="term-label" for="termModule">Module</label>
+      <select class="form-select" id="termModule"><option value="all">All modules</option></select>
+    </div>
+    <div>
+      <label class="term-label" for="termType">Content</label>
+      <select class="form-select" id="termType">
+        <option value="all">Terms & phrases</option>
+        <option value="terminology_flashcard">Terminology</option>
+        <option value="operational_phrase">Operational phrases</option>
+      </select>
+    </div>
+    <div>
+      <label class="term-label" for="termPriority">Priority</label>
+      <select class="form-select" id="termPriority">
+        <option value="all">All priorities</option>
+        <option value="Core">Core</option>
+        <option value="Extended">Extended</option>
+        <option value="Reference">Reference</option>
+      </select>
+    </div>
+    <div>
+      <label class="term-label" for="termStatus">Study status</label>
+      <select class="form-select" id="termStatus">
+        <option value="all">All items</option>
+        <option value="unlearned">Not learned</option>
+        <option value="learned">Learned</option>
+        <option value="favorite">Favorites</option>
+      </select>
+    </div>
+  </section>
+
+  <div class="term-levels" id="termLevels" aria-label="CEFR level">
+    <button class="term-level active" type="button" data-level="all">All levels</button>
+    <button class="term-level" type="button" data-level="A2">A2</button>
+    <button class="term-level" type="button" data-level="B1">B1</button>
+    <button class="term-level" type="button" data-level="B2">B2</button>
+    <button class="term-level" type="button" data-level="C1">C1</button>
+  </div>
+
+  <section class="term-view active" id="vocabularyView">
+    <div class="term-workspace">
+      <div class="term-panel">
+        <div class="term-panel-head"><strong>Terminology bank</strong><span class="term-count" id="termCount">Loading...</span></div>
+        <div class="term-list" id="termList" aria-live="polite"></div>
+      </div>
+      <article class="term-panel term-detail" id="termDetail" aria-live="polite"></article>
+    </div>
+  </section>
+
+  <section class="term-view" id="listeningView">
+    <div class="listen-layout">
+      <div class="listen-stage">
+        <div class="listen-top">
+          <div class="listen-activity" id="listenActivities" aria-label="Listening activity">
+            <button class="active" type="button" data-activity="choice">Choose meaning</button>
+            <button type="button" data-activity="dictation">Dictation</button>
+          </div>
+          <div class="listen-speed" id="listenSpeeds" aria-label="Playback speed">
+            <button type="button" data-speed="0.75">0.75x</button>
+            <button class="active" type="button" data-speed="1">1x</button>
+            <button type="button" data-speed="1.15">1.15x</button>
+          </div>
+        </div>
+        <p class="listen-prompt" id="listenPrompt">Listen carefully, then choose the Mongolian meaning.</p>
+        <button class="listen-play" id="listenPlay" type="button" title="Play audio" aria-label="Play audio"><i class="bi bi-volume-up-fill"></i></button>
+        <div id="listenQuestion"></div>
+        <div class="listen-feedback" id="listenFeedback" aria-live="polite"></div>
+        <div class="text-center mt-2">
+          <button class="btn btn-primary" id="listenNext" type="button">Next item <i class="bi bi-arrow-right ms-1"></i></button>
+        </div>
+      </div>
+      <aside class="listen-stats">
+        <div class="term-panel-head"><strong>Session</strong></div>
+        <div class="listen-stat"><span>Correct</span><strong id="listenCorrect">0</strong></div>
+        <div class="listen-stat"><span>Attempts</span><strong id="listenAttempts">0</strong></div>
+        <div class="listen-stat"><span>Accuracy</span><strong id="listenAccuracy">0%</strong></div>
+        <div class="listen-stat"><span>Streak</span><strong id="listenStreak">0</strong></div>
+        <p class="listen-note">The Listening Lab uses the active filters above. Use headphones and replay each item before answering.</p>
+      </aside>
+    </div>
+  </section>
+
+  <div class="alert alert-danger mt-3 d-none" id="termError" role="alert"></div>
+</main>
+<script src="{% static 'lms/terminology.js' %}" defer></script>
+{% endblock %}

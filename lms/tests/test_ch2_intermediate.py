@@ -20,6 +20,7 @@ Topics covered
 
 import json
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
@@ -116,6 +117,25 @@ class PublicViewsTest(TestCase):
 
     def test_worksheets_returns_200(self):
         self.assertEqual(self.client.get(reverse("worksheets")).status_code, 200)
+
+    def test_terminology_hub_returns_enhanced_vocabulary_and_listening(self):
+        response = self.client.get(reverse("terminology"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "lms/terminology.html")
+        self.assertContains(response, 'id="vocabularyView"')
+        self.assertContains(response, 'id="listeningView"')
+        self.assertContains(response, "310 verified terms")
+
+    def test_terminology_json_contains_complete_import(self):
+        data_path = settings.BASE_DIR / "lms" / "static" / "lms" / "terminology.json"
+        data = json.loads(data_path.read_text(encoding="utf-8"))
+        items = data["items"]
+        self.assertEqual(len(items), 310)
+        self.assertEqual(len(data["meta"]["modules"]), 13)
+        self.assertEqual(len({item["item_id"] for item in items}), 310)
+        self.assertTrue(all(item["audio_script"] for item in items))
+        self.assertEqual(items[0]["front"], "Protectee")
+        self.assertEqual(items[0]["back_mn"], "хамгаалалтад байгаа хүн")
 
     def test_course_library_is_structured_and_complete(self):
         response = self.client.get(reverse("course_library"))
@@ -490,11 +510,15 @@ class VideoAdminFormTest(TestCase):
 # ── worksheets ?tab= query params ────────────────────────────────────────────
 
 class WorksheetsTabParamTest(TestCase):
-    """The worksheets view ignores tab params server-side (JS handles tabs)."""
+    """Legacy worksheet tab URLs continue to reach the right resources."""
 
-    def test_tab_vocabulary_returns_200(self):
+    def test_tab_vocabulary_redirects_to_enhanced_library(self):
         response = self.client.get(reverse("worksheets"), {"tab": "vocabulary"})
-        self.assertEqual(response.status_code, 200)
+        self.assertRedirects(response, reverse("terminology"))
+
+    def test_tab_listening_redirects_to_listening_lab(self):
+        response = self.client.get(reverse("worksheets"), {"tab": "listening"})
+        self.assertRedirects(response, f'{reverse("terminology")}?mode=listening')
 
     def test_tab_reading_returns_200(self):
         response = self.client.get(reverse("worksheets"), {"tab": "reading"})

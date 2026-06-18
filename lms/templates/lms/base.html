@@ -238,8 +238,11 @@
     <a href="{% url 'worksheets' %}?tab=tests" class="{% if request.resolver_match.url_name == 'worksheets' and request.GET.tab == 'tests' %}active{% endif %}">
       <i class="bi bi-clipboard-check"></i> Test Center
     </a>
-    <a href="{% url 'worksheets' %}?tab=vocabulary" class="{% if request.resolver_match.url_name == 'worksheets' and request.GET.tab == 'vocabulary' %}active{% endif %}">
+    <a href="{% url 'terminology' %}" class="{% if request.resolver_match.url_name == 'terminology' and request.GET.mode != 'listening' %}active{% endif %}">
       <i class="bi bi-book"></i> Vocabulary
+    </a>
+    <a href="{% url 'terminology' %}?mode=listening" class="{% if request.resolver_match.url_name == 'terminology' and request.GET.mode == 'listening' %}active{% endif %}">
+      <i class="bi bi-headphones"></i> Listening Lab
     </a>
     <a href="{% url 'worksheets' %}?tab=reading" class="{% if request.resolver_match.url_name == 'worksheets' and request.GET.tab == 'reading' %}active{% endif %}">
       <i class="bi bi-file-text"></i> Reading

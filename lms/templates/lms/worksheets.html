@@ -97,7 +97,8 @@
   <button class="wt active"     onclick="wsShow('home',this)"><i class="bi bi-house me-1"></i>Home</button>
   <button id="wt-bank" class="wt" onclick="wsShow('bank',this)"><i class="bi bi-collection me-1"></i>500 Worksheets</button>
   <button id="wt-tests" class="wt" onclick="wsShow('tests',this)"><i class="bi bi-clipboard-check me-1"></i>Test Center</button>
-  <button id="wt-terms"  class="wt" onclick="wsShow('terms',this)"><i class="bi bi-book me-1"></i>Vocabulary</button>
+  <a id="wt-terms" class="wt text-decoration-none" href="{% url 'terminology' %}"><i class="bi bi-book me-1"></i>Vocabulary</a>
+  <a class="wt text-decoration-none" href="{% url 'terminology' %}?mode=listening"><i class="bi bi-headphones me-1"></i>Listening</a>
   <button id="wt-reading" class="wt" onclick="wsShow('reading',this)"><i class="bi bi-file-text me-1"></i>Reading</button>
   <button class="wt"            onclick="wsShow('teacher',this)"><i class="bi bi-person-workspace me-1"></i>Teacher Guide</button>
   <button class="wt ms-auto"    onclick="window.print()"><i class="bi bi-printer me-1"></i>Print</button>

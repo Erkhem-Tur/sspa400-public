@@ -177,7 +177,8 @@
       <div class="aside-heading">Practice Center</div>
       <a class="aside-link" href="{% url 'worksheets' %}?tab=worksheets"><span class="aside-icon"><i class="bi bi-collection"></i></span><span><strong>500 Worksheets</strong><span>A1-B1 scenario practice</span></span><i class="bi bi-chevron-right"></i></a>
       <a class="aside-link" href="{% url 'worksheets' %}?tab=tests"><span class="aside-icon"><i class="bi bi-clipboard-check"></i></span><span><strong>Test Center</strong><span>Placement and level tests</span></span><i class="bi bi-chevron-right"></i></a>
-      <a class="aside-link" href="{% url 'worksheets' %}?tab=vocabulary"><span class="aside-icon"><i class="bi bi-book"></i></span><span><strong>Vocabulary</strong><span>Bilingual duty terms</span></span><i class="bi bi-chevron-right"></i></a>
+      <a class="aside-link" href="{% url 'terminology' %}"><span class="aside-icon"><i class="bi bi-book"></i></span><span><strong>Vocabulary</strong><span>310 operational terms</span></span><i class="bi bi-chevron-right"></i></a>
+      <a class="aside-link" href="{% url 'terminology' %}?mode=listening"><span class="aside-icon"><i class="bi bi-headphones"></i></span><span><strong>Listening Lab</strong><span>Audio choice and dictation</span></span><i class="bi bi-chevron-right"></i></a>
       <a class="aside-link" href="{% url 'worksheets' %}?tab=reading"><span class="aside-icon"><i class="bi bi-file-text"></i></span><span><strong>Reading</strong><span>Operational scenarios</span></span><i class="bi bi-chevron-right"></i></a>
       {% if alc_lesson %}<a class="aside-link" href="{% url 'lesson' alc_lesson.id %}"><span class="aside-icon"><i class="bi bi-clock-history"></i></span><span><strong>ALC Book 4 Lesson 2</strong><span>Interactive past tense lesson</span></span><i class="bi bi-chevron-right"></i></a>{% endif %}
     </aside>

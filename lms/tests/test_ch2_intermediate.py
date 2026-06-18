@@ -19,6 +19,7 @@ Topics covered
 """
 
 import json
+import zipfile
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -200,6 +201,16 @@ class PublicViewsTest(TestCase):
         source_zip = static_root / "resources" / "alc_sspa_integrated_lesson_pack.zip"
         self.assertTrue(source_zip.exists())
         self.assertGreater(source_zip.stat().st_size, 20_000)
+
+        lesson_text = (lesson_root / "bk4_l2.html").read_text(encoding="utf-8")
+        with zipfile.ZipFile(source_zip) as lesson_pack:
+            zipped_text = lesson_pack.read(
+                "alc_sspa_integrated_lessons/bk4_l2.html"
+            ).decode("utf-8-sig")
+
+        for content in (lesson_text, zipped_text):
+            self.assertIn("<b>second lieutenant</b></td><td><div class=\"mn\">дэслэгч</div>", content)
+            self.assertIn("<b>first lieutenant</b></td><td><div class=\"mn\">ахлах дэслэгч</div>", content)
 
     def test_course_library_links_to_beginner_alc_pack(self):
         response = self.client.get(reverse("course_library"))

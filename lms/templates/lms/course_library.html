@@ -31,6 +31,8 @@
   .module-level { font-size: 11px; font-weight: 900; text-transform: uppercase; }
   .module-band strong { display: block; color: #102b4e; font-size: 14px; margin-top: 3px; }
   .module-band span { color: #697688; font-size: 12px; }
+  .module-link { display: inline-flex; align-items: center; gap: 5px; margin-top: 8px; color: #102b4e; font-size: 11px; font-weight: 900; text-decoration: none; }
+  .module-link:hover { color: #8f2929; }
   .module-a1 .module-level { color: #16794b; }
   .module-a2 .module-level { color: #9a6500; }
   .module-b1 .module-level { color: #a83232; }
@@ -132,7 +134,7 @@
   <div class="module-map">
     <div class="module-band module-a1"><div class="module-level">A1 · {{ course_counts.A1 }} lessons</div><strong>Foundations of Duty English</strong><span>Identity, post, equipment, badges, time, and simple reports</span></div>
     <div class="module-band module-a2"><div class="module-level">A2 · {{ course_counts.A2 }} lessons</div><strong>Access Control & Communication</strong><span>Visitors, radio, emergencies, VIP arrival, media, and reports</span></div>
-    <div class="module-band module-b1"><div class="module-level">B1 · {{ course_counts.B1 }} lessons</div><strong>Professional High-Stakes English</strong><span>Policy, de-escalation, briefings, diplomacy, and formal reporting</span></div>
+    <div class="module-band module-b1"><div class="module-level">A2-B1 · 20 lessons</div><strong>Intermediate English Pathway</strong><span>8 foundation lessons + 12 operational applications</span><a class="module-link" href="{% url 'intermediate_course' %}">Open pathway <i class="bi bi-arrow-right"></i></a></div>
   </div>
 
   <div class="catalog-layout">
@@ -175,6 +177,7 @@
 
     <aside class="course-aside" aria-label="Practice resources">
       <div class="aside-heading">Practice Center</div>
+      <a class="aside-link" href="{% url 'intermediate_course' %}"><span class="aside-icon"><i class="bi bi-signpost-split"></i></span><span><strong>Intermediate Pathway</strong><span>Combined A2-B1 course</span></span><i class="bi bi-chevron-right"></i></a>
       <a class="aside-link" href="{% url 'worksheets' %}?tab=worksheets"><span class="aside-icon"><i class="bi bi-collection"></i></span><span><strong>500 Worksheets</strong><span>A1-B1 scenario practice</span></span><i class="bi bi-chevron-right"></i></a>
       <a class="aside-link" href="{% url 'worksheets' %}?tab=tests"><span class="aside-icon"><i class="bi bi-clipboard-check"></i></span><span><strong>Test Center</strong><span>Placement and level tests</span></span><i class="bi bi-chevron-right"></i></a>
       <a class="aside-link" href="{% url 'terminology' %}"><span class="aside-icon"><i class="bi bi-book"></i></span><span><strong>Vocabulary</strong><span>310 operational terms</span></span><i class="bi bi-chevron-right"></i></a>

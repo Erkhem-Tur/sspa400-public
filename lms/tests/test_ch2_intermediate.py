@@ -147,6 +147,40 @@ class PublicViewsTest(TestCase):
         self.assertContains(response, 'data-number="32"')
         self.assertContains(response, "500 Worksheets")
 
+    def test_intermediate_pathway_combines_foundation_and_operational_lessons(self):
+        response = self.client.get(reverse("intermediate_course"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "lms/intermediate_course.html")
+        self.assertEqual(len(response.context["operational_lessons"]), 12)
+        self.assertEqual(response.context["operational_lessons"][0]["pathway_number"], 9)
+        self.assertEqual(response.context["operational_lessons"][-1]["pathway_number"], 20)
+        self.assertContains(response, "Intermediate English Pathway")
+        self.assertContains(response, 'id="diagnosticOpen"')
+        self.assertContains(response, 'id="finalOpen"')
+
+    def test_intermediate_course_json_contains_complete_docx_import(self):
+        data_path = settings.BASE_DIR / "lms" / "static" / "lms" / "intermediate_course.json"
+        data = json.loads(data_path.read_text(encoding="utf-8"))
+        lessons = data["lessons"]
+        self.assertEqual(len(lessons), 8)
+        self.assertEqual(sum(len(lesson["vocabulary"]) for lesson in lessons), 48)
+        self.assertEqual(len(data["diagnostic"]["questions"]), 15)
+        self.assertTrue(all(len(lesson["reading_questions"]) == len(lesson["reading_answers"]) for lesson in lessons))
+        self.assertTrue(all(len(lesson["language_practice"]) == len(lesson["language_answers"]) for lesson in lessons))
+        self.assertTrue(data["final_assessment"]["reading"])
+        self.assertTrue(data["final_assessment"]["writing"])
+        self.assertTrue(data["final_assessment"]["speaking"])
+
+    def test_intermediate_source_docx_is_available(self):
+        resource = settings.BASE_DIR / "lms" / "static" / "lms" / "resources" / "Integrated_English_Course_Pack_A2-B1.docx"
+        self.assertTrue(resource.exists())
+        self.assertGreater(resource.stat().st_size, 50_000)
+
+    def test_course_library_links_to_intermediate_pathway(self):
+        response = self.client.get(reverse("course_library"))
+        self.assertContains(response, reverse("intermediate_course"))
+        self.assertContains(response, "8 foundation lessons + 12 operational applications")
+
     def test_dashboard_links_to_course_and_practice_centers(self):
         response = self.client.get(reverse("dashboard"))
         self.assertContains(response, reverse("course_library"))

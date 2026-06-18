@@ -231,6 +231,9 @@
     <a href="{% url 'course_library' %}" class="{% if request.resolver_match.url_name == 'course_library' %}active{% endif %}">
       <i class="bi bi-bookshelf"></i> Course Library
     </a>
+    <a href="{% url 'intermediate_course' %}" class="{% if request.resolver_match.url_name == 'intermediate_course' %}active{% endif %}">
+      <i class="bi bi-signpost-split"></i> Intermediate Pathway
+    </a>
     <div class="sidebar-title">Practice</div>
     <a href="{% url 'worksheets' %}" class="{% if request.resolver_match.url_name == 'worksheets' and not request.GET.tab %}active{% endif %}">
       <i class="bi bi-journal-text"></i> Practice Center

@@ -1,0 +1,1135 @@
+{
+  "meta": {
+    "title": "Integrated English Course Pack",
+    "level": "A2-B1",
+    "lesson_count": 8,
+    "minutes_per_lesson": 90,
+    "total_hours": 12
+  },
+  "diagnostic": {
+    "questions": [
+      {
+        "number": 1,
+        "prompt": "I ___ from Ulaanbaatar.",
+        "options": [
+          "is",
+          "am",
+          "are",
+          "be"
+        ],
+        "answer": 1
+      },
+      {
+        "number": 2,
+        "prompt": "She ___ two brothers.",
+        "options": [
+          "have got",
+          "has got",
+          "having",
+          "got have"
+        ],
+        "answer": 1
+      },
+      {
+        "number": 3,
+        "prompt": "There ___ some water on the table.",
+        "options": [
+          "are",
+          "be",
+          "is",
+          "were"
+        ],
+        "answer": 2
+      },
+      {
+        "number": 4,
+        "prompt": "Choose the correct order: a ___ building.",
+        "options": [
+          "stone old beautiful",
+          "beautiful old stone",
+          "old stone beautiful",
+          "stone beautiful old"
+        ],
+        "answer": 1
+      },
+      {
+        "number": 5,
+        "prompt": "The instructor explained the task ___.",
+        "options": [
+          "clear",
+          "clearly",
+          "clearest",
+          "clarity"
+        ],
+        "answer": 1
+      },
+      {
+        "number": 6,
+        "prompt": "We arrived ___ the airport at 7:00.",
+        "options": [
+          "in",
+          "on",
+          "at",
+          "to"
+        ],
+        "answer": 2
+      },
+      {
+        "number": 7,
+        "prompt": "Could I ___ a single room, please?",
+        "options": [
+          "have",
+          "having",
+          "had",
+          "has"
+        ],
+        "answer": 0
+      },
+      {
+        "number": 8,
+        "prompt": "Passengers ___ show a passport before boarding.",
+        "options": [
+          "must",
+          "should to",
+          "can to",
+          "must to"
+        ],
+        "answer": 0
+      },
+      {
+        "number": 9,
+        "prompt": "This route is ___ than the old one.",
+        "options": [
+          "safe",
+          "safest",
+          "safer",
+          "more safest"
+        ],
+        "answer": 2
+      },
+      {
+        "number": 10,
+        "prompt": "Last week, our group ___ the museum.",
+        "options": [
+          "visit",
+          "visits",
+          "visited",
+          "visiting"
+        ],
+        "answer": 2
+      },
+      {
+        "number": 11,
+        "prompt": "If you see smoke, you should ___ the building calmly.",
+        "options": [
+          "evacuate",
+          "evacuated",
+          "evacuating",
+          "evacuates"
+        ],
+        "answer": 0
+      },
+      {
+        "number": 12,
+        "prompt": "Infrastructure means ___.",
+        "options": [
+          "only computers",
+          "basic systems and services",
+          "a personal opinion",
+          "a travel ticket"
+        ],
+        "answer": 1
+      },
+      {
+        "number": 13,
+        "prompt": "The report ___ by the officer yesterday.",
+        "options": [
+          "wrote",
+          "was written",
+          "is writing",
+          "has write"
+        ],
+        "answer": 1
+      },
+      {
+        "number": 14,
+        "prompt": "I have worked here ___ three years.",
+        "options": [
+          "since",
+          "for",
+          "from",
+          "during"
+        ],
+        "answer": 1
+      },
+      {
+        "number": 15,
+        "prompt": "Which phrase introduces an opinion?",
+        "options": [
+          "In my view...",
+          "Turn left.",
+          "How much is it?",
+          "It was built in 2020."
+        ],
+        "answer": 0
+      }
+    ],
+    "profiles": [
+      {
+        "min": 0,
+        "max": 5,
+        "label": "A1 foundations",
+        "guidance": "Use extra modeling, translation support, and paired reading."
+      },
+      {
+        "min": 6,
+        "max": 10,
+        "label": "Developing A2",
+        "guidance": "Follow the core course and use sentence frames."
+      },
+      {
+        "min": 11,
+        "max": 13,
+        "label": "Strong A2",
+        "guidance": "Use the core course plus extension questions."
+      },
+      {
+        "min": 14,
+        "max": 15,
+        "label": "B1 entry",
+        "guidance": "Use leadership roles and advanced extension tasks."
+      }
+    ]
+  },
+  "lessons": [
+    {
+      "number": 1,
+      "title": "Daily Routines and Clear Description",
+      "level": "A2",
+      "time": "90 minutes",
+      "language_focus": "Adjective order; adverbs of manner; present simple",
+      "outcomes": [
+        "Describe a daily routine using present-simple verbs.",
+        "Place common adjectives in a natural English order.",
+        "Form and use adverbs of manner accurately."
+      ],
+      "sequence": [
+        {
+          "time": "10 min",
+          "stage": "Warm-up",
+          "action": "Mime or name six everyday activities."
+        },
+        {
+          "time": "15 min",
+          "stage": "Vocabulary",
+          "action": "Sort routine verbs into morning, work, and evening."
+        },
+        {
+          "time": "20 min",
+          "stage": "Reading",
+          "action": "Read A Busy Training Day; answer for gist and detail."
+        },
+        {
+          "time": "20 min",
+          "stage": "Language focus",
+          "action": "Complete adjective-order and adverb tasks."
+        },
+        {
+          "time": "20 min",
+          "stage": "Speaking",
+          "action": "Describe a partner's ideal training day."
+        },
+        {
+          "time": "5 min",
+          "stage": "Exit ticket",
+          "action": "Write one sentence with two adjectives and one adverb."
+        }
+      ],
+      "vocabulary": [
+        {
+          "word": "routine",
+          "meaning": "the usual order of daily activities",
+          "example": "My morning routine starts at 6:30."
+        },
+        {
+          "word": "prepare",
+          "meaning": "make something ready",
+          "example": "We prepare our materials before class."
+        },
+        {
+          "word": "briefing",
+          "meaning": "a short meeting that gives information",
+          "example": "The daily briefing begins at 8:30."
+        },
+        {
+          "word": "carefully",
+          "meaning": "with attention and caution",
+          "example": "She checks the list carefully."
+        },
+        {
+          "word": "efficiently",
+          "meaning": "well, without wasting time",
+          "example": "The team works efficiently."
+        },
+        {
+          "word": "equipment",
+          "meaning": "tools needed for a task",
+          "example": "The new safety equipment is ready."
+        }
+      ],
+      "reading_title": "A Busy Training Day",
+      "reading": "Every weekday, Naraa arrives at a large modern training center at eight o'clock. She carries a small black leather bag and two new English notebooks. Before class, she greets her team and checks the daily schedule carefully. The instructor begins with a short morning briefing. He speaks clearly and explains each task slowly. During pair work, the trainees listen politely, ask useful questions, and record new words neatly. At lunch, Naraa chooses warm vegetable soup and fresh brown bread. In the afternoon, the group practices visitor conversations and completes a quick review quiz. Everyone leaves the center tired but confident. At home, Naraa studies quietly for twenty minutes and prepares her materials for the next day.",
+      "reading_questions": [
+        "Where does Naraa arrive at eight o'clock?",
+        "What does she carry?",
+        "How does the instructor speak and explain tasks?",
+        "Name two things trainees do during pair work.",
+        "Why do the trainees leave feeling confident? Give one reason from the text."
+      ],
+      "language_practice": [
+        "Put the words in order: a / leather / small / black / bag",
+        "Put the words in order: three / new / useful / training / manuals",
+        "Put the words in order: a / beautiful / old / stone / building",
+        "Change to an adverb: careful -> ___",
+        "Change to an adverb: easy -> ___",
+        "Complete: The team worked ___ (efficient).",
+        "Complete: She speaks English ___ (good)."
+      ],
+      "performance_task": "In pairs, design an ideal training day. Include at least six activities, three adverbs, and two noun phrases with more than one adjective. Present the schedule in 60 seconds.",
+      "homework": "Write 80-100 words about your weekday routine. Underline three adverbs and circle three adjectives.",
+      "reading_answers": [
+        "At a large modern training center.",
+        "A small black leather bag and two new English notebooks.",
+        "Clearly and slowly.",
+        "Any two: listen politely, ask useful questions, record new words neatly.",
+        "Accept a supported answer, e.g., they practiced, collaborated, and completed a review quiz."
+      ],
+      "language_answers": [
+        "a small black leather bag",
+        "three useful new training manuals",
+        "a beautiful old stone building",
+        "carefully",
+        "easily",
+        "efficiently",
+        "well"
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Healthy Living and Everyday Processes",
+      "level": "A2-B1",
+      "time": "90 minutes",
+      "language_focus": "Sequence markers; count/non-count nouns; giving advice",
+      "outcomes": [
+        "Identify key habits in a balanced lifestyle.",
+        "Explain a simple process using first, next, then, and finally.",
+        "Use some, any, much, many, and enough in context."
+      ],
+      "sequence": [
+        {
+          "time": "10 min",
+          "stage": "Warm-up",
+          "action": "Rank six habits from most to least helpful."
+        },
+        {
+          "time": "15 min",
+          "stage": "Vocabulary",
+          "action": "Define health and process words with examples."
+        },
+        {
+          "time": "20 min",
+          "stage": "Reading",
+          "action": "Read A Balanced Week and identify the main advice."
+        },
+        {
+          "time": "20 min",
+          "stage": "Language focus",
+          "action": "Complete quantifier and sequence-marker tasks."
+        },
+        {
+          "time": "20 min",
+          "stage": "Speaking",
+          "action": "Create a realistic seven-day health plan."
+        },
+        {
+          "time": "5 min",
+          "stage": "Exit ticket",
+          "action": "Give one recommendation using should and enough."
+        }
+      ],
+      "vocabulary": [
+        {
+          "word": "balanced",
+          "meaning": "containing the right amounts",
+          "example": "A balanced diet includes different food groups."
+        },
+        {
+          "word": "reduce",
+          "meaning": "make something smaller or less",
+          "example": "We can reduce sugar in our meals."
+        },
+        {
+          "word": "regular",
+          "meaning": "happening repeatedly on a schedule",
+          "example": "Regular exercise supports health."
+        },
+        {
+          "word": "preserve",
+          "meaning": "keep food safe for later use",
+          "example": "Drying can preserve some foods."
+        },
+        {
+          "word": "portion",
+          "meaning": "an amount of food for one person",
+          "example": "Choose a moderate portion."
+        },
+        {
+          "word": "hydrated",
+          "meaning": "having enough water in the body",
+          "example": "Drink water to stay hydrated."
+        }
+      ],
+      "reading_title": "A Balanced Week",
+      "reading": "A healthy lifestyle does not require a perfect routine. It depends on small choices made regularly. First, plan meals that include vegetables, protein, grains, and enough water. Reduce excess salt and sugar, but do not skip meals. Next, choose an activity you can repeat three or four times a week. A brisk walk, light strength practice, or a team sport can all be useful. Then, protect your sleep. Turn off bright screens, prepare the next day's clothes, and go to bed at a regular time. Safe food handling is also important. Fresh food should be cleaned and stored correctly. Traditional methods such as drying or smoking can preserve food, but they require clean materials, suitable conditions, and reliable public-health guidance. Finally, review your week. Keep the habits that worked and change one habit that was difficult.",
+      "reading_questions": [
+        "What four food or drink groups are mentioned in the first recommendation?",
+        "How often does the text suggest repeating an activity?",
+        "Name two actions that can support sleep.",
+        "Why does the text mention public-health guidance?",
+        "What should a learner do at the end of the week?"
+      ],
+      "language_practice": [
+        "Complete: Drink ___ water during the day. (enough / many)",
+        "Complete: We do not need ___ sugar in this meal. (much / many)",
+        "Complete: Are there ___ vegetables in the kitchen? (some / any)",
+        "Complete: She eats ___ pieces of fruit every day. (much / many)",
+        "Choose a sequence marker: ___, wash your hands. Next, prepare the food. (First / Finally)",
+        "Give advice: You / should / regular exercise -> Write a complete sentence."
+      ],
+      "performance_task": "In groups of three, create a practical seven-day plan with meals, movement, sleep, and one safe food-storage rule. Explain the plan with sequence markers.",
+      "homework": "Keep a one-day habit log. Write five sentences using some, any, much, many, or enough.",
+      "reading_answers": [
+        "Vegetables, protein, grains, and water.",
+        "Three or four times a week.",
+        "Any two: turn off bright screens, prepare clothes, go to bed regularly.",
+        "Because food-preservation methods require safe, reliable guidance.",
+        "Review what worked and change one difficult habit."
+      ],
+      "language_answers": [
+        "enough",
+        "much",
+        "any",
+        "many",
+        "First",
+        "You should get regular exercise."
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Airport Travel: From Check-in to Boarding",
+      "level": "A2",
+      "time": "90 minutes",
+      "language_focus": "Must, should, can; information questions; travel vocabulary",
+      "outcomes": [
+        "Follow the usual sequence from airport arrival to boarding.",
+        "Ask and answer common check-in questions.",
+        "Use must, should, can, and must not appropriately."
+      ],
+      "sequence": [
+        {
+          "time": "10 min",
+          "stage": "Warm-up",
+          "action": "Put six airport stages in order."
+        },
+        {
+          "time": "15 min",
+          "stage": "Vocabulary",
+          "action": "Match travel terms to signs or definitions."
+        },
+        {
+          "time": "20 min",
+          "stage": "Reading",
+          "action": "Read The Morning Flight; answer detail questions."
+        },
+        {
+          "time": "20 min",
+          "stage": "Language focus",
+          "action": "Complete modal and question-form tasks."
+        },
+        {
+          "time": "20 min",
+          "stage": "Role-play",
+          "action": "Passenger and check-in agent dialogue."
+        },
+        {
+          "time": "5 min",
+          "stage": "Exit ticket",
+          "action": "Write one must and one should sentence."
+        }
+      ],
+      "vocabulary": [
+        {
+          "word": "departure",
+          "meaning": "the act or time of leaving",
+          "example": "The departure time is 09:40."
+        },
+        {
+          "word": "check-in",
+          "meaning": "the process of registering for a flight",
+          "example": "Online check-in opens early."
+        },
+        {
+          "word": "boarding pass",
+          "meaning": "a document that allows entry to the aircraft",
+          "example": "Keep your boarding pass ready."
+        },
+        {
+          "word": "luggage",
+          "meaning": "bags carried while traveling",
+          "example": "Her luggage weighs fifteen kilograms."
+        },
+        {
+          "word": "allowance",
+          "meaning": "an amount that is permitted",
+          "example": "The ticket includes a luggage allowance."
+        },
+        {
+          "word": "gate",
+          "meaning": "the place where passengers board",
+          "example": "The flight leaves from Gate 12."
+        }
+      ],
+      "reading_title": "The Morning Flight",
+      "reading": "Temuulen has a 9:40 flight to Seoul. He arrives at the airport two hours early and checks the departure screen. At the desk, the agent asks for his passport and ticket. She confirms his destination, weighs his luggage, and gives him a boarding pass. Temuulen asks, 'Which gate should I use?' The agent replies, 'Gate 12. You must pass through security first, and you should be at the gate by 9:10.' He thanks her and keeps his documents in an easy-to-reach pocket. After the security check, he finds the gate and listens carefully to the announcements. He can buy water nearby, but he must not leave his bag unattended. When boarding begins, he joins the correct line and shows his passport and boarding pass.",
+      "reading_questions": [
+        "What time is Temuulen's flight?",
+        "Which two documents does the agent request?",
+        "What does the agent do with his luggage?",
+        "By what time should he be at the gate?",
+        "What must he not do?"
+      ],
+      "language_practice": [
+        "Complete: Passengers ___ show a passport before boarding. (must / can)",
+        "Complete: You ___ arrive early to avoid stress. (should / must not)",
+        "Complete: Travelers ___ ask an agent for help. (can / must not)",
+        "Complete: You ___ leave luggage unattended. (must / must not)",
+        "Make a question: your flight / what time / leave?",
+        "Make a question: which gate / I / use / should?"
+      ],
+      "performance_task": "Role-play check-in. The passenger has one suitcase, prefers an aisle seat, and needs the gate number. The agent checks documents, asks two questions, and gives clear guidance.",
+      "homework": "Write a seven-step airport checklist using first, next, then, after that, and finally.",
+      "reading_answers": [
+        "9:40.",
+        "Passport and ticket.",
+        "She weighs it.",
+        "By 9:10.",
+        "He must not leave his bag unattended."
+      ],
+      "language_answers": [
+        "must",
+        "should",
+        "can",
+        "must not",
+        "What time does your flight leave?",
+        "Which gate should I use?"
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Hotels and Professional Hospitality",
+      "level": "A2-B1",
+      "time": "90 minutes",
+      "language_focus": "There is/are; polite requests; service language",
+      "outcomes": [
+        "Describe hotel facilities using there is and there are.",
+        "Make and respond to polite guest requests.",
+        "Complete a short reception dialogue confidently."
+      ],
+      "sequence": [
+        {
+          "time": "10 min",
+          "stage": "Warm-up",
+          "action": "Brainstorm hotel staff, rooms, and facilities."
+        },
+        {
+          "time": "15 min",
+          "stage": "Vocabulary",
+          "action": "Match service words with guest needs."
+        },
+        {
+          "time": "20 min",
+          "stage": "Reading",
+          "action": "Read A Professional Welcome; scan for facilities."
+        },
+        {
+          "time": "20 min",
+          "stage": "Language focus",
+          "action": "Practice there is/are and polite requests."
+        },
+        {
+          "time": "20 min",
+          "stage": "Role-play",
+          "action": "Receptionist, guest, and observer."
+        },
+        {
+          "time": "5 min",
+          "stage": "Exit ticket",
+          "action": "Write one polite request and one helpful response."
+        }
+      ],
+      "vocabulary": [
+        {
+          "word": "reservation",
+          "meaning": "an arrangement to keep a room for a guest",
+          "example": "I have a reservation for two nights."
+        },
+        {
+          "word": "reception",
+          "meaning": "the hotel area where guests check in",
+          "example": "Please ask at reception."
+        },
+        {
+          "word": "available",
+          "meaning": "ready to be used",
+          "example": "A twin room is available tonight."
+        },
+        {
+          "word": "facilities",
+          "meaning": "services or equipment provided",
+          "example": "The hotel has modern facilities."
+        },
+        {
+          "word": "confirm",
+          "meaning": "state that information is correct",
+          "example": "Could you confirm your surname?"
+        },
+        {
+          "word": "complimentary",
+          "meaning": "provided without extra payment",
+          "example": "Breakfast is complimentary."
+        }
+      ],
+      "reading_title": "A Professional Welcome",
+      "reading": "Ariun arrives at the Blue Sky Hotel after a long journey. At reception, the clerk smiles and says, 'Good evening. How may I help you?' Ariun explains that she has a reservation for two nights. The clerk confirms her name and asks for identification. There is a quiet room on the eighth floor, and there are two lifts near reception. The room has Wi-Fi, a desk, a safe, and a small minibar. Breakfast is served from seven to ten in the dining room. Ariun asks, 'Could I have a wake-up call at 6:30, please?' The clerk records the request and offers directions to the lifts. Before leaving the desk, Ariun asks whether there is a pharmacy nearby. The clerk marks it on a city map and says, 'Please let us know if you need anything else.'",
+      "reading_questions": [
+        "How long will Ariun stay?",
+        "Where is her room?",
+        "Name three facilities in the room.",
+        "What time is breakfast served?",
+        "What two special requests or questions does Ariun make?"
+      ],
+      "language_practice": [
+        "Complete: There ___ a safe in the room. (is / are)",
+        "Complete: There ___ two lifts near reception. (is / are)",
+        "Complete: ___ there a pharmacy nearby? (Is / Are)",
+        "Make polite: Give me the room key.",
+        "Make polite: Tell me the breakfast time.",
+        "Write a helpful reply: Could I have an extra towel, please?"
+      ],
+      "performance_task": "Role-play a hotel check-in. The guest needs a quiet room, breakfast information, and directions. The receptionist confirms details and responds politely. The observer records two strong phrases.",
+      "homework": "Write a 100-word description of an ideal hotel. Use there is/are at least four times.",
+      "reading_answers": [
+        "Two nights.",
+        "On the eighth floor.",
+        "Any three: Wi-Fi, desk, safe, minibar.",
+        "From 7:00 to 10:00.",
+        "A wake-up call and information about a nearby pharmacy."
+      ],
+      "language_answers": [
+        "is",
+        "are",
+        "Is",
+        "Could I have the room key, please?",
+        "Could you tell me the breakfast time, please?",
+        "Certainly. I will send one to your room."
+      ]
+    },
+    {
+      "number": 5,
+      "title": "People, Personality, and Short Narratives",
+      "level": "A2-B1",
+      "time": "90 minutes",
+      "language_focus": "Articles; past simple; personality adjectives; narrative sequence",
+      "outcomes": [
+        "Use a, an, the, or no article in common contexts.",
+        "Describe personality with balanced evidence.",
+        "Retell a short biography or story in chronological order."
+      ],
+      "sequence": [
+        {
+          "time": "10 min",
+          "stage": "Warm-up",
+          "action": "Name a famous person and one achievement."
+        },
+        {
+          "time": "15 min",
+          "stage": "Vocabulary",
+          "action": "Place personality adjectives on a positive-neutral scale."
+        },
+        {
+          "time": "20 min",
+          "stage": "Reading",
+          "action": "Read A Scholar Who Watched the Stars."
+        },
+        {
+          "time": "20 min",
+          "stage": "Language focus",
+          "action": "Complete article and past-tense tasks."
+        },
+        {
+          "time": "20 min",
+          "stage": "Speaking",
+          "action": "Give a one-minute biography or character profile."
+        },
+        {
+          "time": "5 min",
+          "stage": "Exit ticket",
+          "action": "Write one fact and one personality inference."
+        }
+      ],
+      "vocabulary": [
+        {
+          "word": "curious",
+          "meaning": "eager to learn or know",
+          "example": "A curious learner asks useful questions."
+        },
+        {
+          "word": "reliable",
+          "meaning": "able to be trusted",
+          "example": "Her reliable assistant checked the records."
+        },
+        {
+          "word": "reserved",
+          "meaning": "quiet and not quick to show feelings",
+          "example": "He was reserved in large groups."
+        },
+        {
+          "word": "achievement",
+          "meaning": "something completed successfully",
+          "example": "The observatory was a major achievement."
+        },
+        {
+          "word": "observe",
+          "meaning": "watch carefully",
+          "example": "Astronomers observe the night sky."
+        },
+        {
+          "word": "legacy",
+          "meaning": "an influence left for later generations",
+          "example": "His scientific legacy remains important."
+        }
+      ],
+      "reading_title": "A Scholar Who Watched the Stars",
+      "reading": "Ulugbek was a ruler, mathematician, and astronomer in Central Asia during the fifteenth century. He was born into a powerful family, but he became especially interested in science and education. In Samarkand, he supported scholars and built an important observatory. The research team measured the positions of stars with remarkable care. Their work produced a star catalogue that later scholars respected. Historical accounts suggest that Ulugbek was intellectually curious and deeply committed to learning. These qualities helped him create a strong scientific legacy, although political life around him was difficult. His story also shows why a biography should separate recorded facts from interpretations of personality. A writer can state that he built an observatory; calling him courageous or reserved requires evidence and explanation.",
+      "reading_questions": [
+        "What three roles did Ulugbek have?",
+        "Where did he build an observatory?",
+        "What did the research team measure?",
+        "Which two personality qualities does the text infer?",
+        "Why should biography writers separate facts from interpretations?"
+      ],
+      "language_practice": [
+        "Complete: Ulugbek was ___ astronomer. (a / an / the)",
+        "Complete: He built ___ observatory in Samarkand. (a / an / no article)",
+        "Complete: ___ science can change society. (The / No article)",
+        "Past simple: The team ___ (measure) the stars carefully.",
+        "Past simple: Scholars ___ (respect) the catalogue.",
+        "Write one evidence sentence for the adjective curious."
+      ],
+      "performance_task": "Choose a historical figure or a character from a short story. Give a 60-second profile with three past-tense facts, two personality adjectives, and evidence for each adjective.",
+      "homework": "Write a 120-word biography or short narrative. Use at least six past-simple verbs and check all articles.",
+      "reading_answers": [
+        "Ruler, mathematician, and astronomer.",
+        "In Samarkand.",
+        "The positions of stars.",
+        "Curious and committed to learning.",
+        "Because facts are recorded, while personality descriptions require evidence and interpretation."
+      ],
+      "language_answers": [
+        "an",
+        "an",
+        "No article",
+        "measured",
+        "respected",
+        "Example: He supported scholars and built an observatory because he wanted to learn more about science."
+      ]
+    },
+    {
+      "number": 6,
+      "title": "Clear Professional Communication",
+      "level": "A2-B1",
+      "time": "90 minutes",
+      "language_focus": "Formal greetings; question forms; directions; clarification",
+      "outcomes": [
+        "Welcome a visitor and ask for necessary information politely.",
+        "Give simple directions using clear sequence and location phrases.",
+        "Ask for repetition or clarification without losing professionalism."
+      ],
+      "sequence": [
+        {
+          "time": "10 min",
+          "stage": "Warm-up",
+          "action": "Compare informal and formal greetings."
+        },
+        {
+          "time": "15 min",
+          "stage": "Vocabulary",
+          "action": "Practice visitor-service and direction phrases."
+        },
+        {
+          "time": "20 min",
+          "stage": "Model dialogue",
+          "action": "Read and mark question forms."
+        },
+        {
+          "time": "20 min",
+          "stage": "Language focus",
+          "action": "Build accurate questions and directions."
+        },
+        {
+          "time": "20 min",
+          "stage": "Scenario",
+          "action": "Welcome, identify, direct, and close a conversation."
+        },
+        {
+          "time": "5 min",
+          "stage": "Exit ticket",
+          "action": "Write one clarification phrase."
+        }
+      ],
+      "vocabulary": [
+        {
+          "word": "appointment",
+          "meaning": "a planned meeting at a specific time",
+          "example": "Do you have an appointment?"
+        },
+        {
+          "word": "identification",
+          "meaning": "an official document proving identity",
+          "example": "May I see your identification?"
+        },
+        {
+          "word": "checkpoint",
+          "meaning": "a place where people or vehicles are checked",
+          "example": "Please report to the visitor checkpoint."
+        },
+        {
+          "word": "proceed",
+          "meaning": "continue or go forward",
+          "example": "Please proceed to the second floor."
+        },
+        {
+          "word": "clarify",
+          "meaning": "make information easier to understand",
+          "example": "Could you clarify the room number?"
+        },
+        {
+          "word": "rank",
+          "meaning": "a position in an organization",
+          "example": "Use the correct rank in a formal introduction."
+        }
+      ],
+      "reading_title": "Model Visitor Dialogue",
+      "reading": "Officer: Good morning. Welcome to the training center. How may I assist you?\nVisitor: Good morning. I have an appointment with Major Erdene at ten o'clock.\nOfficer: May I see your identification, please?\nVisitor: Certainly. Here it is.\nOfficer: Thank you. Could you confirm your organization?\nVisitor: I am from the regional education office.\nOfficer: Thank you. Please sign the visitor register. Then go straight along this corridor, turn left at the stairs, and report to Room 204.\nVisitor: Sorry, did you say Room 240?\nOfficer: Room 204 - two-zero-four. I can write it on your pass.\nVisitor: Thank you for your help.\nOfficer: You're welcome. Have a good meeting.",
+      "reading_questions": [
+        "Who is the visitor meeting?",
+        "What two pieces of information does the officer confirm?",
+        "Where must the visitor sign?",
+        "Why does the visitor ask for clarification?",
+        "Which phrase closes the conversation professionally?"
+      ],
+      "language_practice": [
+        "Put in order: appointment / do / have / an / you?",
+        "Put in order: may / identification / see / I / your?",
+        "Complete: Go straight ___ the corridor. (along / between)",
+        "Complete: Turn left ___ the stairs. (at / in)",
+        "Write a clarification request when you do not hear a room number.",
+        "Rewrite formally: What's your name?"
+      ],
+      "performance_task": "Three-person scenario: visitor, receiving officer, and observer. The visitor has an appointment but is unsure of the location. The officer greets, checks information, gives directions, confirms understanding, and closes politely.",
+      "homework": "Create a 10-line formal dialogue for welcoming an international visitor. Include one clarification request and three direction phrases.",
+      "reading_answers": [
+        "Major Erdene.",
+        "Identification and organization.",
+        "The visitor register.",
+        "The visitor misheard Room 204 as Room 240.",
+        "Have a good meeting."
+      ],
+      "language_answers": [
+        "Do you have an appointment?",
+        "May I see your identification?",
+        "along",
+        "at",
+        "Could you repeat the room number, please?",
+        "May I have your name, please?"
+      ]
+    },
+    {
+      "number": 7,
+      "title": "Personal and Infrastructure Safety",
+      "level": "B1",
+      "time": "90 minutes",
+      "language_focus": "Must, should, should not; first conditional; calm instructions",
+      "outcomes": [
+        "Explain the difference between personal safety and infrastructure protection.",
+        "Give calm, high-level safety guidance using appropriate modals.",
+        "Use first-conditionals to connect hazards and safe responses."
+      ],
+      "sequence": [
+        {
+          "time": "10 min",
+          "stage": "Warm-up",
+          "action": "Identify safe actions in four everyday scenarios."
+        },
+        {
+          "time": "15 min",
+          "stage": "Vocabulary",
+          "action": "Classify hazard, prevention, response, and recovery words."
+        },
+        {
+          "time": "20 min",
+          "stage": "Reading",
+          "action": "Read Layers of Safety; identify the central message."
+        },
+        {
+          "time": "20 min",
+          "stage": "Language focus",
+          "action": "Complete modal and conditional tasks."
+        },
+        {
+          "time": "20 min",
+          "stage": "Scenario",
+          "action": "Give calm public-facing safety instructions."
+        },
+        {
+          "time": "5 min",
+          "stage": "Exit ticket",
+          "action": "Write one if-clause and safe response."
+        }
+      ],
+      "vocabulary": [
+        {
+          "word": "hazard",
+          "meaning": "something that can cause harm",
+          "example": "Smoke is a serious hazard."
+        },
+        {
+          "word": "prevent",
+          "meaning": "stop something from happening",
+          "example": "Good planning can prevent confusion."
+        },
+        {
+          "word": "respond",
+          "meaning": "act after an event or request",
+          "example": "Staff respond calmly to alarms."
+        },
+        {
+          "word": "resilient",
+          "meaning": "able to recover from difficulty",
+          "example": "A resilient system has backup plans."
+        },
+        {
+          "word": "evacuate",
+          "meaning": "move people away from danger",
+          "example": "Evacuate by the marked exit."
+        },
+        {
+          "word": "report",
+          "meaning": "give information to the correct authority",
+          "example": "Report the hazard immediately."
+        }
+      ],
+      "reading_title": "Layers of Safety",
+      "reading": "Personal safety begins with awareness, simple routines, and calm decisions. At home, people should know emergency contacts and keep exits clear. While traveling, they should protect documents, learn local emergency numbers, and tell a trusted person about major plans. In a workplace, safety also depends on systems. Critical infrastructure includes services such as electricity, water, transport, and communications. Organizations must prepare for disruptions, communicate clearly, and restore essential services. Good protection uses layers: prevention, detection, response, and recovery. If an alarm sounds, people should follow official instructions and move calmly. If they notice an unknown substance or suspicious object, they should not touch it; they should move away and alert trained authorities. Professional protectors require specialist training, but public guidance should remain simple: recognize danger, create distance, report accurately, and follow verified instructions.",
+      "reading_questions": [
+        "Name two personal-safety routines from the text.",
+        "What four services are examples of critical infrastructure?",
+        "What are the four layers of protection?",
+        "What should a person do after noticing an unknown substance or suspicious object?",
+        "Why should public guidance remain simple?"
+      ],
+      "language_practice": [
+        "Choose: People ___ keep emergency exits clear. (should / should not)",
+        "Choose: Organizations ___ prepare for service disruptions. (must / must not)",
+        "Choose: You ___ touch an unknown substance. (should / should not)",
+        "Complete: If an alarm sounds, we ___ official instructions. (follow)",
+        "Complete: If you notice a hazard, you ___ it to the correct authority. (report)",
+        "Rewrite calmly: Run now! -> Use should and calmly."
+      ],
+      "performance_task": "Choose one scenario: hotel fire alarm, power outage, lost travel documents, or an unknown object in a public area. Give four calm, high-level instructions. Do not invent technical procedures; direct people to official guidance.",
+      "homework": "Write a 100-word safety notice for visitors. Include two must statements, two should statements, and one first conditional.",
+      "reading_answers": [
+        "Any two: know emergency contacts, keep exits clear, protect documents, learn emergency numbers, share plans.",
+        "Electricity, water, transport, and communications.",
+        "Prevention, detection, response, and recovery.",
+        "Do not touch it; move away and alert trained authorities.",
+        "So people can understand and act calmly under pressure."
+      ],
+      "language_answers": [
+        "should",
+        "must",
+        "should not",
+        "should follow",
+        "should report",
+        "You should leave calmly now."
+      ]
+    },
+    {
+      "number": 8,
+      "title": "History, Global Affairs, and Critical Reading",
+      "level": "B1",
+      "time": "90 minutes",
+      "language_focus": "Passive voice; reporting verbs; fact, inference, and opinion",
+      "outcomes": [
+        "Distinguish a stated fact, an inference, and an opinion.",
+        "Use passive voice to describe historical or technical processes.",
+        "Deliver a short neutral briefing supported by evidence from a text."
+      ],
+      "sequence": [
+        {
+          "time": "10 min",
+          "stage": "Warm-up",
+          "action": "Sort four statements into fact or opinion."
+        },
+        {
+          "time": "15 min",
+          "stage": "Vocabulary",
+          "action": "Practice neutral reporting and evidence terms."
+        },
+        {
+          "time": "20 min",
+          "stage": "Reading",
+          "action": "Read Geography, History, and Strategy."
+        },
+        {
+          "time": "20 min",
+          "stage": "Language focus",
+          "action": "Transform active and passive sentences."
+        },
+        {
+          "time": "20 min",
+          "stage": "Briefing",
+          "action": "Present a neutral, evidence-based summary."
+        },
+        {
+          "time": "5 min",
+          "stage": "Exit ticket",
+          "action": "Write one fact and one cautious inference."
+        }
+      ],
+      "vocabulary": [
+        {
+          "word": "strategy",
+          "meaning": "a plan for achieving a long-term goal",
+          "example": "Geography can influence national strategy."
+        },
+        {
+          "word": "evidence",
+          "meaning": "information that supports a conclusion",
+          "example": "The writer provides historical evidence."
+        },
+        {
+          "word": "contribution",
+          "meaning": "something given to help achieve a result",
+          "example": "The article describes Mongolia's contribution."
+        },
+        {
+          "word": "perspective",
+          "meaning": "a particular way of viewing an issue",
+          "example": "Sources may present different perspectives."
+        },
+        {
+          "word": "inference",
+          "meaning": "a conclusion based on evidence, not directly stated",
+          "example": "The final sentence is an inference."
+        },
+        {
+          "word": "manual",
+          "meaning": "a document containing structured instructions or reference information",
+          "example": "A manual uses precise headings and warnings."
+        }
+      ],
+      "reading_title": "Geography, History, and Strategy",
+      "reading": "Countries often explain strategy through geography and history. Russia has long been described as a country between Europe and Asia, so writers debate how both regions shaped its identity. China has expanded maritime capabilities as trade routes and sea access have become more important to national planning. During the Second World War, Mongolia provided material assistance to the Soviet war effort, a contribution highlighted in several historical accounts. These statements can be investigated through dates, records, and multiple sources. However, claims such as 'one strategy is the only correct strategy' are opinions and require argument. Critical readers also examine document type. A biography selects events to explain a life; a geopolitical essay interprets patterns; an incident summary records what happened; and a technical manual organizes specifications, warnings, and procedures. The reader should ask who wrote the text, what evidence is offered, which words show judgment, and what information may be missing.",
+      "reading_questions": [
+        "Why do writers debate Russia's regional identity?",
+        "Why has sea access become important in Chinese planning?",
+        "What contribution by Mongolia is mentioned?",
+        "Which sentence in the reading gives an example of an opinion?",
+        "What four questions should a critical reader ask?"
+      ],
+      "language_practice": [
+        "Change to passive: Writers describe Russia as a country between two regions.",
+        "Change to passive: Historical accounts highlight Mongolia's contribution.",
+        "Complete: The manual ___ (organize) into sections.",
+        "Choose the cautious reporting verb: The article (proves / suggests) that geography influenced strategy.",
+        "Label F, I, or O: Mongolia provided material assistance during the Second World War.",
+        "Label F, I, or O: Maritime strategy is always the best national policy."
+      ],
+      "performance_task": "Prepare a 90-second neutral briefing on one topic from the reading. Include two stated facts, one cautious inference, and one phrase that identifies the source type. A partner listens for loaded or unsupported language.",
+      "homework": "Choose a short history or current-affairs article. Write 120 words separating three facts, one inference, and one opinion. Cite the title and author if available.",
+      "reading_answers": [
+        "Because Russia lies between Europe and Asia and has been influenced by both.",
+        "Because trade routes and sea access have become more important.",
+        "Material assistance to the Soviet war effort.",
+        "'One strategy is the only correct strategy' is an opinion.",
+        "Who wrote it? What evidence is offered? Which words show judgment? What may be missing?"
+      ],
+      "language_answers": [
+        "Russia is described as a country between two regions.",
+        "Mongolia's contribution is highlighted by historical accounts.",
+        "is organized",
+        "suggests",
+        "F",
+        "O"
+      ]
+    }
+  ],
+  "final_assessment": {
+    "reading": "A regional training center will host a three-day English and safety exchange for visitors from several countries. Participants will arrive by air on Monday morning. They must keep their travel documents ready and should reach the airport meeting point before 10:00. A hotel near the center has been reserved. There are quiet study rooms, a dining area, and a small fitness room. On the first afternoon, the group will practice professional greetings, directions, and clarification questions. The second day will focus on healthy routines and clear public-safety messages. Trainers will explain that safety depends on preparation, accurate reporting, and verified instructions. Participants will not practice specialist technical procedures. On the final day, each group will read a short historical or global-affairs text and present a neutral briefing. They must separate facts from opinions and identify the evidence used by the writer. At the end of the exchange, learners will write a recommendation for the next program.",
+    "reading_questions": [
+      "How long is the exchange? (2 points)",
+      "What must participants keep ready? (2 points)",
+      "Name two hotel facilities. (2 points)",
+      "What language skills will the group practice on the first afternoon? (2 points)",
+      "According to the trainers, what three things support safety? (3 points)",
+      "What will groups do on the final day? (3 points)",
+      "Why must learners identify evidence? (2 points)"
+    ],
+    "language_questions": [
+      "Complete: There ___ quiet study rooms in the hotel. (1)",
+      "Complete: Participants ___ keep their documents ready. (1)",
+      "Complete: They ___ arrive late at the meeting point. (should / should not) (1)",
+      "Change to passive: The center reserved a hotel. (2)",
+      "Make polite: Give me the schedule. (2)",
+      "Put in order: a / modern / small / fitness / room (2)",
+      "Change to an adverb: accurate -> ___ (1)",
+      "Write one first conditional about airport travel. (2)",
+      "Label fact or opinion: 'The exchange lasts three days.' (1)",
+      "Label fact or opinion: 'This is the best training program in the world.' (1)"
+    ],
+    "writing": "Write 120-150 words recommending one improvement for the next exchange. Include a clear opening, two reasons, one practical example, and a conclusion. Use at least one modal, one sequence marker, and one adjective-adverb combination.",
+    "speaking": "Choose one task: 1) Airport check-in; 2) Hotel reception; 3) Visitor directions; 4) General safety guidance; or 5) Neutral historical briefing. Speak for 2 minutes, then answer two questions.",
+    "reading_answers": [
+      "Three days.",
+      "Their travel documents.",
+      "Any two: quiet study rooms, dining area, fitness room.",
+      "Professional greetings, directions, and clarification questions.",
+      "Preparation, accurate reporting, and verified instructions.",
+      "Read a historical or global-affairs text and present a neutral briefing.",
+      "To distinguish supported facts from unsupported claims or opinions."
+    ],
+    "language_answers": [
+      "are",
+      "must",
+      "should not",
+      "A hotel was reserved by the center.",
+      "Could I have the schedule, please?",
+      "a small modern fitness room",
+      "accurately",
+      "Accept any accurate first conditional, e.g., If the flight is delayed, I will check the departure screen.",
+      "Fact",
+      "Opinion"
+    ]
+  }
+}

@@ -1,0 +1,63 @@
+{% extends 'lms/base.html' %}
+{% load static %}
+{% block title %}Intermediate English Pathway - SSPA LMS{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'lms/intermediate_course.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="ip-page" id="intermediatePathway" data-source="{% static 'lms/intermediate_course.json' %}">
+  <header class="ip-head">
+    <div>
+      <div class="ip-kicker">SSPA English · Intermediate A2-B1</div>
+      <h1>Intermediate English Pathway</h1>
+      <p>Foundation English and operational communication in one 20-lesson sequence.</p>
+    </div>
+    <div class="ip-head-stats" aria-label="Course summary">
+      <div><strong>20</strong><span>Lessons</span></div>
+      <div><strong>30</strong><span>Hours</span></div>
+      <div><strong>A2-B1</strong><span>Level</span></div>
+    </div>
+  </header>
+
+  <section class="ip-progress-row">
+    <div class="ip-progress-copy"><strong id="ipProgressText">0 / 20 complete</strong><span id="ipNextText">Lesson 1 is next</span></div>
+    <div class="ip-progress-track" role="progressbar" aria-label="Intermediate course progress" aria-valuemin="0" aria-valuemax="20" aria-valuenow="0"><div id="ipProgressFill"></div></div>
+    <div class="ip-actions">
+      <button class="btn btn-outline-primary btn-sm" type="button" id="diagnosticOpen"><i class="bi bi-clipboard2-pulse me-1"></i>Diagnostic Test</button>
+      <button class="btn btn-outline-primary btn-sm" type="button" id="finalOpen"><i class="bi bi-award me-1"></i>Final Assessment</button>
+      <a class="btn btn-outline-secondary btn-sm" href="{% static 'lms/resources/Integrated_English_Course_Pack_A2-B1.docx' %}" download><i class="bi bi-file-earmark-word me-1"></i>Course Pack</a>
+    </div>
+  </section>
+
+  <section class="ip-phase-map" aria-label="Intermediate course phases">
+    <button class="ip-phase active" type="button" data-phase="foundation">
+      <span class="ip-phase-number">Phase 1 · Lessons 1-8</span>
+      <strong>Foundation & General English</strong>
+      <small>Grammar, travel, hospitality, professional communication, safety, and critical reading</small>
+    </button>
+    <button class="ip-phase" type="button" data-phase="operational">
+      <span class="ip-phase-number">Phase 2 · Lessons 9-20</span>
+      <strong>Operational Application</strong>
+      <small>Policy, de-escalation, briefings, diplomacy, incident reports, and professional writing</small>
+    </button>
+  </section>
+
+  <div class="ip-layout">
+    <aside class="ip-sidebar" aria-label="Intermediate lessons">
+      <label class="ip-search" for="ipSearch"><i class="bi bi-search"></i><input class="form-control" id="ipSearch" type="search" placeholder="Search lessons..."></label>
+      <div class="ip-lesson-list" id="ipLessonList"></div>
+    </aside>
+
+    <section class="ip-content" id="ipContent" aria-live="polite">
+      <div class="ip-loading"><span class="spinner-border spinner-border-sm me-2"></span>Loading course...</div>
+    </section>
+  </div>
+
+  <div class="alert alert-danger d-none mt-3" id="ipError" role="alert"></div>
+</main>
+
+{{ operational_lessons|json_script:"operationalLessonData" }}
+<script src="{% static 'lms/intermediate_course.js' %}" defer></script>
+{% endblock %}

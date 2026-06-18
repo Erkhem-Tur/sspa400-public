@@ -100,6 +100,20 @@ def course_library_view(request):
     })
 
 
+def intermediate_course_view(request):
+    operational_lessons = []
+    for pathway_number, lesson in enumerate(
+        (item for item in get_course_lessons() if item['level'] == 'B1'),
+        start=9,
+    ):
+        combined = dict(lesson)
+        combined['pathway_number'] = pathway_number
+        operational_lessons.append(combined)
+    return render(request, 'lms/intermediate_course.html', {
+        'operational_lessons': operational_lessons,
+    })
+
+
 def tl_fetch(request):
     """Return all translation overrides for a given URL path as JSON."""
     path = request.GET.get('path', '')

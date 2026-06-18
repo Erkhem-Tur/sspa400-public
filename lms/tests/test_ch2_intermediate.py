@@ -182,20 +182,32 @@ class PublicViewsTest(TestCase):
         self.assertContains(response, reverse("intermediate_course"))
         self.assertContains(response, "8 foundation lessons + 12 operational applications")
 
-    def test_beginner_alc_pack_contains_four_integrated_lessons(self):
+    def test_beginner_alc_pack_contains_study_guide_and_four_lessons(self):
         response = self.client.get(reverse("beginner_course"))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "lms/beginner_course.html")
-        self.assertEqual(len(response.context["beginner_lessons"]), 4)
+        self.assertEqual(len(response.context["beginner_lessons"]), 5)
+        self.assertEqual(
+            response.context["beginner_lessons"][0]["slug"],
+            "alc_book4_summary",
+        )
         self.assertContains(response, "ALC + SSPA Beginner Lesson Pack")
         self.assertContains(response, 'id="bpFrame"')
+        self.assertContains(response, "ALC Book 4 Complete Study Guide")
         self.assertContains(response, "Sports Event Protection + Simple Past")
         self.assertContains(response, "Body, Doctor Visit, and Food Safety")
 
     def test_beginner_pack_static_html_and_zip_are_available(self):
         static_root = settings.BASE_DIR / "lms" / "static" / "lms"
         lesson_root = static_root / "alc_beginner"
-        expected = {"index.html", "bk4_l1.html", "bk4_l2.html", "bk4_l3.html", "bk5_l1.html"}
+        expected = {
+            "index.html",
+            "alc_book4_summary.html",
+            "bk4_l1.html",
+            "bk4_l2.html",
+            "bk4_l3.html",
+            "bk5_l1.html",
+        }
         example_counts = {
             "bk4_l1.html": 26,
             "bk4_l2.html": 30,
@@ -209,6 +221,18 @@ class PublicViewsTest(TestCase):
         self.assertGreater(source_zip.stat().st_size, 20_000)
 
         with zipfile.ZipFile(source_zip) as lesson_pack:
+            summary_text = (lesson_root / "alc_book4_summary.html").read_text(
+                encoding="utf-8"
+            )
+            zipped_summary = lesson_pack.read(
+                "alc_sspa_integrated_lessons/alc_book4_summary.html"
+            ).decode("utf-8-sig")
+            for content in (summary_text, zipped_summary):
+                self.assertIn("ALC Book 4 — Language Laboratory Activities", content)
+                self.assertIn("showTab('grammar', this)", content)
+                self.assertIn("Military English", content)
+                self.assertNotIn("fonts.googleapis.com", content)
+
             for name, expected_count in example_counts.items():
                 lesson_text = (lesson_root / name).read_text(encoding="utf-8")
                 zipped_text = lesson_pack.read(
@@ -237,7 +261,7 @@ class PublicViewsTest(TestCase):
     def test_course_library_links_to_beginner_alc_pack(self):
         response = self.client.get(reverse("course_library"))
         self.assertContains(response, reverse("beginner_course"))
-        self.assertContains(response, "4 integrated ALC lessons")
+        self.assertContains(response, "Book 4 guide + 4 integrated lessons")
 
     def test_dashboard_links_to_course_and_practice_centers(self):
         response = self.client.get(reverse("dashboard"))

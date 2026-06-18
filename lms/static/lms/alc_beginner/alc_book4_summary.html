@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALC Book 4 — Language Laboratory Activities</title>
+<style>
+  :root {
+    --navy: #0a1628;
+    --navy-mid: #132240;
+    --navy-light: #1e3a5f;
+    --gold: #c9a227;
+    --gold-light: #e6c35a;
+    --gold-pale: #f5e9c0;
+    --white: #f8f9fb;
+    --muted: #8fa3bb;
+    --card-bg: #0d1f38;
+    --border: #1e3a5f;
+    --green: #2a7f5f;
+    --green-light: #3dba8c;
+    --red: #8b2635;
+    --accent: #4a7fc1;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: Arial, sans-serif;
+    background: var(--navy);
+    color: var(--white);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, var(--navy-mid) 0%, var(--navy-light) 100%);
+    border-bottom: 2px solid var(--gold);
+    padding: 2rem 1.5rem 1.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,162,39,0.15);
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: -60px;
+    width: 250px; height: 250px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,162,39,0.08);
+  }
+
+  .badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    background: rgba(201,162,39,0.12);
+    border: 1px solid rgba(201,162,39,0.3);
+    padding: 0.25rem 0.75rem;
+    border-radius: 2px;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+  }
+
+  header h1 {
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: -0.02em;
+    margin-bottom: 0.4rem;
+  }
+
+  header h1 span { color: var(--gold); }
+
+  header p {
+    font-size: 0.85rem;
+    color: var(--muted);
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .meta-row {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1.2rem;
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .meta-item strong { color: var(--gold-light); }
+
+  /* NAV TABS */
+  .nav-tabs {
+    display: flex;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--border);
+    background: var(--navy-mid);
+    padding: 0 1rem;
+    gap: 0.25rem;
+    scrollbar-width: none;
+  }
+
+  .nav-tabs::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    flex-shrink: 0;
+    padding: 0.85rem 1.1rem;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+    white-space: nowrap;
+  }
+
+  .tab-btn:hover { color: var(--white); }
+
+  .tab-btn.active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+  }
+
+  /* MAIN */
+  main { padding: 1.5rem 1rem 3rem; max-width: 860px; margin: 0 auto; }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* OVERVIEW GRID */
+  .overview-intro {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    border-radius: 4px;
+    padding: 1.2rem 1.4rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.88rem;
+    color: var(--muted);
+  }
+
+  .overview-intro strong { color: var(--white); }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .stat-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--gold);
+    display: block;
+  }
+
+  .stat-label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 0.2rem;
+    display: block;
+  }
+
+  /* LESSON CARDS */
+  .lesson-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+
+  .lesson-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.2rem;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+
+  .lesson-header:hover { background: rgba(201,162,39,0.05); }
+
+  .lesson-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--gold);
+    min-width: 32px;
+  }
+
+  .lesson-title { flex: 1; }
+
+  .lesson-title h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--white);
+  }
+
+  .lesson-title p {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 0.15rem;
+  }
+
+  .chevron {
+    color: var(--muted);
+    font-size: 0.8rem;
+    transition: transform 0.2s;
+  }
+
+  .lesson-card.open .chevron { transform: rotate(180deg); }
+
+  .lesson-body {
+    display: none;
+    padding: 0 1.2rem 1.2rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .lesson-card.open .lesson-body { display: block; }
+
+  /* SUB-LESSONS */
+  .sub-lessons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.6rem;
+    margin-top: 1rem;
+  }
+
+  .sub-lesson {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.8rem;
+  }
+
+  .sub-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .skill-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+
+  .tag {
+    font-size: 0.68rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 2px;
+    font-weight: 500;
+  }
+
+  .tag-grammar { background: rgba(74,127,193,0.2); color: #7ab3e8; border: 1px solid rgba(74,127,193,0.3); }
+  .tag-vocab { background: rgba(42,127,95,0.2); color: #5ecba1; border: 1px solid rgba(42,127,95,0.3); }
+  .tag-listen { background: rgba(139,38,53,0.25); color: #e07585; border: 1px solid rgba(139,38,53,0.35); }
+  .tag-speak { background: rgba(201,162,39,0.18); color: var(--gold-light); border: 1px solid rgba(201,162,39,0.3); }
+  .tag-write { background: rgba(120,80,180,0.2); color: #b89ae0; border: 1px solid rgba(120,80,180,0.3); }
+  .tag-func { background: rgba(180,100,40,0.2); color: #e0a870; border: 1px solid rgba(180,100,40,0.3); }
+
+  /* GRAMMAR SECTION */
+  .grammar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .grammar-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1rem;
+  }
+
+  .grammar-card h4 {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--gold);
+    margin-bottom: 0.6rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .grammar-card p {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .example-box {
+    background: rgba(201,162,39,0.07);
+    border: 1px solid rgba(201,162,39,0.2);
+    border-radius: 3px;
+    padding: 0.5rem 0.75rem;
+    margin-top: 0.6rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--gold-pale);
+  }
+
+  /* VOCAB SECTION */
+  .vocab-category {
+    margin-bottom: 1.2rem;
+  }
+
+  .vocab-category h4 {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.6rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .vocab-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .vocab-chip {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.78rem;
+    color: var(--white);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .vocab-chip:hover {
+    background: rgba(201,162,39,0.12);
+    border-color: rgba(201,162,39,0.4);
+    color: var(--gold-light);
+  }
+
+  /* SKILL BREAKDOWN */
+  .skill-breakdown {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+  }
+
+  .skill-breakdown h3 {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 1rem;
+  }
+
+  .skill-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .skill-name {
+    font-size: 0.78rem;
+    color: var(--muted);
+    min-width: 100px;
+  }
+
+  .skill-bar-bg {
+    flex: 1;
+    height: 6px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .skill-bar {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.8s ease;
+  }
+
+  .skill-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    min-width: 28px;
+    text-align: right;
+  }
+
+  /* MILITARY SECTION */
+  .military-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+  }
+
+  .military-table th {
+    background: rgba(201,162,39,0.12);
+    color: var(--gold);
+    padding: 0.6rem 0.8rem;
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .military-table td {
+    padding: 0.55rem 0.8rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: var(--muted);
+  }
+
+  .military-table td:first-child { color: var(--white); font-weight: 500; }
+
+  .military-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* SOUND PAIRS */
+  .sound-pairs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+  }
+
+  .sound-pair {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.8rem;
+    text-align: center;
+  }
+
+  .sound-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem;
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  .sound-examples {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 0.3rem;
+  }
+
+  /* TIMELINE */
+  .timeline {
+    position: relative;
+    padding-left: 1.5rem;
+    border-left: 2px solid var(--border);
+    margin-bottom: 1.5rem;
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 1.2rem;
+    padding-left: 0.8rem;
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1.75rem;
+    top: 0.35rem;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: 2px solid var(--navy);
+  }
+
+  .timeline-item h4 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 0.2rem;
+  }
+
+  .timeline-item p {
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 0.72rem;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">DLIELC · Level I · BK4LLAST · January 1991</div>
+  <h1>American Language Course<br><span>Book 4</span> — Lab Activities</h1>
+  <p>Language Laboratory Activities Student Text — Defense Language Institute English Language Center</p>
+  <div class="meta-row">
+    <span class="meta-item"><strong>4</strong> Lessons</span>
+    <span class="meta-item"><strong>85</strong> Pages</span>
+    <span class="meta-item"><strong>5</strong> Skill Areas</span>
+    <span class="meta-item"><strong>Level I</strong> CEFR ~A2</span>
+  </div>
+</header>
+
+<nav class="nav-tabs">
+  <button class="tab-btn active" onclick="showTab('overview', this)">Overview</button>
+  <button class="tab-btn" onclick="showTab('lessons', this)">Lessons</button>
+  <button class="tab-btn" onclick="showTab('grammar', this)">Grammar</button>
+  <button class="tab-btn" onclick="showTab('vocabulary', this)">Vocabulary</button>
+  <button class="tab-btn" onclick="showTab('skills', this)">Skills</button>
+  <button class="tab-btn" onclick="showTab('military', this)">Military English</button>
+</nav>
+
+<main>
+
+  <!-- OVERVIEW -->
+  <div id="tab-overview" class="section active">
+
+    <div class="overview-intro">
+      <strong>Book 4</strong> is a Level I Language Laboratory Activities workbook designed for military students learning American English. It accompanies audio recordings and covers four progressive lessons on daily life, military culture, modals, and shopping — all within a US Armed Forces context.
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-num">4</span>
+        <span class="stat-label">Main Lessons</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num">16</span>
+        <span class="stat-label">Sub-Lessons (A–D)</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num">85+</span>
+        <span class="stat-label">Figures / Exercises</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num">27</span>
+        <span class="stat-label">Irregular Verbs</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num">10</span>
+        <span class="stat-label">Officer Ranks</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num">8</span>
+        <span class="stat-label">Colors Taught</span>
+      </div>
+    </div>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <h4>Lesson 1 — Sports, Daily Routines & Past Tense</h4>
+        <p>Introduces sports vocabulary (football, soccer, basketball, tennis, baseball), leisure activities, and city/town life. Grammar focus: regular past tense formation (-ed endings, three pronunciations: /d/, /t/, /ɪd/).</p>
+      </div>
+      <div class="timeline-item">
+        <h4>Lesson 2 — Military Life & Irregular Past Tense</h4>
+        <p>Covers military vocabulary: ranks, uniforms, ID cards, saluting, military time (24-hour clock), barracks life, and classroom routines. Grammar: 27 key irregular verbs (go/went, eat/ate, fly/flew, etc.).</p>
+      </div>
+      <div class="timeline-item">
+        <h4>Lesson 3 — Clothing, Ability & Permission</h4>
+        <p>Clothing vocabulary (uniform vs. civilian dress). Modal verbs: CAN (ability), MAY (permission), MUST / MUST NOT (obligation and prohibition). Military context dialogs.</p>
+      </div>
+      <div class="timeline-item">
+        <h4>Lesson 4 — Questions, Colors & Shopping</h4>
+        <p>WHAT questions with nouns, demonstratives (this/that/these/those), colors, shopping dialogs with HOW MUCH…?, and seasonal vocabulary. Culminates in a shopping role-play at the BX (Base Exchange).</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- LESSONS -->
+  <div id="tab-lessons" class="section">
+
+    <!-- Lesson 1 -->
+    <div class="lesson-card" id="l1">
+      <div class="lesson-header" onclick="toggleLesson('l1')">
+        <span class="lesson-num">01</span>
+        <div class="lesson-title">
+          <h3>Sports, Cities & Past Tense (Regular Verbs)</h3>
+          <p>Sub-lessons 1A · 1B · 1C · 1D — Pages 1–20</p>
+        </div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="lesson-body">
+        <div class="sub-lessons">
+          <div class="sub-lesson">
+            <span class="sub-label">1A — Vocabulary</span>
+            <div class="skill-tags">
+              <span class="tag tag-vocab">Sports names</span>
+              <span class="tag tag-listen">Sound /j/ vs /y/</span>
+              <span class="tag tag-vocab">City vs town</span>
+            </div>
+          </div>
+          <div class="sub-lesson">
+            <span class="sub-label">1B — Grammar</span>
+            <div class="skill-tags">
+              <span class="tag tag-grammar">-ed past tense</span>
+              <span class="tag tag-listen">/a/ vs /ɔ/ sounds</span>
+              <span class="tag tag-vocab">Downtown vocabulary</span>
+            </div>
+          </div>
+          <div class="sub-lesson">
+            <span class="sub-label">1C — Speaking</span>
+            <div class="skill-tags">
+              <span class="tag tag-grammar">Did/didn't questions</span>
+              <span class="tag tag-speak">Pronounce /ə/</span>
+              <span class="tag tag-speak">Dialog role-play</span>
+            </div>
+          </div>
+          <div class="sub-lesson">
+            <span class="sub-label">1D — Writing</span>
+            <div class="skill-tags">
+              <span class="tag tag-listen">Dialog comprehension</span>
+              <span class="tag tag-vocab">5 languages</span>
+              <span class="tag tag-speak">Pronounce /iː/</span>
+              <span class="tag tag-write">Dictation</span>
+            </div>
+          </div>
+        </div>
+        <div class="example-box">EX: "Did she cook dinner, too?" / "Yes, she did." / "No, she didn't."<br>Past -ed: /d/ played · /t/ worked · /ɪd/ wanted</div>
+      </div>
+    </div>
+
+    <!-- Lesson 2 -->
+    <div class="lesson-card" id="l2">
+      <div class="lesson-header" onclick="toggleLesson('l2')">
+        <span class="lesson-num">02</span>
+        <div class="lesson-title">
+          <h3>Military Life & Irregular Past Tense</h3>
+          <p>Sub-lessons 2A · 2B · 2C · 2D — Pages 21–39</p>
+        </div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="lesson-body">
+        <div class="sub-lessons">
+          <div class="sub-lesson">
+            <span class="sub-label">2A — Ranks & Uniforms</span>
+            <div class="skill-tags">
+              <span class="tag tag-vocab">Military ranks</span>
+              <span class="tag tag-vocab">Uniform parts</span>
+              <span class="tag tag-listen">True/False</span>
+            </div>
+          </div>
+          <div class="sub-lesson">
+            <span class="sub-label">2B — Daily Routine</span>
+            <div class="skill-tags">
+              <span class="tag tag-vocab">Abbreviations</span>
+              <span class="tag tag-vocab">Military time</span>
+              <span class="tag tag-listen">Dialog questions</span>
+            </div>
+          </div>
+          <div class="sub-lesson">
+            <span class="sub-label">2C — Irregular Verbs</span>
+            <div class="skill-tags">
+              <span class="tag tag-grammar">27 irregular verbs</span>
+              <span class="tag tag-func">Negative past</span>
+              <span class="tag tag-listen">Paragraph listening</span>
+            </div>
+          </div>
+          <div class="sub-lesson">
+            <span class="sub-label">2D — Sounds</span>
+            <div class="skill-tags">
+              <span class="tag tag-listen">/ʃ/ vs /ʒ/ sounds</span>
+              <span class="tag tag-write">Write "sh" words</span>
+              <span class="tag tag-listen">True statement</span>
+            </div>
+          </div>
+        </div>
+        <div class="example-box">EX: go→went · eat→ate · fly→flew · bring→brought · know→knew · see→saw</div>
+      </div>
+    </div>
+
+    <!-- Lesson 3 -->
+    <div class="lesson-card" id="l3">
+      <div class="lesson-header" onclick="toggleLesson('l3')">
+        <span class="lesson-num">03</span>
+        <div class="lesson-title">
+          <h3>Clothing, Ability & Modal Verbs</h3>
+          <p>Sub-lessons 3A · 3B · 3C · 3D — Pages 41–64</p>
+        </div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="lesson-body">
+        <div class="sub-lessons">
+          <div class="sub-lesson">
+            <span class="sub-label">3A — Men's Clothing</span>
+            <div class="skill-tags">
+              <span class="tag tag-vocab">Hat shirt belt tie</span>
+              <span class="tag tag-vocab">Put on / take off</span>
+              <span class="tag tag-listen">True/False</span>
+            </div>
+          </div>
+          <div class="sub-lesson">
+            <span class="sub-label">3B — Women's Clothing</span>
+            <div class="skill-tags">
+              <span class="tag tag-vocab">Suit dress blouse</span>
+              <span class="tag tag-vocab">Jacket boots coat</span>
+              <span class="tag tag-listen">/w/ vs /r/ sounds</span>
+            </div>
+          </div>
+          <div class="sub-lesson">
+            <span class="sub-label">3C — CAN (Ability)</span>
+            <div class="skill-tags">
+              <span class="tag tag-grammar">Can / cannot</span>
+              <span class="tag tag-func">Ability statements</span>
+              <span class="tag tag-write">Dictation</span>
+            </div>
+          </div>
+          <div class="sub-lesson">
+            <span class="sub-label">3D — MAY & MUST</span>
+            <div class="skill-tags">
+              <span class="tag tag-grammar">May / may not</span>
+              <span class="tag tag-grammar">Must / must not</span>
+              <span class="tag tag-write">Punctuation</span>
+            </div>
+          </div>
+        </div>
+        <div class="example-box">CAN: "He can fly planes." / "She can't hear us."<br>MAY: "May I come in?" · MUST: "You must sign in at 0800 hours."</div>
+      </div>
+    </div>
+
+    <!-- Lesson 4 -->
+    <div class="lesson-card" id="l4">
+      <div class="lesson-header" onclick="toggleLesson('l4')">
+        <span class="lesson-num">04</span>
+        <div class="lesson-title">
+          <h3>Questions, Colors & Shopping</h3>
+          <p>Sub-lessons 4A · 4B · 4C · 4D — Pages 65–85</p>
+        </div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="lesson-body">
+        <div class="sub-lessons">
+          <div class="sub-lesson">
+            <span class="sub-label">4A — WHAT Questions</span>
+            <div class="skill-tags">
+              <span class="tag tag-grammar">What + noun</span>
+              <span class="tag tag-vocab">Colors</span>
+              <span class="tag tag-listen">/d/ vs /ð/ sounds</span>
+            </div>
+          </div>
+          <div class="sub-lesson">
+            <span class="sub-label">4B — Music & Stores</span>
+            <div class="skill-tags">
+              <span class="tag tag-vocab">Music, dance, recorder</span>
+              <span class="tag tag-func">Shopping function</span>
+              <span class="tag tag-vocab">Store vocabulary</span>
+            </div>
+          </div>
+          <div class="sub-lesson">
+            <span class="sub-label">4C — This/That/These/Those</span>
+            <div class="skill-tags">
+              <span class="tag tag-grammar">Demonstratives</span>
+              <span class="tag tag-grammar">How much…?</span>
+              <span class="tag tag-speak">Shopping dialog</span>
+            </div>
+          </div>
+          <div class="sub-lesson">
+            <span class="sub-label">4D — Seasons & Days</span>
+            <div class="skill-tags">
+              <span class="tag tag-vocab">4 seasons / months</span>
+              <span class="tag tag-vocab">Days of week</span>
+              <span class="tag tag-listen">True/False</span>
+            </div>
+          </div>
+        </div>
+        <div class="example-box">WHAT: "What language are they learning?" → "They're learning English."<br>HOW MUCH: "How much does this recorder cost?" → "It's $80.00."</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- GRAMMAR -->
+  <div id="tab-grammar" class="section">
+
+    <div class="grammar-grid">
+
+      <div class="grammar-card">
+        <h4>Regular Past Tense — -ed</h4>
+        <p>Add -ed to base verb. Three pronunciations based on final consonant.</p>
+        <div class="example-box">
+          /d/ lived · played · answered<br>
+          /t/ worked · cooked · asked<br>
+          /ɪd/ wanted · ended · visited
+        </div>
+      </div>
+
+      <div class="grammar-card">
+        <h4>Irregular Past Tense</h4>
+        <p>27 verbs with unpredictable past forms. Must be memorized.</p>
+        <div class="example-box">
+          go→went · eat→ate · fly→flew<br>
+          see→saw · buy→bought · sleep→slept<br>
+          drive→drove · know→knew
+        </div>
+      </div>
+
+      <div class="grammar-card">
+        <h4>Past Tense Questions</h4>
+        <p>Use DID + subject + base verb for yes/no questions.</p>
+        <div class="example-box">
+          Did she cook dinner? Yes, she did.<br>
+          Did Carl play football? No, he didn't.<br>
+          He played soccer instead.
+        </div>
+      </div>
+
+      <div class="grammar-card">
+        <h4>Modal: CAN / CANNOT</h4>
+        <p>Expresses ability. Use base verb after CAN. Negative: cannot / can't.</p>
+        <div class="example-box">
+          He can fly planes.<br>
+          She can't hear the tape.<br>
+          They can speak Spanish.
+        </div>
+      </div>
+
+      <div class="grammar-card">
+        <h4>Modal: MAY / MAY NOT</h4>
+        <p>Expresses permission (more formal than CAN for requests).</p>
+        <div class="example-box">
+          May I come in? Yes, you may.<br>
+          You may write with a pencil.<br>
+          You may not write with a pen.
+        </div>
+      </div>
+
+      <div class="grammar-card">
+        <h4>Modal: MUST / MUST NOT</h4>
+        <p>Expresses obligation or strong prohibition. Military context.</p>
+        <div class="example-box">
+          You must sign in at 0800.<br>
+          You must not wear civilian clothes.<br>
+          Students must not come late.
+        </div>
+      </div>
+
+      <div class="grammar-card">
+        <h4>Demonstratives + Noun</h4>
+        <p>This/these (near) vs. that/those (far) + noun.</p>
+        <div class="example-box">
+          This coffee is hot.<br>
+          That coffee is cold.<br>
+          These gloves are Jane's.
+        </div>
+      </div>
+
+      <div class="grammar-card">
+        <h4>HOW MUCH…?</h4>
+        <p>Asking about price. Works with cost, be, and did.</p>
+        <div class="example-box">
+          How much does it cost?<br>
+          How much is this dress?<br>
+          How much did it cost before?
+        </div>
+      </div>
+
+      <div class="grammar-card">
+        <h4>WHAT + Noun Questions</h4>
+        <p>What + noun (not just What) to narrow the question.</p>
+        <div class="example-box">
+          What language are you learning?<br>
+          What sports do the students play?<br>
+          What uniform is he wearing?
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- VOCABULARY -->
+  <div id="tab-vocabulary" class="section">
+
+    <div class="vocab-category">
+      <h4>Sports</h4>
+      <div class="vocab-chips">
+        <span class="vocab-chip">football</span>
+        <span class="vocab-chip">baseball</span>
+        <span class="vocab-chip">tennis</span>
+        <span class="vocab-chip">soccer</span>
+        <span class="vocab-chip">basketball</span>
+        <span class="vocab-chip">swim / swam</span>
+        <span class="vocab-chip">play / game / ball</span>
+      </div>
+    </div>
+
+    <div class="vocab-category">
+      <h4>Military Ranks</h4>
+      <div class="vocab-chips">
+        <span class="vocab-chip">Second Lieutenant (O-1)</span>
+        <span class="vocab-chip">First Lieutenant (O-2)</span>
+        <span class="vocab-chip">Captain (O-3)</span>
+        <span class="vocab-chip">Major (O-4)</span>
+        <span class="vocab-chip">Lieutenant Colonel (O-5)</span>
+        <span class="vocab-chip">Colonel (O-6)</span>
+        <span class="vocab-chip">General (O-10)</span>
+        <span class="vocab-chip">Sergeant</span>
+        <span class="vocab-chip">Airman</span>
+      </div>
+    </div>
+
+    <div class="vocab-category">
+      <h4>Military Abbreviations</h4>
+      <div class="vocab-chips">
+        <span class="vocab-chip">Sgt</span>
+        <span class="vocab-chip">Lt</span>
+        <span class="vocab-chip">Capt</span>
+        <span class="vocab-chip">Maj</span>
+        <span class="vocab-chip">Lt Col</span>
+        <span class="vocab-chip">Col</span>
+        <span class="vocab-chip">Gen</span>
+        <span class="vocab-chip">BX (Base Exchange)</span>
+        <span class="vocab-chip">I.D. card</span>
+      </div>
+    </div>
+
+    <div class="vocab-category">
+      <h4>Men's Clothing</h4>
+      <div class="vocab-chips">
+        <span class="vocab-chip">hat / cap</span>
+        <span class="vocab-chip">shirt</span>
+        <span class="vocab-chip">necktie</span>
+        <span class="vocab-chip">belt</span>
+        <span class="vocab-chip">trousers</span>
+        <span class="vocab-chip">T-shirt</span>
+        <span class="vocab-chip">pants</span>
+        <span class="vocab-chip">uniform</span>
+        <span class="vocab-chip">name tag</span>
+      </div>
+    </div>
+
+    <div class="vocab-category">
+      <h4>Women's Clothing</h4>
+      <div class="vocab-chips">
+        <span class="vocab-chip">suit</span>
+        <span class="vocab-chip">blouse</span>
+        <span class="vocab-chip">dress</span>
+        <span class="vocab-chip">shoes / stockings / socks</span>
+        <span class="vocab-chip">skirt</span>
+        <span class="vocab-chip">sweater</span>
+        <span class="vocab-chip">jacket / coat</span>
+        <span class="vocab-chip">boots / gloves</span>
+        <span class="vocab-chip">scarf / slacks</span>
+      </div>
+    </div>
+
+    <div class="vocab-category">
+      <h4>Colors</h4>
+      <div class="vocab-chips">
+        <span class="vocab-chip" style="background:rgba(180,30,30,0.3);border-color:#b41e1e">red</span>
+        <span class="vocab-chip" style="background:rgba(200,100,0,0.3);border-color:#c86400">orange</span>
+        <span class="vocab-chip" style="background:rgba(180,160,0,0.3);border-color:#b4a000">yellow</span>
+        <span class="vocab-chip" style="background:rgba(20,120,50,0.3);border-color:#147832">green</span>
+        <span class="vocab-chip" style="background:rgba(20,80,180,0.3);border-color:#1450b4">blue</span>
+        <span class="vocab-chip" style="background:rgba(80,20,120,0.3);border-color:#501478">purple</span>
+        <span class="vocab-chip" style="background:rgba(200,100,130,0.3);border-color:#c86482">pink</span>
+        <span class="vocab-chip" style="background:rgba(120,70,20,0.3);border-color:#784614">brown</span>
+        <span class="vocab-chip" style="background:rgba(20,20,20,0.5);border-color:#555">black</span>
+        <span class="vocab-chip" style="background:rgba(220,220,220,0.15);border-color:#aaa">white</span>
+      </div>
+    </div>
+
+    <div class="vocab-category">
+      <h4>Seasons & Months</h4>
+      <div class="vocab-chips">
+        <span class="vocab-chip">winter (Dec–Feb)</span>
+        <span class="vocab-chip">spring (Mar–May)</span>
+        <span class="vocab-chip">summer (Jun–Aug)</span>
+        <span class="vocab-chip">fall / autumn (Sep–Nov)</span>
+        <span class="vocab-chip">January · February · March</span>
+        <span class="vocab-chip">April · May · June</span>
+        <span class="vocab-chip">July · August · September</span>
+        <span class="vocab-chip">October · November · December</span>
+      </div>
+    </div>
+
+    <div class="vocab-category">
+      <h4>Key Irregular Verbs (Book 4)</h4>
+      <div class="vocab-chips">
+        <span class="vocab-chip">go → went</span>
+        <span class="vocab-chip">eat → ate</span>
+        <span class="vocab-chip">fly → flew</span>
+        <span class="vocab-chip">see → saw</span>
+        <span class="vocab-chip">buy → bought</span>
+        <span class="vocab-chip">bring → brought</span>
+        <span class="vocab-chip">drive → drove</span>
+        <span class="vocab-chip">know → knew</span>
+        <span class="vocab-chip">speak → spoke</span>
+        <span class="vocab-chip">sleep → slept</span>
+        <span class="vocab-chip">leave → left</span>
+        <span class="vocab-chip">write → wrote</span>
+        <span class="vocab-chip">drink → drank</span>
+        <span class="vocab-chip">swim → swam</span>
+        <span class="vocab-chip">choose → chose</span>
+        <span class="vocab-chip">hear → heard</span>
+        <span class="vocab-chip">say → said</span>
+        <span class="vocab-chip">have → had</span>
+        <span class="vocab-chip">do → did</span>
+        <span class="vocab-chip">take → took</span>
+        <span class="vocab-chip">come → came</span>
+        <span class="vocab-chip">get → got</span>
+        <span class="vocab-chip">sit → sat</span>
+        <span class="vocab-chip">stand → stood</span>
+        <span class="vocab-chip">put → put</span>
+        <span class="vocab-chip">read → read</span>
+        <span class="vocab-chip">fall → fell</span>
+        <span class="vocab-chip">wake → woke</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SKILLS -->
+  <div id="tab-skills" class="section">
+
+    <div class="skill-breakdown">
+      <h3>Skill Distribution Across Book 4</h3>
+
+      <div class="skill-row">
+        <span class="skill-name">Grammar</span>
+        <div class="skill-bar-bg">
+          <div class="skill-bar" style="width:82%;background:linear-gradient(90deg,#4a7fc1,#7ab3e8)"></div>
+        </div>
+        <span class="skill-count">~28</span>
+      </div>
+
+      <div class="skill-row">
+        <span class="skill-name">Vocabulary</span>
+        <div class="skill-bar-bg">
+          <div class="skill-bar" style="width:74%;background:linear-gradient(90deg,#2a7f5f,#5ecba1)"></div>
+        </div>
+        <span class="skill-count">~25</span>
+      </div>
+
+      <div class="skill-row">
+        <span class="skill-name">Listening</span>
+        <div class="skill-bar-bg">
+          <div class="skill-bar" style="width:68%;background:linear-gradient(90deg,#8b2635,#e07585)"></div>
+        </div>
+        <span class="skill-count">~22</span>
+      </div>
+
+      <div class="skill-row">
+        <span class="skill-name">Speaking</span>
+        <div class="skill-bar-bg">
+          <div class="skill-bar" style="width:38%;background:linear-gradient(90deg,#c9a227,#e6c35a)"></div>
+        </div>
+        <span class="skill-count">~13</span>
+      </div>
+
+      <div class="skill-row">
+        <span class="skill-name">Writing</span>
+        <div class="skill-bar-bg">
+          <div class="skill-bar" style="width:22%;background:linear-gradient(90deg,#7850b4,#b89ae0)"></div>
+        </div>
+        <span class="skill-count">~7</span>
+      </div>
+
+      <div class="skill-row">
+        <span class="skill-name">Function</span>
+        <div class="skill-bar-bg">
+          <div class="skill-bar" style="width:18%;background:linear-gradient(90deg,#b46428,#e0a870)"></div>
+        </div>
+        <span class="skill-count">~6</span>
+      </div>
+    </div>
+
+    <div style="margin-bottom:1rem">
+      <h3 style="font-size:0.88rem;color:var(--white);margin-bottom:0.8rem">Phonics / Sound Discrimination</h3>
+      <div class="sound-pairs">
+        <div class="sound-pair">
+          <div class="sound-label">/j/ vs /y/</div>
+          <div class="sound-examples">jet · yet</div>
+        </div>
+        <div class="sound-pair">
+          <div class="sound-label">/a/ vs /ɔ/</div>
+          <div class="sound-examples">cop · cup</div>
+        </div>
+        <div class="sound-pair">
+          <div class="sound-label">/ə/</div>
+          <div class="sound-examples">cup · lunch · bus</div>
+        </div>
+        <div class="sound-pair">
+          <div class="sound-label">/iː/</div>
+          <div class="sound-examples">speak · read · week</div>
+        </div>
+        <div class="sound-pair">
+          <div class="sound-label">/ʃ/ vs /ʒ/</div>
+          <div class="sound-examples">she · vision</div>
+        </div>
+        <div class="sound-pair">
+          <div class="sound-label">/w/ vs /r/</div>
+          <div class="sound-examples">went · rent</div>
+        </div>
+        <div class="sound-pair">
+          <div class="sound-label">/d/ vs /ð/</div>
+          <div class="sound-examples">day · they</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="overview-intro">
+      <strong>Exercise types used throughout:</strong> Listen &amp; repeat · Circle the correct answer · Write the verb forms · Write missing words · Ask a question · Answer the questions · Change the sentences · Dialog role-play (assume one role) · Dictation · True/False · Same/Different sound discrimination
+    </div>
+
+  </div>
+
+  <!-- MILITARY -->
+  <div id="tab-military" class="section">
+
+    <div class="overview-intro">
+      Book 4 is specifically designed for <strong>military students</strong> and uses US Armed Forces contexts throughout. All dialogs, vocabulary, and scenarios reflect actual military life.
+    </div>
+
+    <h3 style="font-size:0.88rem;color:var(--gold);margin-bottom:0.75rem;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.08em">Officer Ranks — US Air Force / Army</h3>
+
+    <table class="military-table">
+      <thead>
+        <tr>
+          <th>Abbreviation</th>
+          <th>Full Rank</th>
+          <th>NATO Code</th>
+          <th>Insignia</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>2Lt</td><td>Second Lieutenant</td><td>O-1</td><td>Gold bar</td></tr>
+        <tr><td>1Lt</td><td>First Lieutenant</td><td>O-2</td><td>Silver bar</td></tr>
+        <tr><td>Capt</td><td>Captain</td><td>O-3</td><td>Silver (double)</td></tr>
+        <tr><td>Maj</td><td>Major</td><td>O-4</td><td>Gold oak leaf</td></tr>
+        <tr><td>Lt Col</td><td>Lieutenant Colonel</td><td>O-5</td><td>Silver oak leaf</td></tr>
+        <tr><td>Col</td><td>Colonel</td><td>O-6</td><td>Eagle</td></tr>
+        <tr><td>Gen</td><td>General</td><td>O-10</td><td>4 stars</td></tr>
+        <tr><td>Sgt</td><td>Sergeant</td><td>E-5</td><td>Stripes</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size:0.88rem;color:var(--gold);margin-bottom:0.75rem;margin-top:1.5rem;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.08em">Military Time — Civilian Equivalents</h3>
+
+    <table class="military-table">
+      <thead>
+        <tr><th>Civilian</th><th>Military</th><th>Civilian</th><th>Military</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1:00 a.m.</td><td>0100 hours</td><td>noon</td><td>1200 hours</td></tr>
+        <tr><td>6:30 a.m.</td><td>0630 hours</td><td>5:30 p.m.</td><td>1730 hours</td></tr>
+        <tr><td>9:45 a.m.</td><td>0945 hours</td><td>8:15 p.m.</td><td>2015 hours</td></tr>
+        <tr><td>8:00 a.m.</td><td>0800 hours</td><td>midnight</td><td>2400 hours</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size:0.88rem;color:var(--gold);margin-bottom:0.75rem;margin-top:1.5rem;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.08em">Military Vocabulary</h3>
+    <div class="vocab-chips" style="flex-wrap:wrap;gap:0.4rem;">
+      <span class="vocab-chip">base (Air Force)</span>
+      <span class="vocab-chip">post (Army)</span>
+      <span class="vocab-chip">naval base (Navy)</span>
+      <span class="vocab-chip">barracks</span>
+      <span class="vocab-chip">I.D. card</span>
+      <span class="vocab-chip">name tag</span>
+      <span class="vocab-chip">uniform</span>
+      <span class="vocab-chip">stripes</span>
+      <span class="vocab-chip">salute</span>
+      <span class="vocab-chip">report to</span>
+      <span class="vocab-chip">sign in / locator</span>
+      <span class="vocab-chip">butt can</span>
+      <span class="vocab-chip">BX (Base Exchange)</span>
+      <span class="vocab-chip">commissary</span>
+      <span class="vocab-chip">dining hall</span>
+      <span class="vocab-chip">civilian clothes</span>
+      <span class="vocab-chip">enlisted / officer</span>
+      <span class="vocab-chip">on time / late</span>
+    </div>
+
+  </div>
+
+</main>
+
+<footer>
+  ALC Book 4 LLA · DLIELC Lackland AFB, Texas · BK4LLAST January 1991 · Level I
+</footer>
+
+<script>
+  function showTab(id, button) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    button.classList.add('active');
+  }
+
+  function toggleLesson(id) {
+    const card = document.getElementById(id);
+    card.classList.toggle('open');
+  }
+</script>
+
+</body>
+</html>

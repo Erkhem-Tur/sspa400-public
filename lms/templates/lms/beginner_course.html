@@ -14,12 +14,12 @@
       <h1>ALC + SSPA Beginner Lesson Pack</h1>
       <p>ALC grammar and vocabulary applied to protection, checkpoint, duty, service, and reporting situations.</p>
     </div>
-    <div class="bp-stats"><div><strong>4</strong><span>Lessons</span></div><div><strong>A1-A2</strong><span>Level</span></div></div>
+    <div class="bp-stats"><div><strong>{{ beginner_lessons|length }}</strong><span>Study modules</span></div><div><strong>A1-A2</strong><span>Level</span></div></div>
   </header>
 
   <section class="bp-progress-row">
-    <div class="bp-progress-copy"><strong id="bpProgressText">0 / 4 complete</strong><span id="bpCurrentText">Book 4 · Lesson 1</span></div>
-    <div class="bp-progress-track" role="progressbar" aria-label="Beginner pack progress" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0"><div id="bpProgressFill"></div></div>
+    <div class="bp-progress-copy"><strong id="bpProgressText">0 / {{ beginner_lessons|length }} complete</strong><span id="bpCurrentText">Book 4 · Study Guide</span></div>
+    <div class="bp-progress-track" role="progressbar" aria-label="Beginner pack progress" aria-valuemin="0" aria-valuemax="{{ beginner_lessons|length }}" aria-valuenow="0"><div id="bpProgressFill"></div></div>
     <div class="bp-actions">
       <a class="btn btn-outline-primary btn-sm" href="{% url 'course_library' %}?level=A1"><i class="bi bi-bookshelf me-1"></i>A1 Core Lessons</a>
       <a class="btn btn-outline-secondary btn-sm" href="{% static 'lms/resources/alc_sspa_integrated_lesson_pack.zip' %}" download><i class="bi bi-file-earmark-zip me-1"></i>Download Pack</a>
@@ -28,7 +28,7 @@
 
   <div class="bp-layout">
     <aside class="bp-sidebar" aria-label="Beginner ALC lessons">
-      <div class="bp-sidebar-title">Integrated lessons</div>
+      <div class="bp-sidebar-title">Study guide and integrated lessons</div>
       {% for lesson in beginner_lessons %}
       <button class="bp-lesson-button{% if forloop.first %} active{% endif %}" type="button" data-lesson="{{ lesson.slug }}">
         <span class="bp-number">{{ lesson.number|stringformat:'02d' }}</span>
@@ -41,11 +41,11 @@
     <section class="bp-workspace">
       <div class="bp-toolbar">
         <button class="bp-icon-button" id="bpPrevious" type="button" title="Previous lesson" aria-label="Previous lesson"><i class="bi bi-arrow-left"></i></button>
-        <div><div class="bp-kicker" id="bpLessonBook">Book 4 · Lesson 1</div><strong id="bpLessonTitle">Sports Event Protection + Simple Past</strong></div>
+        <div><div class="bp-kicker" id="bpLessonBook">Book 4 · Study Guide</div><strong id="bpLessonTitle">ALC Book 4 Complete Study Guide</strong></div>
         <button class="btn btn-outline-success btn-sm" id="bpComplete" type="button"><i class="bi bi-check2-circle me-1"></i>Mark complete</button>
         <button class="bp-icon-button" id="bpNext" type="button" title="Next lesson" aria-label="Next lesson"><i class="bi bi-arrow-right"></i></button>
       </div>
-      <iframe class="bp-frame" id="bpFrame" src="{% static 'lms/alc_beginner/bk4_l1.html' %}" title="ALC + SSPA interactive beginner lesson"></iframe>
+      <iframe class="bp-frame" id="bpFrame" src="{% static 'lms/alc_beginner/alc_book4_summary.html' %}" title="ALC + SSPA beginner study material"></iframe>
     </section>
   </div>
 </main>

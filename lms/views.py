@@ -118,6 +118,13 @@ def beginner_course_view(request):
     return render(request, 'lms/beginner_course.html', {
         'beginner_lessons': [
             {
+                'number': 0,
+                'slug': 'alc_book4_summary',
+                'book': 'Book 4 · Study Guide',
+                'title': 'ALC Book 4 Complete Study Guide',
+                'focus': 'Four-lesson overview, grammar, vocabulary, skills, ranks, and military time',
+            },
+            {
                 'number': 1,
                 'slug': 'bk4_l1',
                 'book': 'Book 4 · Lesson 1',

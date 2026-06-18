@@ -6,6 +6,7 @@
 
   const lessons = JSON.parse(document.getElementById('beginnerLessonData').textContent);
   const storageKey = 'sspa-beginner-alc-pack';
+  const draftVersion = 2;
   const requested = new URLSearchParams(window.location.search).get('lesson');
   const state = {
     current: lessons.some((lesson) => lesson.slug === requested) ? requested : lessons[0].slug,
@@ -20,10 +21,11 @@
       const saved = JSON.parse(localStorage.getItem(storageKey) || '{}');
       return {
         completed: Array.isArray(saved.completed) ? saved.completed : [],
-        drafts: saved.drafts || {},
+        drafts: saved.draftVersion === draftVersion ? (saved.drafts || {}) : {},
+        draftVersion,
       };
     } catch (_) {
-      return { completed: [], drafts: {} };
+      return { completed: [], drafts: {}, draftVersion };
     }
   }
 

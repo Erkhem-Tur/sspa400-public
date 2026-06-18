@@ -196,14 +196,36 @@ class PublicViewsTest(TestCase):
         static_root = settings.BASE_DIR / "lms" / "static" / "lms"
         lesson_root = static_root / "alc_beginner"
         expected = {"index.html", "bk4_l1.html", "bk4_l2.html", "bk4_l3.html", "bk5_l1.html"}
+        example_counts = {
+            "bk4_l1.html": 26,
+            "bk4_l2.html": 30,
+            "bk4_l3.html": 30,
+            "bk5_l1.html": 40,
+        }
         self.assertEqual({path.name for path in lesson_root.glob("*.html")}, expected)
         self.assertTrue(all((lesson_root / name).stat().st_size > 4_000 for name in expected))
         source_zip = static_root / "resources" / "alc_sspa_integrated_lesson_pack.zip"
         self.assertTrue(source_zip.exists())
         self.assertGreater(source_zip.stat().st_size, 20_000)
 
-        lesson_text = (lesson_root / "bk4_l2.html").read_text(encoding="utf-8")
         with zipfile.ZipFile(source_zip) as lesson_pack:
+            for name, expected_count in example_counts.items():
+                lesson_text = (lesson_root / name).read_text(encoding="utf-8")
+                zipped_text = lesson_pack.read(
+                    f"alc_sspa_integrated_lessons/{name}"
+                ).decode("utf-8-sig")
+
+                for content in (lesson_text, zipped_text):
+                    vocabulary = content.split(
+                        '<section class="card" id="vocabulary">', 1
+                    )[1].split("</table></section>", 1)[0]
+                    self.assertNotIn("<input", vocabulary)
+                    self.assertEqual(vocabulary.count('class="example"'), expected_count)
+                    self.assertIn('<a class="btn light" href="#grammar">Grammar</a>', content)
+                    self.assertIn('<section class="card" id="grammar"><h2>Grammar:', content)
+                    self.assertIn("<input", content.split(vocabulary, 1)[1])
+
+            lesson_text = (lesson_root / "bk4_l2.html").read_text(encoding="utf-8")
             zipped_text = lesson_pack.read(
                 "alc_sspa_integrated_lessons/bk4_l2.html"
             ).decode("utf-8-sig")

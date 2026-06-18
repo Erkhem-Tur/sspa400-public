@@ -13,6 +13,7 @@ urlpatterns = [
     path('api/quiz/submit/', views.submit_quiz, name='submit_quiz'),
     path('api/study/time/', views.track_study_time, name='track_study_time'),
     path('profile/', views.profile_view, name='profile'),
+    path('course/', views.course_library_view, name='course_library'),
     path('worksheets/', views.worksheets_view, name='worksheets'),
     path('departments/', views.department_view, name='departments'),
     path('videos/', views.videos_view, name='videos'),

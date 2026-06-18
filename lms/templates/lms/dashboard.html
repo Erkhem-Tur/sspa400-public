@@ -29,15 +29,15 @@
 <!-- Quick nav cards -->
 <div class="row g-3 mb-4">
   <div class="col-12 col-md-4">
-    <a href="{% url 'worksheets' %}" class="text-decoration-none">
+    <a href="{% url 'course_library' %}" class="text-decoration-none">
       <div class="card h-100 border-0 shadow-sm quick-nav-card" style="border-radius:14px;">
         <div class="card-body p-4 text-center">
           <div class="mb-3 nav-icon-wrap mx-auto d-flex align-items-center justify-content-center"
                style="width:60px;height:60px;background:#e8f4fd;border-radius:50%;">
-            <i class="bi bi-pencil-square" style="font-size:26px;color:#1b3a6b;"></i>
+            <i class="bi bi-bookshelf" style="font-size:26px;color:#1b3a6b;"></i>
           </div>
-          <h6 class="fw-bold mb-1" style="color:#1b3a6b;">Worksheets &amp; Tests</h6>
-          <p class="text-muted small mb-0">500 дасгал, шалгалт, flashcard</p>
+          <h6 class="fw-bold mb-1" style="color:#1b3a6b;">Course Library</h6>
+          <p class="text-muted small mb-0">32 lessons · A1-B1 · structured pathway</p>
         </div>
         <div class="card-footer border-0 pt-0 pb-3 text-center">
           <span class="btn btn-sm btn-outline-primary" style="border-radius:20px;font-size:12px;">Нээх &rarr;</span>
@@ -63,19 +63,15 @@
     </a>
   </div>
   <div class="col-12 col-md-4">
-    {% if lessons %}
-    <a href="{% url 'lesson' lessons.0.id %}" class="text-decoration-none">
-    {% else %}
-    <a href="#lessons" class="text-decoration-none">
-    {% endif %}
+    <a href="{% url 'worksheets' %}" class="text-decoration-none">
       <div class="card h-100 border-0 shadow-sm quick-nav-card" style="border-radius:14px;">
         <div class="card-body p-4 text-center">
           <div class="mb-3 nav-icon-wrap mx-auto d-flex align-items-center justify-content-center"
                style="width:60px;height:60px;background:#f0fdf4;border-radius:50%;">
-            <i class="bi bi-headphones" style="font-size:26px;color:#16a34a;"></i>
+            <i class="bi bi-collection" style="font-size:26px;color:#16a34a;"></i>
           </div>
-          <h6 class="fw-bold mb-1" style="color:#1b3a6b;">400 асуулт + Listening</h6>
-          <p class="text-muted small mb-0">Vocabulary, grammar, quiz</p>
+          <h6 class="fw-bold mb-1" style="color:#1b3a6b;">Practice Center</h6>
+          <p class="text-muted small mb-0">500 worksheets · tests · vocabulary · reading</p>
         </div>
         <div class="card-footer border-0 pt-0 pb-3 text-center">
           <span class="btn btn-sm btn-outline-primary" style="border-radius:20px;font-size:12px;">Эхлэх &rarr;</span>

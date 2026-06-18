@@ -95,8 +95,8 @@
 <!-- Module nav -->
 <div class="ws-nav" id="wsNav">
   <button class="wt active"     onclick="wsShow('home',this)"><i class="bi bi-house me-1"></i>Home</button>
-  <button class="wt"            onclick="wsShow('bank',this)"><i class="bi bi-collection me-1"></i>500 Worksheets</button>
-  <button class="wt"            onclick="wsShow('tests',this)"><i class="bi bi-clipboard-check me-1"></i>Test Center</button>
+  <button id="wt-bank" class="wt" onclick="wsShow('bank',this)"><i class="bi bi-collection me-1"></i>500 Worksheets</button>
+  <button id="wt-tests" class="wt" onclick="wsShow('tests',this)"><i class="bi bi-clipboard-check me-1"></i>Test Center</button>
   <button id="wt-terms"  class="wt" onclick="wsShow('terms',this)"><i class="bi bi-book me-1"></i>Vocabulary</button>
   <button id="wt-reading" class="wt" onclick="wsShow('reading',this)"><i class="bi bi-file-text me-1"></i>Reading</button>
   <button class="wt"            onclick="wsShow('teacher',this)"><i class="bi bi-person-workspace me-1"></i>Teacher Guide</button>
@@ -1250,9 +1250,14 @@ function wsTransCancel(box){
 /* ═══════════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════════ */
+const _wsParams=new URLSearchParams(location.search);
+const _wsLevel=_wsParams.get('level');
+if(['A1','A2','B1'].includes(_wsLevel))document.getElementById('wsLvlFilter').value=_wsLevel;
 wsPopGrammar();wsRenderList();wsRenderTerms();wsRenderReading();wsFcRender();wsOpen(1);wsUpdateProg();
-const _wsTab=new URLSearchParams(location.search).get('tab');
-if(_wsTab==='vocabulary'){const b=document.getElementById('wt-terms');if(b)wsShow('terms',b);}
+const _wsTab=_wsParams.get('tab');
+if(_wsTab==='worksheets'){const b=document.getElementById('wt-bank');if(b)wsShow('bank',b);}
+else if(_wsTab==='tests'){const b=document.getElementById('wt-tests');if(b)wsShow('tests',b);}
+else if(_wsTab==='vocabulary'){const b=document.getElementById('wt-terms');if(b)wsShow('terms',b);}
 else if(_wsTab==='reading'){const b=document.getElementById('wt-reading');if(b)wsShow('reading',b);}
 </script>
 {% endblock %}

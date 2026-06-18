@@ -10,6 +10,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from .models import Lesson, QuizResult, UserProgress, Department, Video, LogEntry, TlOverride, WallPost, RANK_CHOICES, PROMPT_CHOICES
+from .course_catalog import get_course_lessons
 
 
 LESSON_RESOURCE_FILES = [
@@ -77,6 +78,18 @@ def lesson_view(request, lesson_id):
 
 def worksheets_view(request):
     return render(request, 'lms/worksheets.html')
+
+
+def course_library_view(request):
+    lessons = get_course_lessons()
+    return render(request, 'lms/course_library.html', {
+        'course_lessons': lessons,
+        'alc_lesson': Lesson.objects.filter(title__icontains='ALC Book 4 Lesson 2').first(),
+        'course_counts': {
+            level: sum(lesson['level'] == level for lesson in lessons)
+            for level in ('A1', 'A2', 'B1')
+        },
+    })
 
 
 def tl_fetch(request):

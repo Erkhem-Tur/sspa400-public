@@ -1,0 +1,188 @@
+{% extends 'lms/base.html' %}
+{% load static %}
+
+{% block title %}SSPA Operational English Course Library{% endblock %}
+
+{% block extra_head %}
+<style>
+  .course-shell { max-width: 1120px; margin: 0 auto; color: #172033; }
+  .course-head { display: grid; grid-template-columns: 1fr 300px; gap: 24px; padding: 22px 24px; background: #102b4e; color: #fff; border-bottom: 4px solid #c9a227; }
+  .course-kicker { color: #f2cb58; font-size: 11px; font-weight: 900; text-transform: uppercase; }
+  .course-head h1 { font-size: 27px; margin: 5px 0 6px; letter-spacing: 0; }
+  .course-head p { margin: 0; color: #dce6f2; font-size: 14px; }
+  .course-progress-label { display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; margin-bottom: 7px; }
+  .course-progress-track { height: 9px; background: rgba(255,255,255,.18); overflow: hidden; }
+  .course-progress-fill { height: 100%; width: 0; background: #f2cb58; transition: width .2s ease; }
+  .course-progress-actions { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 12px; }
+  .course-progress-actions small { color: #dce6f2; }
+
+  .course-toolbar { display: grid; grid-template-columns: minmax(220px, 1fr) auto auto; gap: 10px; align-items: center; padding: 14px 0; border-bottom: 1px solid #dbe2ea; }
+  .course-search { position: relative; }
+  .course-search i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #748194; }
+  .course-search input { padding-left: 36px; }
+  .course-filters { display: flex; gap: 5px; }
+  .course-filter { border: 1px solid #cbd5df; background: #fff; color: #29415d; min-width: 48px; padding: 8px 10px; font-size: 12px; font-weight: 900; }
+  .course-filter.active { background: #102b4e; color: #fff; border-color: #102b4e; }
+  .course-visible-count { color: #5d6878; font-size: 12px; font-weight: 800; white-space: nowrap; }
+
+  .module-map { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid #dbe2ea; border-top: 0; }
+  .module-band { padding: 14px 16px; border-right: 1px solid #dbe2ea; background: #fff; }
+  .module-band:last-child { border-right: 0; }
+  .module-level { font-size: 11px; font-weight: 900; text-transform: uppercase; }
+  .module-band strong { display: block; color: #102b4e; font-size: 14px; margin-top: 3px; }
+  .module-band span { color: #697688; font-size: 12px; }
+  .module-a1 .module-level { color: #16794b; }
+  .module-a2 .module-level { color: #9a6500; }
+  .module-b1 .module-level { color: #a83232; }
+
+  .catalog-layout { display: grid; grid-template-columns: minmax(0, 1fr) 250px; gap: 18px; margin-top: 18px; align-items: start; }
+  .catalog-panel { border: 1px solid #dbe2ea; background: #fff; }
+  .catalog-header { display: grid; grid-template-columns: 58px 70px minmax(180px, 1.1fr) minmax(180px, 1fr) 88px; gap: 10px; align-items: center; padding: 9px 12px; background: #eef3f8; color: #5d6878; font-size: 11px; font-weight: 900; text-transform: uppercase; }
+  .course-row { border-top: 1px solid #e3e8ee; }
+  .course-row:first-of-type { border-top: 0; }
+  .course-summary { display: grid; grid-template-columns: 58px 70px minmax(180px, 1.1fr) minmax(180px, 1fr) 88px; gap: 10px; align-items: center; padding: 11px 12px; min-height: 64px; }
+  .course-summary:hover { background: #f7f9fb; }
+  .lesson-number { color: #102b4e; font-size: 14px; font-weight: 900; }
+  .level-badge { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 25px; font-size: 11px; font-weight: 900; border: 1px solid; }
+  .level-a1 { color: #0b6138; border-color: #65b58b; background: #e9f7ef; }
+  .level-a2 { color: #7a5100; border-color: #d6ad44; background: #fff8df; }
+  .level-b1 { color: #8f2929; border-color: #d88d8d; background: #fff0f0; }
+  .lesson-title { color: #102b4e; font-size: 14px; font-weight: 900; line-height: 1.3; }
+  .lesson-grammar { color: #5d6878; font-size: 12px; line-height: 1.35; }
+  .row-actions { display: flex; justify-content: flex-end; gap: 6px; }
+  .row-icon-btn { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #cbd5df; background: #fff; color: #102b4e; }
+  .row-icon-btn:hover { background: #eaf0f6; }
+  .row-check.is-done { background: #16794b; border-color: #16794b; color: #fff; }
+  .row-expand[aria-expanded="true"] i { transform: rotate(180deg); }
+  .row-expand i { transition: transform .15s; }
+
+  .course-detail { display: none; padding: 0 12px 14px 150px; background: #f7f9fb; }
+  .course-detail.open { display: block; }
+  .detail-grid { display: grid; grid-template-columns: 1.25fr 1fr; gap: 16px; border-top: 1px solid #dbe2ea; padding-top: 14px; }
+  .detail-label { color: #9a6500; font-size: 10px; font-weight: 900; text-transform: uppercase; margin-bottom: 4px; }
+  .detail-copy { color: #354256; font-size: 13px; line-height: 1.55; margin-bottom: 12px; }
+  .vocab-list { display: flex; flex-wrap: wrap; gap: 5px; }
+  .vocab-chip { border: 1px solid #cbd5df; background: #fff; color: #29415d; padding: 4px 7px; font-size: 11px; font-weight: 700; }
+  .detail-links { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+
+  .course-aside { position: sticky; top: 74px; border: 1px solid #dbe2ea; background: #fff; }
+  .aside-heading { padding: 11px 13px; background: #102b4e; color: #fff; font-size: 13px; font-weight: 900; }
+  .aside-link { display: grid; grid-template-columns: 34px 1fr auto; gap: 9px; align-items: center; padding: 11px 12px; color: #29415d; text-decoration: none; border-bottom: 1px solid #e3e8ee; }
+  .aside-link:last-child { border-bottom: 0; }
+  .aside-link:hover { background: #f7f9fb; color: #102b4e; }
+  .aside-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: #eef3f8; color: #102b4e; }
+  .aside-link strong { display: block; font-size: 12px; }
+  .aside-link span { display: block; color: #748194; font-size: 10px; margin-top: 1px; }
+  .empty-state { display: none; padding: 36px 18px; text-align: center; color: #5d6878; }
+
+  @media (max-width: 900px) {
+    .course-head, .catalog-layout { grid-template-columns: 1fr; }
+    .course-aside { position: static; }
+    .course-toolbar { grid-template-columns: 1fr auto; }
+    .course-visible-count { grid-column: 1 / -1; }
+  }
+  @media (max-width: 700px) {
+    .module-map { grid-template-columns: 1fr; }
+    .module-band { border-right: 0; border-bottom: 1px solid #dbe2ea; }
+    .module-band:last-child { border-bottom: 0; }
+    .catalog-header { display: none; }
+    .course-summary { grid-template-columns: 44px 48px minmax(0, 1fr) 76px; }
+    .lesson-grammar { grid-column: 3 / -1; }
+    .course-detail { padding: 0 12px 14px; }
+    .detail-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    .course-head { padding: 18px 15px; }
+    .course-head h1 { font-size: 23px; }
+    .course-toolbar { grid-template-columns: 1fr; }
+    .course-filters { overflow-x: auto; }
+    .course-summary { grid-template-columns: 38px 44px minmax(0, 1fr); }
+    .row-actions { grid-column: 3; justify-content: flex-start; }
+    .lesson-grammar { grid-column: 3; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="course-shell" id="courseLibrary">
+  <header class="course-head">
+    <div>
+      <div class="course-kicker">SSPA Operational English · CEFR A1-B1</div>
+      <h1>Course Library</h1>
+      <p>32 operational lessons organized by level, scenario, grammar, vocabulary, role-play, and writing task.</p>
+    </div>
+    <div>
+      <div class="course-progress-label"><span>Course progress</span><span id="courseProgressText">0 / 32</span></div>
+      <div class="course-progress-track" role="progressbar" aria-label="Course progress" aria-valuemin="0" aria-valuemax="32" aria-valuenow="0"><div class="course-progress-fill" id="courseProgressFill"></div></div>
+      <div class="course-progress-actions"><small id="courseProgressNote">Lesson 1 is next.</small><button class="btn btn-sm btn-warning" type="button" id="continueCourse">Continue</button></div>
+    </div>
+  </header>
+
+  <div class="course-toolbar">
+    <label class="course-search" for="courseSearch"><i class="bi bi-search"></i><input class="form-control" id="courseSearch" type="search" placeholder="Search badge, radio, report, grammar..."></label>
+    <div class="course-filters" aria-label="Course level">
+      <button type="button" class="course-filter active" data-level="all">All</button>
+      <button type="button" class="course-filter" data-level="A1">A1</button>
+      <button type="button" class="course-filter" data-level="A2">A2</button>
+      <button type="button" class="course-filter" data-level="B1">B1</button>
+    </div>
+    <div class="course-visible-count" id="courseVisibleCount">32 lessons</div>
+  </div>
+
+  <div class="module-map">
+    <div class="module-band module-a1"><div class="module-level">A1 · {{ course_counts.A1 }} lessons</div><strong>Foundations of Duty English</strong><span>Identity, post, equipment, badges, time, and simple reports</span></div>
+    <div class="module-band module-a2"><div class="module-level">A2 · {{ course_counts.A2 }} lessons</div><strong>Access Control & Communication</strong><span>Visitors, radio, emergencies, VIP arrival, media, and reports</span></div>
+    <div class="module-band module-b1"><div class="module-level">B1 · {{ course_counts.B1 }} lessons</div><strong>Professional High-Stakes English</strong><span>Policy, de-escalation, briefings, diplomacy, and formal reporting</span></div>
+  </div>
+
+  <div class="catalog-layout">
+    <section class="catalog-panel" aria-label="Course lessons">
+      <div class="catalog-header"><span>Lesson</span><span>Level</span><span>Topic</span><span>Grammar focus</span><span>Actions</span></div>
+      <div id="courseRows">
+        {% for lesson in course_lessons %}
+        <article class="course-row" id="course-lesson-{{ lesson.number }}" data-number="{{ lesson.number }}" data-level="{{ lesson.level }}" data-search="{{ lesson.title|lower }} {{ lesson.grammar|lower }} {{ lesson.scenario|lower }} {{ lesson.vocabulary|join:' '|lower }}">
+          <div class="course-summary">
+            <div class="lesson-number">{{ lesson.number|stringformat:'02d' }}</div>
+            <div><span class="level-badge level-{{ lesson.level|lower }}">{{ lesson.level }}</span></div>
+            <div class="lesson-title">{{ lesson.title }}</div>
+            <div class="lesson-grammar">{{ lesson.grammar }}</div>
+            <div class="row-actions">
+              <button type="button" class="row-icon-btn row-check" data-complete-lesson="{{ lesson.number }}" title="Mark lesson complete" aria-label="Mark lesson {{ lesson.number }} complete"><i class="bi bi-check2"></i></button>
+              <button type="button" class="row-icon-btn row-expand" data-expand-lesson="{{ lesson.number }}" title="Open lesson details" aria-label="Open lesson {{ lesson.number }} details" aria-expanded="false"><i class="bi bi-chevron-down"></i></button>
+            </div>
+          </div>
+          <div class="course-detail" id="course-detail-{{ lesson.number }}">
+            <div class="detail-grid">
+              <div>
+                <div class="detail-label">Operational scenario</div><div class="detail-copy">{{ lesson.scenario }}</div>
+                <div class="detail-label">Vocabulary</div><div class="vocab-list">{% for word in lesson.vocabulary %}<span class="vocab-chip">{{ word }}</span>{% endfor %}</div>
+              </div>
+              <div>
+                <div class="detail-label">Role-play</div><div class="detail-copy">{{ lesson.role_play }}</div>
+                <div class="detail-label">Writing task</div><div class="detail-copy">{{ lesson.writing }}</div>
+              </div>
+            </div>
+            <div class="detail-links">
+              <a class="btn btn-sm btn-primary" href="{% url 'worksheets' %}?tab=worksheets&amp;level={{ lesson.level }}"><i class="bi bi-pencil-square me-1"></i>{{ lesson.level }} worksheets</a>
+              <a class="btn btn-sm btn-outline-secondary" href="{% url 'worksheets' %}?tab=tests"><i class="bi bi-clipboard-check me-1"></i>Test Center</a>
+            </div>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+      <div class="empty-state" id="courseEmpty"><i class="bi bi-search fs-4 d-block mb-2"></i>No matching lessons.</div>
+    </section>
+
+    <aside class="course-aside" aria-label="Practice resources">
+      <div class="aside-heading">Practice Center</div>
+      <a class="aside-link" href="{% url 'worksheets' %}?tab=worksheets"><span class="aside-icon"><i class="bi bi-collection"></i></span><span><strong>500 Worksheets</strong><span>A1-B1 scenario practice</span></span><i class="bi bi-chevron-right"></i></a>
+      <a class="aside-link" href="{% url 'worksheets' %}?tab=tests"><span class="aside-icon"><i class="bi bi-clipboard-check"></i></span><span><strong>Test Center</strong><span>Placement and level tests</span></span><i class="bi bi-chevron-right"></i></a>
+      <a class="aside-link" href="{% url 'worksheets' %}?tab=vocabulary"><span class="aside-icon"><i class="bi bi-book"></i></span><span><strong>Vocabulary</strong><span>Bilingual duty terms</span></span><i class="bi bi-chevron-right"></i></a>
+      <a class="aside-link" href="{% url 'worksheets' %}?tab=reading"><span class="aside-icon"><i class="bi bi-file-text"></i></span><span><strong>Reading</strong><span>Operational scenarios</span></span><i class="bi bi-chevron-right"></i></a>
+      {% if alc_lesson %}<a class="aside-link" href="{% url 'lesson' alc_lesson.id %}"><span class="aside-icon"><i class="bi bi-clock-history"></i></span><span><strong>ALC Book 4 Lesson 2</strong><span>Interactive past tense lesson</span></span><i class="bi bi-chevron-right"></i></a>{% endif %}
+    </aside>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}<script src="{% static 'lms/course_library.js' %}"></script>{% endblock %}

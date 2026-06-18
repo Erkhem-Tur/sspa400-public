@@ -224,12 +224,19 @@
 <!-- SIDEBAR -->
 <aside class="app-sidebar" id="sidebar">
   <nav class="sidebar-nav">
-    <div class="sidebar-title">Үндсэн цэс</div>
+    <div class="sidebar-title">Course</div>
     <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
       <i class="bi bi-house-door"></i> Нүүр хуудас
     </a>
+    <a href="{% url 'course_library' %}" class="{% if request.resolver_match.url_name == 'course_library' %}active{% endif %}">
+      <i class="bi bi-bookshelf"></i> Course Library
+    </a>
+    <div class="sidebar-title">Practice</div>
     <a href="{% url 'worksheets' %}" class="{% if request.resolver_match.url_name == 'worksheets' and not request.GET.tab %}active{% endif %}">
-      <i class="bi bi-journal-text"></i> Worksheets &amp; Tests
+      <i class="bi bi-journal-text"></i> Practice Center
+    </a>
+    <a href="{% url 'worksheets' %}?tab=tests" class="{% if request.resolver_match.url_name == 'worksheets' and request.GET.tab == 'tests' %}active{% endif %}">
+      <i class="bi bi-clipboard-check"></i> Test Center
     </a>
     <a href="{% url 'worksheets' %}?tab=vocabulary" class="{% if request.resolver_match.url_name == 'worksheets' and request.GET.tab == 'vocabulary' %}active{% endif %}">
       <i class="bi bi-book"></i> Vocabulary
@@ -237,6 +244,7 @@
     <a href="{% url 'worksheets' %}?tab=reading" class="{% if request.resolver_match.url_name == 'worksheets' and request.GET.tab == 'reading' %}active{% endif %}">
       <i class="bi bi-file-text"></i> Reading
     </a>
+    <div class="sidebar-title">Media &amp; Records</div>
     <a href="{% url 'videos' %}" class="{% if request.resolver_match.url_name == 'videos' %}active{% endif %}">
       <i class="bi bi-play-circle"></i> Видео хичээлүүд
     </a>

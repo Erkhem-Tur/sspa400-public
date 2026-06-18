@@ -15,11 +15,15 @@ Topics covered
 - Database-level unique_together constraint
 """
 
+from datetime import timedelta
+
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.test import TestCase
+from django.utils import timezone
 
 from lms.admin import extract_youtube_id
+from lms.course_catalog import get_course_lessons
 from lms.models import (
     Department, Lesson, LogEntry, QuizResult,
     TlOverride, UserProgress, Video, WallPost,
@@ -59,6 +63,21 @@ class LessonModelTest(TestCase):
             .values_list("title", flat=True)
         )
         self.assertEqual(titles, ["A", "B"])
+
+
+class CourseCatalogTest(TestCase):
+    def test_catalog_has_32_numbered_lessons(self):
+        lessons = get_course_lessons()
+        self.assertEqual(len(lessons), 32)
+        self.assertEqual([lesson["number"] for lesson in lessons], list(range(1, 33)))
+
+    def test_catalog_level_counts(self):
+        lessons = get_course_lessons()
+        counts = {
+            level: sum(lesson["level"] == level for lesson in lessons)
+            for level in ("A1", "A2", "B1")
+        }
+        self.assertEqual(counts, {"A1": 8, "A2": 12, "B1": 12})
 
 
 # ── QuizResult ────────────────────────────────────────────────────────────────
@@ -292,6 +311,9 @@ class QuizResultOrderingTest(TestCase):
         r2 = QuizResult.objects.create(
             user=self.user, lesson=self.lesson, batch_index=1, score=8, total=10
         )
+        QuizResult.objects.filter(pk=r1.pk).update(
+            taken_at=timezone.now() - timedelta(seconds=1)
+        )
         results = list(QuizResult.objects.all())
         # r2 was created after r1 so it should appear first
         self.assertEqual(results[0].pk, r2.pk)
@@ -314,6 +336,9 @@ class WallPostOrderingTest(TestCase):
     def test_newest_post_first(self):
         p1 = WallPost.objects.create(author_name="A", prompt="learned", content="first")
         p2 = WallPost.objects.create(author_name="B", prompt="learned", content="second")
+        WallPost.objects.filter(pk=p1.pk).update(
+            created_at=timezone.now() - timedelta(seconds=1)
+        )
         posts = list(WallPost.objects.filter(pk__in=[p1.pk, p2.pk]))
         self.assertEqual(posts[0].pk, p2.pk)
 

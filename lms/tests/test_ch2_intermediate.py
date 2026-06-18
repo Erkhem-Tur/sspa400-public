@@ -117,6 +117,22 @@ class PublicViewsTest(TestCase):
     def test_worksheets_returns_200(self):
         self.assertEqual(self.client.get(reverse("worksheets")).status_code, 200)
 
+    def test_course_library_is_structured_and_complete(self):
+        response = self.client.get(reverse("course_library"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "lms/course_library.html")
+        self.assertEqual(len(response.context["course_lessons"]), 32)
+        self.assertEqual(response.context["course_counts"], {"A1": 8, "A2": 12, "B1": 12})
+        self.assertContains(response, 'id="courseRows"')
+        self.assertContains(response, 'data-number="32"')
+        self.assertContains(response, "500 Worksheets")
+
+    def test_dashboard_links_to_course_and_practice_centers(self):
+        response = self.client.get(reverse("dashboard"))
+        self.assertContains(response, reverse("course_library"))
+        self.assertContains(response, "Course Library")
+        self.assertContains(response, "Practice Center")
+
     def test_videos_view_returns_200(self):
         self.assertEqual(self.client.get(reverse("videos")).status_code, 200)
 

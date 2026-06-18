@@ -12,6 +12,38 @@ from django.views.decorators.http import require_POST
 from .models import Lesson, QuizResult, UserProgress, Department, Video, LogEntry, TlOverride, WallPost, RANK_CHOICES, PROMPT_CHOICES
 
 
+LESSON_RESOURCE_FILES = [
+    (
+        ('COP17', 'SSPA_COP17_A1_English_Resource_Pack.docx'),
+        [
+            {
+                'path': 'lms/resources/SSPA_COP17_A1_English_Resource_Pack.docx',
+                'title': 'Download classroom pack',
+                'description': 'Editable Word document for printing and trainer preparation.',
+                'button': 'Download DOCX',
+            },
+        ],
+    ),
+    (
+        ('ALC Book 4 Lesson 2', 'SSPA_ALC_Book4_Lesson2_A1_Support_Pack.docx'),
+        [
+            {
+                'path': 'lms/resources/SSPA_ALC_Book4_Lesson2_A1_Support_Pack.docx',
+                'title': 'Download A1 support pack',
+                'description': 'Editable lesson plan, worksheets, role-play cards, homework, and answer key.',
+                'button': 'Download DOCX',
+            },
+            {
+                'path': 'lms/resources/ALC_Book4_Lesson2.pdf',
+                'title': 'Open ALC Book 4 Lesson 2',
+                'description': 'The 27-page source lesson supplied for this course.',
+                'button': 'Open PDF',
+            },
+        ],
+    ),
+]
+
+
 # ── Public views (no login required) ────────────────────────────────────────
 
 def dashboard_view(request):
@@ -26,16 +58,16 @@ def lesson_view(request, lesson_id):
     if lesson.pk == 1:
         return render(request, 'lms/index.html', {'lesson': lesson})
 
-    resource_file = ''
-    if (
-        'COP17' in lesson.title
-        or 'SSPA_COP17_A1_English_Resource_Pack.docx' in lesson.description
-    ):
-        resource_file = 'lms/resources/SSPA_COP17_A1_English_Resource_Pack.docx'
+    resource_files = []
+    lesson_text = f'{lesson.title}\n{lesson.description}'
+    for markers, files in LESSON_RESOURCE_FILES:
+        if any(marker in lesson_text for marker in markers):
+            resource_files = files
+            break
 
     return render(request, 'lms/lesson_detail.html', {
         'lesson': lesson,
-        'resource_file': resource_file,
+        'resource_files': resource_files,
     })
 
 

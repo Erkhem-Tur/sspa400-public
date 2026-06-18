@@ -33,7 +33,7 @@ from lms.models import Department, Lesson, LogEntry, TlOverride, Video, WallPost
 
 class PublicViewsTest(TestCase):
     def setUp(self):
-        self.lesson = Lesson.objects.create(title="Test Lesson", order=1)
+        self.lesson = Lesson.objects.create(id=1, title="Test Lesson", order=1)
 
     def test_dashboard_returns_200(self):
         response = self.client.get(reverse("dashboard"))
@@ -77,6 +77,26 @@ class PublicViewsTest(TestCase):
         self.assertContains(response, "Teacher guide")
         self.assertContains(response, "Learner handouts")
         self.assertNotContains(response, "400 Questions")
+
+    def test_alc_support_lesson_links_docx_and_pdf(self):
+        lesson = Lesson.objects.create(
+            title="ALC Book 4 Lesson 2 Support English - SSPA Protection Officers",
+            description="SSPA_ALC_Book4_Lesson2_A1_Support_Pack.docx",
+            order=3,
+        )
+        response = self.client.get(reverse("lesson", args=[lesson.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "lms/lesson_detail.html")
+        self.assertContains(response, "ALC Book 4 Lesson 2")
+        self.assertContains(response, "SSPA_ALC_Book4_Lesson2_A1_Support_Pack.docx")
+        self.assertEqual(
+            [resource["path"] for resource in response.context["resource_files"]],
+            [
+                "lms/resources/SSPA_ALC_Book4_Lesson2_A1_Support_Pack.docx",
+                "lms/resources/ALC_Book4_Lesson2.pdf",
+            ],
+        )
+        self.assertContains(response, "Open PDF")
 
     def test_lesson_view_returns_404_for_missing_id(self):
         response = self.client.get(reverse("lesson", args=[99999]))

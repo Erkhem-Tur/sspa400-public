@@ -54,7 +54,10 @@ class LessonModelTest(TestCase):
     def test_ordering_by_order_field(self):
         Lesson.objects.create(title="B", order=2)
         Lesson.objects.create(title="A", order=1)
-        titles = list(Lesson.objects.values_list("title", flat=True))
+        titles = list(
+            Lesson.objects.filter(title__in=["A", "B"])
+            .values_list("title", flat=True)
+        )
         self.assertEqual(titles, ["A", "B"])
 
 

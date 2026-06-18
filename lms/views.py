@@ -65,7 +65,11 @@ def lesson_view(request, lesson_id):
             resource_files = files
             break
 
-    return render(request, 'lms/lesson_detail.html', {
+    template_name = 'lms/lesson_detail.html'
+    if 'ALC Book 4 Lesson 2' in lesson_text:
+        template_name = 'lms/alc_lesson2.html'
+
+    return render(request, template_name, {
         'lesson': lesson,
         'resource_files': resource_files,
     })

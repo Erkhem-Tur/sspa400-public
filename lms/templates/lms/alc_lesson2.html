@@ -1,0 +1,315 @@
+{% extends 'lms/base.html' %}
+{% load static %}
+
+{% block title %}ALC Book 4 Lesson 2 - Interactive English{% endblock %}
+{% block og_title %}ALC Book 4 Lesson 2 - Interactive English{% endblock %}
+{% block og_description %}Interactive A1 vocabulary, past tense, military time, reading, quiz, and homework for SSPA protection officers.{% endblock %}
+
+{% block extra_head %}
+<style>
+  .alc-shell { max-width: 1040px; margin: 0 auto; color: #172033; }
+  .alc-course-head { background: #102b4e; color: #fff; padding: 24px; border-bottom: 4px solid #c9a227; }
+  .alc-course-grid { display: grid; grid-template-columns: 1fr 270px; gap: 24px; align-items: end; }
+  .alc-eyebrow { color: #f2cb58; font-size: 12px; font-weight: 800; text-transform: uppercase; }
+  .alc-course-head h1 { font-size: 30px; line-height: 1.2; margin: 8px 0; letter-spacing: 0; }
+  .alc-course-head p { margin: 0; color: #dce6f2; max-width: 680px; }
+  .alc-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .alc-meta span { border: 1px solid rgba(255,255,255,.28); padding: 5px 9px; font-size: 12px; font-weight: 700; }
+  .alc-progress-label { display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; margin-bottom: 8px; }
+  .alc-progress-track { height: 10px; background: rgba(255,255,255,.18); overflow: hidden; }
+  .alc-progress-fill { height: 100%; width: 0; background: #f2cb58; transition: width .25s ease; }
+  .alc-progress-note { color: #dce6f2; font-size: 12px; margin-top: 8px; }
+
+  .alc-nav { position: sticky; top: 56px; z-index: 20; display: flex; overflow-x: auto; background: #fff; border: 1px solid #dbe2ea; border-top: 0; scrollbar-width: thin; }
+  .alc-nav a { color: #29415d; text-decoration: none; font-size: 12px; font-weight: 800; padding: 12px 14px; white-space: nowrap; border-bottom: 3px solid transparent; }
+  .alc-nav a:hover, .alc-nav a:focus { color: #102b4e; border-bottom-color: #c9a227; }
+
+  .lesson-stage { padding: 30px 4px; border-bottom: 1px solid #dbe2ea; scroll-margin-top: 116px; }
+  .stage-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+  .stage-kicker { color: #a47700; font-size: 11px; font-weight: 900; text-transform: uppercase; }
+  .stage-head h2 { color: #102b4e; font-size: 23px; margin: 4px 0; letter-spacing: 0; }
+  .stage-head p { color: #5d6878; margin: 0; max-width: 720px; }
+  .stage-time { flex: 0 0 auto; background: #eef3f8; color: #29415d; padding: 6px 9px; font-size: 12px; font-weight: 800; }
+  .stage-actions { display: flex; justify-content: flex-end; margin-top: 18px; }
+  .complete-btn.is-complete { background: #16794b; border-color: #16794b; color: #fff; }
+
+  .segment-control { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .segment-control button { border: 1px solid #cbd5df; background: #fff; color: #29415d; padding: 8px 12px; font-size: 13px; font-weight: 800; }
+  .segment-control button.active { background: #102b4e; color: #fff; border-color: #102b4e; }
+  .vocab-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .word-card { min-height: 148px; border: 1px solid #d4dce5; background: #fff; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; }
+  .word-card.learned { border-color: #16794b; box-shadow: inset 0 0 0 1px #16794b; }
+  .word-kind { color: #a47700; font-size: 10px; font-weight: 900; text-transform: uppercase; }
+  .word-en { color: #102b4e; font-size: 17px; font-weight: 900; margin-top: 6px; }
+  .word-mn { color: #5d6878; font-size: 13px; margin-top: 4px; }
+  .word-actions { display: flex; justify-content: space-between; margin-top: 12px; }
+  .icon-btn { width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #cbd5df; background: #f7f9fb; color: #102b4e; font-size: 16px; }
+  .icon-btn:hover { background: #e9eff5; }
+  .learn-toggle.active { background: #16794b; border-color: #16794b; color: #fff; }
+  .learned-count { color: #5d6878; font-size: 13px; font-weight: 700; margin-top: 10px; }
+
+  .practice-panel { border: 1px solid #d4dce5; background: #fff; padding: 20px; min-height: 230px; }
+  .practice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .practice-label { color: #5d6878; font-size: 12px; font-weight: 800; text-transform: uppercase; }
+  .practice-word { color: #102b4e; font-size: 30px; font-weight: 900; margin: 10px 0 16px; min-height: 46px; }
+  .answer-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .answer-btn { min-width: 92px; border: 1px solid #bfcad6; background: #f7f9fb; color: #172033; padding: 10px 13px; font-weight: 800; }
+  .answer-btn.correct { background: #e9f7ef; border-color: #16794b; color: #0b5a35; }
+  .answer-btn.wrong { background: #fff0f0; border-color: #c83232; color: #9d2020; }
+  .feedback { min-height: 48px; margin-top: 14px; padding: 10px 12px; background: #eef3f8; color: #29415d; font-size: 14px; }
+  .feedback.ok { background: #e9f7ef; color: #0b5a35; }
+  .feedback.no { background: #fff0f0; color: #9d2020; }
+  .mini-rule { border-left: 4px solid #c9a227; background: #fff8df; padding: 13px 15px; margin-bottom: 14px; }
+  .mini-rule strong { color: #102b4e; }
+
+  .verb-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .verb-table th { background: #102b4e; color: #fff; text-align: left; padding: 9px 10px; }
+  .verb-table td { border-bottom: 1px solid #dbe2ea; padding: 8px 10px; }
+  .verb-table td:nth-child(2) { color: #9a6500; font-weight: 900; }
+  .form-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 12px; }
+  .form-row .form-control { min-width: 0; }
+
+  .time-display { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid #d4dce5; min-height: 132px; margin-bottom: 14px; }
+  .time-face { background: #102b4e; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 900; letter-spacing: 0; }
+  .time-prompt { display: flex; flex-direction: column; justify-content: center; padding: 18px; }
+  .time-prompt strong { color: #102b4e; font-size: 19px; }
+  .time-prompt span { color: #5d6878; font-size: 13px; }
+
+  .reading-block { border-left: 4px solid #102b4e; background: #eef3f8; padding: 18px; line-height: 1.75; }
+  .reading-tools { display: flex; justify-content: space-between; gap: 10px; align-items: center; margin-bottom: 10px; }
+  .reading-tools h3 { margin: 0; color: #102b4e; font-size: 18px; }
+  .tf-list { display: grid; gap: 9px; margin-top: 14px; }
+  .tf-item { border: 1px solid #d4dce5; background: #fff; padding: 12px; display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; }
+  .tf-options { display: flex; gap: 6px; }
+  .tf-options button { width: 40px; height: 36px; border: 1px solid #bfcad6; background: #f7f9fb; font-weight: 900; }
+
+  .quiz-shell { border: 1px solid #d4dce5; background: #fff; padding: 20px; }
+  .quiz-top { display: flex; justify-content: space-between; color: #5d6878; font-size: 13px; font-weight: 800; }
+  .quiz-question { color: #102b4e; font-size: 20px; font-weight: 900; margin: 18px 0 12px; min-height: 55px; }
+  .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .quiz-option { border: 1px solid #cbd5df; background: #f7f9fb; color: #172033; padding: 12px; text-align: left; font-weight: 700; }
+  .quiz-option.correct { background: #e9f7ef; border-color: #16794b; color: #0b5a35; }
+  .quiz-option.wrong { background: #fff0f0; border-color: #c83232; color: #9d2020; }
+  .quiz-result { text-align: center; padding: 20px 8px; }
+  .quiz-score { color: #102b4e; font-size: 46px; font-weight: 900; }
+
+  .homework-list { display: grid; gap: 8px; }
+  .timeline-row { display: grid; grid-template-columns: 130px 1fr; gap: 8px; }
+  .save-status { min-height: 24px; color: #16794b; font-size: 13px; font-weight: 800; margin-top: 8px; }
+  .resources-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .resource-link { display: inline-flex; align-items: center; gap: 7px; border: 1px solid #bfcad6; color: #102b4e; padding: 9px 12px; text-decoration: none; font-weight: 800; font-size: 13px; }
+  .resource-link:hover { background: #eef3f8; color: #102b4e; }
+
+  @media (max-width: 900px) {
+    .alc-course-grid, .practice-grid { grid-template-columns: 1fr; }
+    .vocab-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (max-width: 650px) {
+    .alc-course-head { padding: 20px 16px; }
+    .alc-course-head h1 { font-size: 24px; }
+    .alc-nav { top: 56px; }
+    .lesson-stage { padding: 25px 0; }
+    .stage-head { display: block; }
+    .stage-time { display: inline-block; margin-top: 9px; }
+    .vocab-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .quiz-options, .time-display { grid-template-columns: 1fr; }
+    .time-face { min-height: 96px; }
+    .timeline-row { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 390px) {
+    .vocab-grid { grid-template-columns: 1fr; }
+    .tf-item { grid-template-columns: 1fr; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="alc-shell" id="alcLesson" data-lesson-id="{{ lesson.id }}">
+  <section class="alc-course-head" aria-labelledby="lessonTitle">
+    <div class="alc-course-grid">
+      <div>
+        <div class="alc-eyebrow">ALC Book 4 · Lesson 2 · CEFR A1</div>
+        <h1 id="lessonTitle">He's in the Army now</h1>
+        <p>Military personnel, rank and duty vocabulary, past tense, military time, and a career timeline for SSPA protection officers.</p>
+        <div class="alc-meta">
+          <span>90 minutes</span><span>6 stages</span><span>10-question quiz</span><span>Homework included</span>
+        </div>
+      </div>
+      <div>
+        <div class="alc-progress-label"><span>Lesson progress</span><span id="progressText">0 / 6</span></div>
+        <div class="alc-progress-track" role="progressbar" aria-label="Lesson progress" aria-valuemin="0" aria-valuemax="6" aria-valuenow="0">
+          <div class="alc-progress-fill" id="progressFill"></div>
+        </div>
+        <div class="alc-progress-note" id="progressNote">Start with military vocabulary.</div>
+      </div>
+    </div>
+  </section>
+
+  <nav class="alc-nav" aria-label="Lesson sections">
+    <a href="#vocabulary">Vocabulary</a>
+    <a href="#pronunciation">Pronunciation</a>
+    <a href="#grammar">Grammar</a>
+    <a href="#time">Military time</a>
+    <a href="#reading">Reading</a>
+    <a href="#quiz">Final quiz</a>
+    <a href="#homework">Homework</a>
+  </nav>
+
+  <section class="lesson-stage" id="vocabulary" data-stage="vocabulary">
+    <div class="stage-head">
+      <div><div class="stage-kicker">Stage 1</div><h2>Military vocabulary</h2><p>People, workplaces, uniform items, duty language, and officer ranks.</p></div>
+      <span class="stage-time">20 min</span>
+    </div>
+    <div class="segment-control" id="vocabFilters" aria-label="Vocabulary groups">
+      <button type="button" class="active" data-filter="all">All words</button>
+      <button type="button" data-filter="people">People &amp; places</button>
+      <button type="button" data-filter="duty">Uniform &amp; duty</button>
+      <button type="button" data-filter="rank">Ranks</button>
+    </div>
+    <div class="vocab-grid" id="vocabGrid"></div>
+    <div class="learned-count" id="learnedCount">0 words learned</div>
+    <div class="stage-actions"><button type="button" class="btn btn-outline-success complete-btn" data-complete="vocabulary"><i class="bi bi-check2-circle me-1"></i> Mark stage complete</button></div>
+  </section>
+
+  <section class="lesson-stage" id="pronunciation" data-stage="pronunciation">
+    <div class="stage-head">
+      <div><div class="stage-kicker">Stage 2</div><h2>Regular past tense sounds</h2><p>Sort each past-tense verb by its final sound.</p></div>
+      <span class="stage-time">10 min</span>
+    </div>
+    <div class="mini-rule"><strong>/t/</strong> watched · <strong>/d/</strong> cleaned · <strong>/id/</strong> wanted</div>
+    <div class="practice-panel">
+      <div class="practice-label">Choose the final sound</div>
+      <div class="d-flex align-items-center gap-2">
+        <div class="practice-word flex-grow-1" id="pronWord">checked</div>
+        <button type="button" class="icon-btn" id="pronListen" title="Listen to the word" aria-label="Listen to the word"><i class="bi bi-volume-up"></i></button>
+      </div>
+      <div class="answer-row" id="pronAnswers">
+        <button type="button" class="answer-btn" data-sound="t">/t/</button>
+        <button type="button" class="answer-btn" data-sound="d">/d/</button>
+        <button type="button" class="answer-btn" data-sound="id">/id/</button>
+      </div>
+      <div class="feedback" id="pronFeedback" aria-live="polite">Score: 0 / 0</div>
+    </div>
+    <div class="stage-actions"><button type="button" class="btn btn-outline-success complete-btn" data-complete="pronunciation"><i class="bi bi-check2-circle me-1"></i> Mark stage complete</button></div>
+  </section>
+
+  <section class="lesson-stage" id="grammar" data-stage="grammar">
+    <div class="stage-head">
+      <div><div class="stage-kicker">Stage 3</div><h2>Past tense and questions</h2><p>Practise irregular verbs and make questions with <strong>did + base verb</strong>.</p></div>
+      <span class="stage-time">20 min</span>
+    </div>
+    <div class="practice-grid">
+      <div>
+        <div class="mini-rule"><strong>Statement:</strong> She went to class.<br><strong>Question:</strong> Did she go to class?</div>
+        <div class="practice-panel">
+          <div class="practice-label">Irregular verb drill</div>
+          <div class="practice-word" id="verbPrompt">go → ?</div>
+          <div class="answer-row" id="verbAnswers"></div>
+          <div class="feedback" id="verbFeedback" aria-live="polite">Choose the past form.</div>
+        </div>
+      </div>
+      <div>
+        <table class="verb-table" aria-label="Irregular verb reference">
+          <thead><tr><th>Base verb</th><th>Past</th><th>Монгол</th></tr></thead>
+          <tbody>
+            <tr><td>begin</td><td>began</td><td>эхлэх</td></tr><tr><td>bring</td><td>brought</td><td>авчрах</td></tr>
+            <tr><td>come</td><td>came</td><td>ирэх</td></tr><tr><td>drive</td><td>drove</td><td>жолоодох</td></tr>
+            <tr><td>get up</td><td>got up</td><td>босох</td></tr><tr><td>go</td><td>went</td><td>явах</td></tr>
+            <tr><td>leave</td><td>left</td><td>явах / орхих</td></tr><tr><td>report</td><td>reported</td><td>илтгэх</td></tr>
+            <tr><td>see</td><td>saw</td><td>харах</td></tr><tr><td>take</td><td>took</td><td>авах</td></tr>
+            <tr><td>write</td><td>wrote</td><td>бичих</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="practice-panel mt-3">
+      <div class="practice-label">Write the question</div>
+      <div class="practice-word" id="questionStatement">She went to training.</div>
+      <div class="text-muted small" id="questionAnswer">Answer: Yes, she went to training.</div>
+      <div class="form-row">
+        <input class="form-control" id="questionInput" autocomplete="off" aria-label="Write a past tense question">
+        <button type="button" class="btn btn-primary" id="checkQuestion">Check answer</button>
+      </div>
+      <div class="feedback" id="questionFeedback" aria-live="polite">Use: Did + subject + base verb?</div>
+    </div>
+    <div class="stage-actions"><button type="button" class="btn btn-outline-success complete-btn" data-complete="grammar"><i class="bi bi-check2-circle me-1"></i> Mark stage complete</button></div>
+  </section>
+
+  <section class="lesson-stage" id="time" data-stage="time">
+    <div class="stage-head">
+      <div><div class="stage-kicker">Stage 4</div><h2>Military time</h2><p>Convert between civilian time and the 24-hour clock.</p></div>
+      <span class="stage-time">10 min</span>
+    </div>
+    <div class="time-display">
+      <div class="time-face" id="timeFace">0730</div>
+      <div class="time-prompt"><span id="timeDirection">Military time</span><strong id="timeQuestion">What is the civilian time?</strong></div>
+    </div>
+    <div class="answer-row" id="timeAnswers"></div>
+    <div class="feedback" id="timeFeedback" aria-live="polite">Choose one answer.</div>
+    <div class="stage-actions"><button type="button" class="btn btn-outline-success complete-btn" data-complete="time"><i class="bi bi-check2-circle me-1"></i> Mark stage complete</button></div>
+  </section>
+
+  <section class="lesson-stage" id="reading" data-stage="reading">
+    <div class="stage-head">
+      <div><div class="stage-kicker">Stage 5</div><h2>Reading and timeline</h2><p>Read an original SSPA duty timeline and check the details.</p></div>
+      <span class="stage-time">15 min</span>
+    </div>
+    <div class="reading-block" id="readingText">
+      <div class="reading-tools"><h3>Captain Naran's duty day</h3><button type="button" class="icon-btn" id="readingListen" title="Listen to the reading" aria-label="Listen to the reading"><i class="bi bi-volume-up"></i></button></div>
+      <p>Captain Naran joined the academy in 2018. She completed protection training in 2019 and began work at an SSPA post in 2020. Yesterday, she reported for duty at 0730. She checked her uniform and ID card. At 1200, she took a short break. She left the post at 1630.</p>
+    </div>
+    <div class="tf-list" id="readingQuestions"></div>
+    <div class="feedback" id="readingFeedback" aria-live="polite">Reading score: 0 / 0</div>
+    <div class="stage-actions"><button type="button" class="btn btn-outline-success complete-btn" data-complete="reading"><i class="bi bi-check2-circle me-1"></i> Mark stage complete</button></div>
+  </section>
+
+  <section class="lesson-stage" id="quiz" data-stage="quiz">
+    <div class="stage-head">
+      <div><div class="stage-kicker">Stage 6</div><h2>Final quiz</h2><p>Ten questions from vocabulary, grammar, pronunciation, and military time.</p></div>
+      <span class="stage-time">15 min</span>
+    </div>
+    <div class="quiz-shell" id="finalQuiz">
+      <div class="quiz-top"><span id="quizCounter">Question 1 of 10</span><span id="quizRunningScore">Score 0</span></div>
+      <div class="quiz-question" id="quizQuestion"></div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="feedback" id="quizFeedback" aria-live="polite">Choose the best answer.</div>
+      <div class="d-flex justify-content-end mt-3"><button type="button" class="btn btn-primary" id="quizNext" disabled>Next question</button></div>
+    </div>
+  </section>
+
+  <section class="lesson-stage" id="homework">
+    <div class="stage-head">
+      <div><div class="stage-kicker">Homework</div><h2>My service timeline</h2><p>Write four important dates and events. Use the past tense.</p></div>
+      <span class="stage-time">20 min</span>
+    </div>
+    <div class="homework-list" id="homeworkRows">
+      {% for number in '1234' %}
+      <div class="timeline-row">
+        <input class="form-control homework-year" inputmode="numeric" placeholder="Year / date" aria-label="Timeline date {{ forloop.counter }}">
+        <input class="form-control homework-event" placeholder="I began... / I joined... / I completed..." aria-label="Timeline event {{ forloop.counter }}">
+      </div>
+      {% endfor %}
+    </div>
+    <div class="d-flex flex-wrap gap-2 mt-3">
+      <button type="button" class="btn btn-primary" id="saveHomework"><i class="bi bi-floppy me-1"></i> Save homework</button>
+      <button type="button" class="btn btn-outline-secondary" id="clearHomework">Clear</button>
+    </div>
+    <div class="save-status" id="homeworkStatus" aria-live="polite"></div>
+  </section>
+
+  <section class="lesson-stage" id="resources">
+    <div class="stage-head"><div><div class="stage-kicker">Optional resources</div><h2>Teacher pack and source lesson</h2></div></div>
+    <div class="resources-row">
+      {% for resource in resource_files %}
+      <a class="resource-link" href="{% static resource.path %}"{% if '.pdf' not in resource.path %} download{% endif %}>
+        <i class="bi {% if '.pdf' in resource.path %}bi-file-earmark-pdf{% else %}bi-file-earmark-word{% endif %}"></i>{{ resource.button }}
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'lms/alc_lesson2.js' %}"></script>
+{% endblock %}

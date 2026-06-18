@@ -86,9 +86,11 @@ class PublicViewsTest(TestCase):
         )
         response = self.client.get(reverse("lesson", args=[lesson.pk]))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "lms/lesson_detail.html")
+        self.assertTemplateUsed(response, "lms/alc_lesson2.html")
         self.assertContains(response, "ALC Book 4 Lesson 2")
-        self.assertContains(response, "SSPA_ALC_Book4_Lesson2_A1_Support_Pack.docx")
+        self.assertContains(response, 'id="vocabGrid"')
+        self.assertContains(response, 'id="finalQuiz"')
+        self.assertContains(response, "lms/alc_lesson2.js")
         self.assertEqual(
             [resource["path"] for resource in response.context["resource_files"]],
             [
@@ -97,6 +99,16 @@ class PublicViewsTest(TestCase):
             ],
         )
         self.assertContains(response, "Open PDF")
+
+    def test_non_alc_resource_lesson_keeps_generic_template(self):
+        lesson = Lesson.objects.create(
+            title="Another classroom resource",
+            description="Teacher notes",
+            order=4,
+        )
+        response = self.client.get(reverse("lesson", args=[lesson.pk]))
+        self.assertTemplateUsed(response, "lms/lesson_detail.html")
+        self.assertNotContains(response, 'id="finalQuiz"')
 
     def test_lesson_view_returns_404_for_missing_id(self):
         response = self.client.get(reverse("lesson", args=[99999]))

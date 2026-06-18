@@ -114,6 +114,41 @@ def intermediate_course_view(request):
     })
 
 
+def beginner_course_view(request):
+    return render(request, 'lms/beginner_course.html', {
+        'beginner_lessons': [
+            {
+                'number': 1,
+                'slug': 'bk4_l1',
+                'book': 'Book 4 · Lesson 1',
+                'title': 'Sports Event Protection + Simple Past',
+                'focus': 'Sports vocabulary, regular past -ed, Did questions, SITREP reporting',
+            },
+            {
+                'number': 2,
+                'slug': 'bk4_l2',
+                'book': 'Book 4 · Lesson 2',
+                'title': 'Ranks, Duty, Military Time + Self-Introduction',
+                'focus': 'Ranks, irregular past, Did questions, and 24-hour time',
+            },
+            {
+                'number': 3,
+                'slug': 'bk4_l3',
+                'book': 'Book 4 · Lesson 3',
+                'title': 'Clothes, Uniform Rules, Can/Must/May',
+                'focus': 'Uniform vocabulary, ability, requirements, prohibition, and permission',
+            },
+            {
+                'number': 4,
+                'slug': 'bk5_l1',
+                'book': 'Book 5 · Lesson 1',
+                'title': 'Body, Doctor Visit, and Food Safety',
+                'focus': 'Body, sickness, food choices, allergies, which/one/or',
+            },
+        ],
+    })
+
+
 def tl_fetch(request):
     """Return all translation overrides for a given URL path as JSON."""
     path = request.GET.get('path', '')

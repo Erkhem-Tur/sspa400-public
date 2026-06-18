@@ -231,6 +231,9 @@
     <a href="{% url 'course_library' %}" class="{% if request.resolver_match.url_name == 'course_library' %}active{% endif %}">
       <i class="bi bi-bookshelf"></i> Course Library
     </a>
+    <a href="{% url 'beginner_course' %}" class="{% if request.resolver_match.url_name == 'beginner_course' %}active{% endif %}">
+      <i class="bi bi-mortarboard"></i> Beginner ALC Pack
+    </a>
     <a href="{% url 'intermediate_course' %}" class="{% if request.resolver_match.url_name == 'intermediate_course' %}active{% endif %}">
       <i class="bi bi-signpost-split"></i> Intermediate Pathway
     </a>

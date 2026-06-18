@@ -181,6 +181,31 @@ class PublicViewsTest(TestCase):
         self.assertContains(response, reverse("intermediate_course"))
         self.assertContains(response, "8 foundation lessons + 12 operational applications")
 
+    def test_beginner_alc_pack_contains_four_integrated_lessons(self):
+        response = self.client.get(reverse("beginner_course"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "lms/beginner_course.html")
+        self.assertEqual(len(response.context["beginner_lessons"]), 4)
+        self.assertContains(response, "ALC + SSPA Beginner Lesson Pack")
+        self.assertContains(response, 'id="bpFrame"')
+        self.assertContains(response, "Sports Event Protection + Simple Past")
+        self.assertContains(response, "Body, Doctor Visit, and Food Safety")
+
+    def test_beginner_pack_static_html_and_zip_are_available(self):
+        static_root = settings.BASE_DIR / "lms" / "static" / "lms"
+        lesson_root = static_root / "alc_beginner"
+        expected = {"index.html", "bk4_l1.html", "bk4_l2.html", "bk4_l3.html", "bk5_l1.html"}
+        self.assertEqual({path.name for path in lesson_root.glob("*.html")}, expected)
+        self.assertTrue(all((lesson_root / name).stat().st_size > 4_000 for name in expected))
+        source_zip = static_root / "resources" / "alc_sspa_integrated_lesson_pack.zip"
+        self.assertTrue(source_zip.exists())
+        self.assertGreater(source_zip.stat().st_size, 20_000)
+
+    def test_course_library_links_to_beginner_alc_pack(self):
+        response = self.client.get(reverse("course_library"))
+        self.assertContains(response, reverse("beginner_course"))
+        self.assertContains(response, "4 integrated ALC lessons")
+
     def test_dashboard_links_to_course_and_practice_centers(self):
         response = self.client.get(reverse("dashboard"))
         self.assertContains(response, reverse("course_library"))

@@ -14,6 +14,7 @@ urlpatterns = [
     path('api/study/time/', views.track_study_time, name='track_study_time'),
     path('profile/', views.profile_view, name='profile'),
     path('course/', views.course_library_view, name='course_library'),
+    path('course/beginner/', views.beginner_course_view, name='beginner_course'),
     path('course/intermediate/', views.intermediate_course_view, name='intermediate_course'),
     path('terminology/', views.terminology_view, name='terminology'),
     path('worksheets/', views.worksheets_view, name='worksheets'),

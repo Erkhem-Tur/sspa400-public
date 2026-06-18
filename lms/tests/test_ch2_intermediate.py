@@ -193,7 +193,7 @@ class PublicViewsTest(TestCase):
         )
         self.assertContains(response, "ALC + SSPA Beginner Lesson Pack")
         self.assertContains(response, 'id="bpFrame"')
-        self.assertContains(response, "ALC Book 4 Complete Study Guide")
+        self.assertContains(response, "ALC Book 4 Speaking &amp; Study Guide")
         self.assertContains(response, "Sports Event Protection + Simple Past")
         self.assertContains(response, "Body, Doctor Visit, and Food Safety")
 
@@ -235,10 +235,16 @@ class PublicViewsTest(TestCase):
                 "alc_sspa_integrated_lessons/alc_book4_summary.html"
             ).decode("utf-8-sig")
             for content in (summary_text, zipped_summary):
-                self.assertIn("ALC Book 4 — Language Laboratory Activities", content)
+                self.assertIn("ALC Book 4 — Speaking and Study Guide", content)
                 self.assertIn("showTab('grammar', this)", content)
+                self.assertIn("showTab('speaking', this)", content)
+                self.assertEqual(content.count('class="speaking-card"'), 4)
+                self.assertIn("What did you do at the event?", content)
+                self.assertIn("May I enter this area?", content)
                 self.assertIn("Military English", content)
                 self.assertNotIn("fonts.googleapis.com", content)
+                self.assertNotIn("lab activities", content.lower())
+                self.assertNotIn("laboratory activities", content.lower())
 
             for name, expected_count in example_counts.items():
                 lesson_text = (lesson_root / name).read_text(encoding="utf-8")

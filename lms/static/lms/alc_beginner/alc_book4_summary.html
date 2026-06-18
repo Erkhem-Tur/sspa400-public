@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ALC Book 4 — Language Laboratory Activities</title>
+<title>ALC Book 4 — Speaking and Study Guide</title>
 <style>
   :root {
     --navy: #0a1628;
@@ -333,6 +333,53 @@
     color: var(--gold-pale);
   }
 
+  /* SPEAKING PRACTICE */
+  .speaking-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 0.85rem;
+  }
+
+  .speaking-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    padding: 1rem;
+  }
+
+  .speaking-card h3 {
+    color: var(--gold-light);
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .speaking-goal {
+    color: var(--muted);
+    font-size: 0.78rem;
+    margin-bottom: 0.7rem;
+  }
+
+  .model-dialogue {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    padding: 0.75rem;
+  }
+
+  .model-dialogue p {
+    color: var(--white);
+    font-size: 0.79rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .model-dialogue p:last-child { margin-bottom: 0; }
+  .model-dialogue strong { color: var(--gold-pale); }
+
+  .speaking-task {
+    color: #b8c7d9;
+    font-size: 0.76rem;
+    margin-top: 0.7rem;
+  }
+
   /* VOCAB SECTION */
   .vocab-category {
     margin-bottom: 1.2rem;
@@ -534,9 +581,9 @@
 <body>
 
 <header>
-  <div class="badge">DLIELC · Level I · BK4LLAST · January 1991</div>
-  <h1>American Language Course<br><span>Book 4</span> — Lab Activities</h1>
-  <p>Language Laboratory Activities Student Text — Defense Language Institute English Language Center</p>
+  <div class="badge">DLIELC · Level I · ALC Book 4</div>
+  <h1>American Language Course<br><span>Book 4</span> — Speaking &amp; Study Guide</h1>
+  <p>Grammar, vocabulary, military English, and guided speaking practice</p>
   <div class="meta-row">
     <span class="meta-item"><strong>4</strong> Lessons</span>
     <span class="meta-item"><strong>85</strong> Pages</span>
@@ -549,6 +596,7 @@
   <button class="tab-btn active" onclick="showTab('overview', this)">Overview</button>
   <button class="tab-btn" onclick="showTab('lessons', this)">Lessons</button>
   <button class="tab-btn" onclick="showTab('grammar', this)">Grammar</button>
+  <button class="tab-btn" onclick="showTab('speaking', this)">Speaking Practice</button>
   <button class="tab-btn" onclick="showTab('vocabulary', this)">Vocabulary</button>
   <button class="tab-btn" onclick="showTab('skills', this)">Skills</button>
   <button class="tab-btn" onclick="showTab('military', this)">Military English</button>
@@ -560,7 +608,7 @@
   <div id="tab-overview" class="section active">
 
     <div class="overview-intro">
-      <strong>Book 4</strong> is a Level I Language Laboratory Activities workbook designed for military students learning American English. It accompanies audio recordings and covers four progressive lessons on daily life, military culture, modals, and shopping — all within a US Armed Forces context.
+      <strong>Book 4</strong> is a Level I course for military students learning American English. This guide covers four progressive lessons on daily life, military culture, modals, shopping, and practical speaking within a US Armed Forces context.
     </div>
 
     <div class="stats-grid">
@@ -912,6 +960,59 @@
 
   </div>
 
+  <!-- SPEAKING PRACTICE -->
+  <div id="tab-speaking" class="section">
+    <div class="speaking-grid">
+      <article class="speaking-card">
+        <h3>Session 1 · After-Event Report</h3>
+        <p class="speaking-goal">Use regular past verbs and Did questions to report completed protection duties.</p>
+        <div class="model-dialogue">
+          <p><strong>Officer A:</strong> What did you do at the event?</p>
+          <p><strong>Officer B:</strong> I checked the entrance at 0900 and escorted two guests.</p>
+          <p><strong>Officer A:</strong> Did you inspect the bags?</p>
+          <p><strong>Officer B:</strong> Yes, I did. There was no incident.</p>
+        </div>
+        <p class="speaking-task"><strong>Speak:</strong> Change the event, place, time, actions, and result. Continue for six lines.</p>
+      </article>
+
+      <article class="speaking-card">
+        <h3>Session 2 · Report for Duty</h3>
+        <p class="speaking-goal">Introduce rank and role, then state a post and military reporting time.</p>
+        <div class="model-dialogue">
+          <p><strong>Officer A:</strong> Good morning. Please introduce yourself.</p>
+          <p><strong>Officer B:</strong> I am Second Lieutenant Bat. I am a checkpoint protection officer.</p>
+          <p><strong>Officer A:</strong> What is your duty today?</p>
+          <p><strong>Officer B:</strong> I report to Post Two at zero seven hundred.</p>
+        </div>
+        <p class="speaking-task"><strong>Speak:</strong> Substitute your name, rank, role, post, department, and time.</p>
+      </article>
+
+      <article class="speaking-card">
+        <h3>Session 3 · Protected-Area Rules</h3>
+        <p class="speaking-goal">Use can, may, must, and must not to give clear visitor instructions.</p>
+        <div class="model-dialogue">
+          <p><strong>Visitor:</strong> May I enter this area?</p>
+          <p><strong>Officer:</strong> Yes, but you must show your ID and keep your badge visible.</p>
+          <p><strong>Visitor:</strong> Can I take a picture?</p>
+          <p><strong>Officer:</strong> No. You must not take pictures in the protected area.</p>
+        </div>
+        <p class="speaking-task"><strong>Speak:</strong> Add two permitted actions and two prohibited actions.</p>
+      </article>
+
+      <article class="speaking-card">
+        <h3>Session 4 · Shopping and Service</h3>
+        <p class="speaking-goal">Ask about an item, color, price, and choice using this, that, and How much.</p>
+        <div class="model-dialogue">
+          <p><strong>Assistant:</strong> Can I help you?</p>
+          <p><strong>Customer:</strong> Yes. How much is this black jacket?</p>
+          <p><strong>Assistant:</strong> It is eighty dollars. That blue jacket is sixty dollars.</p>
+          <p><strong>Customer:</strong> May I try the blue one on?</p>
+        </div>
+        <p class="speaking-task"><strong>Speak:</strong> Change the item, color, price, size, and final choice.</p>
+      </article>
+    </div>
+  </div>
+
   <!-- VOCABULARY -->
   <div id="tab-vocabulary" class="section">
 
@@ -1220,7 +1321,7 @@
 </main>
 
 <footer>
-  ALC Book 4 LLA · DLIELC Lackland AFB, Texas · BK4LLAST January 1991 · Level I
+  ALC Book 4 · Speaking &amp; Study Guide · DLIELC · Level I
 </footer>
 
 <script>

@@ -121,8 +121,8 @@ def beginner_course_view(request):
                 'number': 0,
                 'slug': 'alc_book4_summary',
                 'book': 'Book 4 · Study Guide',
-                'title': 'ALC Book 4 Complete Study Guide',
-                'focus': 'Four-lesson overview, grammar, vocabulary, skills, ranks, and military time',
+                'title': 'ALC Book 4 Speaking & Study Guide',
+                'focus': 'Four speaking sessions, grammar, vocabulary, skills, ranks, and military time',
             },
             {
                 'number': 1,

@@ -221,6 +221,13 @@ class PublicViewsTest(TestCase):
         self.assertGreater(source_zip.stat().st_size, 20_000)
 
         with zipfile.ZipFile(source_zip) as lesson_pack:
+            index_text = (lesson_root / "index.html").read_text(encoding="utf-8")
+            zipped_index = lesson_pack.read(
+                "alc_sspa_integrated_lessons/index.html"
+            ).decode("utf-8-sig")
+            for content in (index_text, zipped_index):
+                self.assertNotIn("Teacher note", content)
+
             summary_text = (lesson_root / "alc_book4_summary.html").read_text(
                 encoding="utf-8"
             )
@@ -243,6 +250,9 @@ class PublicViewsTest(TestCase):
                     vocabulary = content.split(
                         '<section class="card" id="vocabulary">', 1
                     )[1].split("</table></section>", 1)[0]
+                    self.assertNotIn("Teacher", content)
+                    self.assertNotIn("teacher/student", content)
+                    self.assertNotIn("Багш", content)
                     self.assertNotIn("<input", vocabulary)
                     self.assertEqual(vocabulary.count('class="example"'), expected_count)
                     self.assertIn('<a class="btn light" href="#grammar">Grammar</a>', content)

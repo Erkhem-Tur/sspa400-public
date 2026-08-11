@@ -1,0 +1,18 @@
+{% extends 'lms/base.html' %}
+{% load lms_extras %}
+{% block title %}LMS management | SSPA400{% endblock %}
+{% block content %}
+<div class="portal-shell">
+  <div class="portal-page-head"><div><h1>LMS management</h1><p>Manage accounts, categories, courses, and platform activity from one place.</p></div><div class="portal-actions"><a class="btn btn-outline-primary" href="{% url 'admin:index' %}"><i class="bi bi-database-gear me-1"></i> Advanced admin</a><a class="btn btn-primary" href="{% url 'course_create' %}"><i class="bi bi-plus-lg me-1"></i> Create course</a></div></div>
+  <div class="metric-grid"><div class="metric"><strong>{{ user_count }}</strong><span>Total accounts</span></div><div class="metric"><strong>{{ enrollment_count }}</strong><span>Course enrollments</span></div><div class="metric"><strong>{{ course_count }}</strong><span>Courses</span></div><div class="metric"><strong>{{ completion_count }}</strong><span>Course completions</span></div></div>
+  <div class="course-grid mb-4">
+    <a class="course-tile text-decoration-none text-dark" href="{% url 'admin_users' %}"><div class="fs-3 text-primary"><i class="bi bi-people"></i></div><h3>Manage users</h3><p>Search accounts, change student or instructor roles, and disable access.</p><span class="text-primary fw-semibold">Open users <i class="bi bi-arrow-right"></i></span></a>
+    <a class="course-tile text-decoration-none text-dark" href="{% url 'admin_categories' %}"><div class="fs-3" style="color:#087f8c"><i class="bi bi-tags"></i></div><h3>Manage categories</h3><p>Keep the public catalog organized and easy to filter.</p><span class="text-primary fw-semibold">Open categories <i class="bi bi-arrow-right"></i></span></a>
+    <a class="course-tile text-decoration-none text-dark" href="{% url 'instructor_dashboard' %}"><div class="fs-3 text-success"><i class="bi bi-journals"></i></div><h3>Manage courses</h3><p>Open any course builder, gradebook, or publishing setting.</p><span class="text-primary fw-semibold">Open courses <i class="bi bi-arrow-right"></i></span></a>
+  </div>
+  <div class="dashboard-grid">
+    <section class="content-panel"><div class="portal-section-head"><h2>Recently joined</h2><a href="{% url 'admin_users' %}">All users</a></div>{% for account in recent_users %}<div class="d-flex align-items-center gap-2 py-2 {% if not forloop.last %}border-bottom{% endif %}"><span class="avatar-sm">{{ account|display_name|first|upper }}</span><div><strong>{{ account|display_name }}</strong><div class="small text-muted">{{ account.email|default:account.username }} · {{ account.date_joined|date:'M j, Y' }}</div></div></div>{% endfor %}</section>
+    <section class="content-panel"><div class="portal-section-head"><h2>Recent courses</h2><a href="{% url 'instructor_dashboard' %}">All courses</a></div>{% for course in recent_courses %}<div class="d-flex justify-content-between align-items-center gap-2 py-2 {% if not forloop.last %}border-bottom{% endif %}"><div><strong>{{ course.title }}</strong><div class="small text-muted">{{ course.get_status_display }}{% if course.instructor %} · {{ course.instructor|display_name }}{% endif %}</div></div><a class="btn btn-sm btn-outline-primary" href="{% url 'course_builder' course.slug %}">Open</a></div>{% endfor %}</section>
+  </div>
+</div>
+{% endblock %}

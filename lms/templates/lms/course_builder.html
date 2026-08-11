@@ -1,0 +1,64 @@
+{% extends 'lms/base.html' %}
+{% block title %}Course builder | {{ course.title }}{% endblock %}
+{% block content %}
+<div class="portal-shell">
+  <div class="portal-page-head">
+    <div>
+      <div class="course-meta mb-2"><span class="status-pill {% if course.status == 'PUBLISHED' %}success{% elif course.status == 'DRAFT' %}warning{% else %}muted{% endif %}">{{ course.get_status_display }}</span><span>{{ course.get_level_display }}</span></div>
+      <h1>{{ course.title }}</h1>
+      <p>Organize the course into short modules and focused activities. Changes are saved immediately.</p>
+    </div>
+    <div class="portal-actions">
+      <a class="btn btn-outline-primary" href="{{ course.get_absolute_url }}"><i class="bi bi-eye me-1"></i> Preview</a>
+      <a class="btn btn-outline-primary" href="{% url 'course_gradebook' course.slug %}"><i class="bi bi-table me-1"></i> Gradebook</a>
+      <a class="btn btn-outline-primary" href="{% url 'course_edit' course.slug %}"><i class="bi bi-pencil me-1"></i> Settings</a>
+      <a class="btn btn-primary" href="{% url 'module_create' course.slug %}"><i class="bi bi-plus-lg me-1"></i> Add module</a>
+    </div>
+  </div>
+
+  {% if course.status == 'DRAFT' %}<div class="alert alert-warning"><i class="bi bi-info-circle me-1"></i> Learners cannot see this course until its status is changed to Published in Settings.</div>{% endif %}
+
+  {% for module in modules %}
+  <section class="builder-module" aria-labelledby="module{{ module.id }}Title">
+    <div class="builder-module-head">
+      <div><strong id="module{{ module.id }}Title">Module {{ forloop.counter }}: {{ module.title }}</strong>{% if module.summary %}<div class="small text-muted mt-1">{{ module.summary }}</div>{% endif %}</div>
+      <div class="builder-unit-actions">
+        <a class="btn btn-sm btn-outline-primary" href="{% url 'unit_create' course.slug module.id %}"><i class="bi bi-plus-lg me-1"></i> Add activity</a>
+        <a class="btn btn-sm btn-outline-secondary" href="{% url 'module_edit' course.slug module.id %}" title="Edit module"><i class="bi bi-pencil"></i></a>
+        <form method="post" action="{% url 'module_delete' course.slug module.id %}" onsubmit="return confirm('Delete this module and all its lessons?');">{% csrf_token %}<button class="btn btn-sm btn-outline-danger" type="submit" title="Delete module"><i class="bi bi-trash"></i></button></form>
+      </div>
+    </div>
+    {% for unit in module.units.all %}
+    <div class="builder-unit">
+      <span class="unit-icon">
+        {% if unit.kind == 'VIDEO' %}<i class="bi bi-play-btn"></i>{% elif unit.kind == 'QUIZ' %}<i class="bi bi-ui-checks"></i>{% elif unit.kind == 'LISTENING' %}<i class="bi bi-headphones"></i>{% elif unit.kind == 'ASSIGNMENT' %}<i class="bi bi-pencil-square"></i>{% elif unit.kind == 'LIVE' %}<i class="bi bi-camera-video"></i>{% else %}<i class="bi bi-file-text"></i>{% endif %}
+      </span>
+      <div>
+        <div class="fw-semibold">{{ unit.title }} {% if not unit.is_published %}<span class="status-pill muted">Hidden</span>{% endif %}</div>
+        <small class="text-muted">{{ unit.get_kind_display }} · {{ unit.duration_minutes }} min · order {{ unit.order }}</small>
+      </div>
+      <div class="builder-unit-actions">
+        {% if unit.kind == 'QUIZ' %}<a class="btn btn-sm btn-outline-primary" href="{% url 'question_create' course.slug unit.id %}"><i class="bi bi-plus-lg me-1"></i> Question</a>{% endif %}
+        {% if unit.kind == 'ASSIGNMENT' %}<a class="btn btn-sm btn-outline-primary" href="{% url 'assignment_edit' course.slug unit.id %}"><i class="bi bi-list-check me-1"></i> Settings</a>{% endif %}
+        <a class="btn btn-sm btn-outline-secondary" href="{% url 'unit_edit' course.slug unit.id %}" title="Edit activity"><i class="bi bi-pencil"></i></a>
+        <form method="post" action="{% url 'unit_delete' course.slug unit.id %}" onsubmit="return confirm('Delete this activity and its learner records?');">{% csrf_token %}<button class="btn btn-sm btn-outline-danger" type="submit" title="Delete activity"><i class="bi bi-trash"></i></button></form>
+      </div>
+    </div>
+    {% if unit.kind == 'QUIZ' %}
+    <ol class="question-list">
+      {% for question in unit.questions.all %}
+      <li>
+        <span class="fw-semibold">{{ question.get_kind_display }}:</span> {{ question.prompt|truncatewords:18 }}
+        <a class="ms-2" href="{% url 'question_edit' course.slug question.id %}">Edit</a>
+        <form class="d-inline" method="post" action="{% url 'question_delete' course.slug question.id %}" onsubmit="return confirm('Delete this question?');">{% csrf_token %}<button class="btn btn-sm btn-link text-danger p-0 ms-1" type="submit">Delete</button></form>
+      </li>
+      {% empty %}<li>No questions yet. Add at least one before publishing.</li>{% endfor %}
+    </ol>
+    {% endif %}
+    {% empty %}<div class="p-4 text-center text-muted">No activities yet. Add a text, video, listening, quiz, or assignment activity.</div>{% endfor %}
+  </section>
+  {% empty %}
+  <div class="empty-state"><i class="bi bi-folder-plus"></i><h2>Add the first module</h2><p>A good starting module reviews previous learning before introducing new speaking tasks.</p><a class="btn btn-primary" href="{% url 'module_create' course.slug %}">Add module</a></div>
+  {% endfor %}
+</div>
+{% endblock %}

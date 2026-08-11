@@ -4,13 +4,17 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.db.models import Avg, Sum
-from django.http import JsonResponse
+from django.http import Http404, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
 from .models import Lesson, QuizResult, UserProgress, Department, Video, LogEntry, TlOverride, WallPost, RANK_CHOICES, PROMPT_CHOICES
-from .course_catalog import get_course_lessons
+from .course_catalog import get_course_lessons, get_course_modules
+from .forms import LoginForm, LogbookEntryForm, WallPostForm
+from .authoring import AUTHORING_CHECKLIST, AUTHORING_STEPS, COURSE_PACK_DEFAULTS, list_authoring_recipes
+from .prompt_guides import get_prompt_guide, list_prompt_guides
 
 
 LESSON_RESOURCE_FILES = [
@@ -45,12 +49,32 @@ LESSON_RESOURCE_FILES = [
 ]
 
 
+def _client_ip(request):
+    return (
+        request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0].strip()
+        or request.META.get('REMOTE_ADDR')
+        or None
+    )
+
+
+def _first_form_error(form):
+    for errors in form.errors.values():
+        if errors:
+            return errors[0]
+    return None
+
+
 # ── Public views (no login required) ────────────────────────────────────────
 
 def dashboard_view(request):
     lessons = Lesson.objects.all()
     videos  = Video.objects.filter(is_published=True)
-    ctx = {'lessons': lessons, 'videos': videos}
+    ctx = {
+        'lessons': lessons,
+        'videos': videos,
+        'course_modules': get_course_modules(),
+        'course_lesson_total': len(get_course_lessons()),
+    }
     return render(request, 'lms/dashboard.html', ctx)
 
 
@@ -73,6 +97,7 @@ def lesson_view(request, lesson_id):
     return render(request, template_name, {
         'lesson': lesson,
         'resource_files': resource_files,
+        'lesson_outline': build_lesson_outline(lesson.description),
     })
 
 
@@ -92,12 +117,73 @@ def course_library_view(request):
     lessons = get_course_lessons()
     return render(request, 'lms/course_library.html', {
         'course_lessons': lessons,
+        'course_modules': get_course_modules(),
         'alc_lesson': Lesson.objects.filter(title__icontains='ALC Book 4 Lesson 2').first(),
         'course_counts': {
             level: sum(lesson['level'] == level for lesson in lessons)
             for level in ('A1', 'A2', 'B1')
         },
     })
+
+
+def prompt_guides_view(request):
+    guides = list_prompt_guides()
+    return render(request, 'lms/prompt_guides.html', {
+        'prompt_guides': guides,
+        'guide_count': len(guides),
+        'prompt_total': sum(guide['prompt_count'] for guide in guides),
+    })
+
+
+def prompt_guide_detail_view(request, slug):
+    guide = get_prompt_guide(slug)
+    if guide is None:
+        raise Http404('Prompt guide not found')
+    return render(request, 'lms/prompt_guide_detail.html', {
+        'guide': guide,
+    })
+
+
+def authoring_studio_view(request):
+    recipes = list_authoring_recipes()
+    return render(request, 'lms/authoring_studio.html', {
+        'authoring_steps': AUTHORING_STEPS,
+        'authoring_checklist': AUTHORING_CHECKLIST,
+        'course_pack_defaults': COURSE_PACK_DEFAULTS,
+        'prompt_recipes': recipes,
+        'recipe_count': len(recipes),
+    })
+
+
+def build_lesson_outline(description):
+    """Split plain lesson descriptions into readable page sections."""
+    lines = [line.strip() for line in (description or '').splitlines()]
+    intro = []
+    sections = []
+    current = None
+
+    for line in lines:
+        if not line:
+            continue
+        if line.endswith(':') and not line.startswith('-'):
+            current = {'title': line[:-1], 'copy': [], 'bullets': []}
+            sections.append(current)
+            continue
+        if line.startswith('-'):
+            if current is None:
+                current = {'title': 'Key points', 'copy': [], 'bullets': []}
+                sections.append(current)
+            current['bullets'].append(line[1:].strip())
+            continue
+        if current is None:
+            intro.append(line)
+        else:
+            current['copy'].append(line)
+
+    return {
+        'intro': intro,
+        'sections': sections,
+    }
 
 
 def intermediate_course_view(request):
@@ -172,11 +258,14 @@ def tl_save(request):
         path = body.get('path', '').strip()
         key  = body.get('key', '').strip()
         text = body.get('text', '').strip()
-        if path and key and text:
-            TlOverride.objects.update_or_create(
-                path=path, key=key,
-                defaults={'text': text}
-            )
+        if path and key:
+            if text:
+                TlOverride.objects.update_or_create(
+                    path=path, key=key,
+                    defaults={'text': text}
+                )
+            else:
+                TlOverride.objects.filter(path=path, key=key).delete()
         return JsonResponse({'ok': True})
     except Exception as e:
         return JsonResponse({'ok': False, 'error': str(e)}, status=400)
@@ -207,22 +296,54 @@ def videos_view(request):
     return render(request, 'lms/videos.html', {'videos': videos})
 
 
-# Quiz submit — save only if logged in, otherwise just return ok
+# Legacy static-lesson quiz endpoint. Anonymous practice remains available, while
+# signed-in attempts are also recorded on the learner profile.
 @require_POST
 def submit_quiz(request):
     try:
         data = json.loads(request.body)
         score = int(data.get('score', 0))
         total = int(data.get('total', 10))
-        return JsonResponse({'status': 'ok', 'score': score, 'total': total})
+        batch_index = int(data.get('batch_index', 0))
+        if total <= 0 or total > 1000 or score < 0 or score > total or batch_index < 0:
+            raise ValueError('Invalid quiz score.')
+        saved = False
+        lesson_id = data.get('lesson_id')
+        if request.user.is_authenticated and lesson_id:
+            lesson = get_object_or_404(Lesson, pk=lesson_id)
+            QuizResult.objects.create(
+                user=request.user,
+                lesson=lesson,
+                batch_index=batch_index,
+                score=score,
+                total=total,
+            )
+            progress, _ = UserProgress.objects.get_or_create(user=request.user)
+            progress.total_score += score
+            progress.missions_completed += 1
+            progress.save(update_fields=['total_score', 'missions_completed', 'last_accessed'])
+            saved = True
+        return JsonResponse({'status': 'ok', 'score': score, 'total': total, 'saved': saved})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
 
-# Study time — no-op on public version
 @require_POST
 def track_study_time(request):
-    return JsonResponse({'status': 'ok'})
+    if not request.user.is_authenticated:
+        return JsonResponse({'status': 'ok', 'saved': False})
+    try:
+        data = json.loads(request.body or '{}')
+        minutes = int(data.get('minutes', 0))
+        if not 0 <= minutes <= 120:
+            raise ValueError('Minutes must be between 0 and 120.')
+        if minutes:
+            progress, _ = UserProgress.objects.get_or_create(user=request.user)
+            progress.study_minutes += minutes
+            progress.save(update_fields=['study_minutes', 'last_accessed'])
+        return JsonResponse({'status': 'ok', 'saved': bool(minutes)})
+    except (TypeError, ValueError, json.JSONDecodeError) as error:
+        return JsonResponse({'status': 'error', 'message': str(error)}, status=400)
 
 
 # ── Admin-only views (still protected) ──────────────────────────────────────
@@ -262,9 +383,14 @@ def dept_edit_view(request, dept_id):
             error = f'"{name}" нэртэй хэлтэс аль хэдийн байна.'
         else:
             dept.name = name
-            dept.order = int(request.POST.get('order', dept.order))
-            dept.save()
-            return redirect('dept_manage')
+            order_value = request.POST.get('order', str(dept.order)).strip()
+            try:
+                dept.order = int(order_value)
+            except (TypeError, ValueError):
+                error = 'Order must be a whole number.'
+            else:
+                dept.save()
+                return redirect('dept_manage')
     return render(request, 'lms/dept_edit.html', {'dept': dept, 'error': error})
 
 
@@ -274,36 +400,24 @@ def logbook_view(request):
     departments = Department.objects.all()
     success = False
     error = None
+    form = LogbookEntryForm()
 
     if request.method == 'POST':
-        full_name    = request.POST.get('full_name', '').strip()
-        rank         = request.POST.get('rank', '').strip()
-        dept_id      = request.POST.get('department', '').strip()
-        tasag        = request.POST.get('tasag', '').strip()
-        tl_english   = request.POST.get('tl_english', '').strip()
-        tl_mongolian = request.POST.get('tl_mongolian', '').strip()
-        note         = request.POST.get('note', '').strip()
-
-        if not full_name:
-            error = 'Нэрээ оруулна уу.'
-        else:
-            parts = []
-            if tl_english:
-                parts.append(f'[EN] {tl_english}')
-            if tl_mongolian:
-                parts.append(f'[MN] {tl_mongolian}')
-            if note:
-                parts.append(note)
-            combined_note = ' | '.join(parts)
-
-            dept = Department.objects.filter(pk=dept_id).first() if dept_id else None
-            ip   = (request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0].strip()
-                    or request.META.get('REMOTE_ADDR'))
+        form = LogbookEntryForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
             LogEntry.objects.create(
-                full_name=full_name, rank=rank, tasag=tasag,
-                department=dept, note=combined_note, ip=ip or None,
+                full_name=data['full_name'],
+                rank=data.get('rank', ''),
+                tasag=data.get('tasag', ''),
+                department=data.get('department'),
+                note=form.combined_note(),
+                ip=_client_ip(request),
             )
             success = True
+            form = LogbookEntryForm()
+        else:
+            error = _first_form_error(form)
 
     # Today's entries — use localtime so Mongolia midnight is correct
     today = timezone.localtime(timezone.now()).date()
@@ -314,6 +428,7 @@ def logbook_view(request):
         'today_entries': today_entries,
         'success': success,
         'error': error,
+        'form': form,
         'RANK_CHOICES': [(r, l) for r, l in RANK_CHOICES if r],
     })
 
@@ -344,7 +459,10 @@ def logbook_admin_view(request):
             pass
 
     if dept_id:
-        entries = entries.filter(department_id=dept_id)
+        if dept_id.isdecimal():
+            entries = entries.filter(department_id=int(dept_id))
+        else:
+            dept_id = ''
 
     # Stats
     today = timezone.now().date()
@@ -377,31 +495,28 @@ def logbook_admin_view(request):
 def padlet_view(request):
     error = None
     success = False
+    form = WallPostForm()
     if request.method == 'POST':
-        author_name = request.POST.get('author_name', '').strip()
-        prompt      = request.POST.get('prompt', '').strip()
-        content     = request.POST.get('content', '').strip()
-        valid_keys  = [k for k, _ in PROMPT_CHOICES]
-        if not author_name:
-            error = 'Нэрээ оруулна уу.'
-        elif prompt not in valid_keys:
-            error = 'Асуулт сонгоно уу.'
-        elif not content:
-            error = 'Хариултаа бичнэ үү.'
-        else:
-            ip = (request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0].strip()
-                  or request.META.get('REMOTE_ADDR'))
+        form = WallPostForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
             WallPost.objects.create(
-                author_name=author_name, prompt=prompt,
-                content=content, ip=ip or None,
+                author_name=data['author_name'],
+                prompt=data['prompt'],
+                content=data['content'],
+                ip=_client_ip(request),
             )
             success = True
+            form = WallPostForm()
+        else:
+            error = _first_form_error(form)
 
     posts = WallPost.objects.all()
     return render(request, 'lms/padlet.html', {
         'posts': posts,
         'error': error,
         'success': success,
+        'form': form,
         'PROMPT_CHOICES': PROMPT_CHOICES,
     })
 
@@ -415,16 +530,34 @@ def padlet_delete_view(request, post_id):
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('dashboard')
-    from .forms import LoginForm
+        return redirect(_account_home(request.user))
     form = LoginForm(request, data=request.POST or None)
     if request.method == 'POST' and form.is_valid():
         login(request, form.get_user())
-        return redirect(request.GET.get('next') or 'dashboard')
+        next_url = request.POST.get('next') or request.GET.get('next')
+        if next_url and url_has_allowed_host_and_scheme(
+            next_url,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
+        ):
+            return redirect(next_url)
+        return redirect(_account_home(form.get_user()))
     return render(request, 'lms/login.html', {
         'form': form,
         'firebase_config': settings.FIREBASE_WEB_CONFIG,
+        'next': request.GET.get('next', ''),
     })
+
+
+def _account_home(user):
+    if user.is_staff:
+        return 'admin_dashboard'
+    progress, _ = UserProgress.objects.get_or_create(user=user)
+    if not progress.profile_complete:
+        return 'setup_profile'
+    if progress.role == UserProgress.Role.INSTRUCTOR:
+        return 'instructor_dashboard'
+    return 'learning_dashboard'
 
 
 @require_POST
@@ -434,20 +567,20 @@ def firebase_auth_view(request):
     try:
         body = json.loads(request.body)
         id_token = body.get('idToken', '')
-        if not id_token:
+        if not isinstance(id_token, str) or not id_token or len(id_token) > 20000:
             return JsonResponse({'ok': False, 'error': 'idToken missing'}, status=400)
 
         decoded = verify_id_token(id_token)
-        uid   = decoded['uid']
-        email = decoded.get('email', '')
-        name  = decoded.get('name', '')
+        uid   = str(decoded['uid'])[:128]
+        email = str(decoded.get('email', ''))[:254]
+        name  = str(decoded.get('name', ''))[:200]
 
         # Use a prefixed UID as the Django username so it never collides with
         # manually-created accounts.  UIDs are 28 chars; prefix keeps us < 150.
         username = f'fb_{uid}'
         user, created = User.objects.get_or_create(
             username=username,
-            defaults={'email': email, 'first_name': name.split()[0] if name else ''},
+            defaults={'email': email, 'first_name': name.split()[0][:150] if name else ''},
         )
         if not created and email and user.email != email:
             user.email = email
@@ -456,24 +589,28 @@ def firebase_auth_view(request):
             user.set_unusable_password()
             user.save(update_fields=['password'])
 
+        progress, _ = UserProgress.objects.get_or_create(
+            user=user,
+            defaults={'full_name': name, 'role': UserProgress.Role.STUDENT},
+        )
+        if name and not progress.full_name:
+            progress.full_name = name
+            progress.save(update_fields=['full_name', 'last_accessed'])
+
         login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-        return JsonResponse({'ok': True, 'created': created})
-    except Exception as e:
-        return JsonResponse({'ok': False, 'error': str(e)}, status=400)
+        next_url = body.get('next', '')
+        if not next_url or not url_has_allowed_host_and_scheme(
+            next_url,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
+        ):
+            next_url = '/setup-profile/' if not progress.profile_complete else '/learning/'
+        return JsonResponse({'ok': True, 'created': created, 'redirect': next_url})
+    except Exception as error:
+        message = str(error) if settings.DEBUG else 'Google sign-in could not be verified. Please try again or use password login.'
+        return JsonResponse({'ok': False, 'error': message}, status=400)
 
 
 def logout_view(request):
     logout(request)
-    return redirect('dashboard')
-
-def register_view(request):
-    return redirect('dashboard')
-
-def setup_profile(request):
-    return redirect('dashboard')
-
-def profile_view(request):
-    return redirect('dashboard')
-
-def department_view(request):
     return redirect('dashboard')

@@ -1,0 +1,43 @@
+{% extends 'lms/base.html' %}
+{% load lms_extras %}
+{% block title %}Gradebook | {{ course.title }}{% endblock %}
+{% block content %}
+<div class="portal-shell">
+  <div class="portal-page-head"><div><h1>Gradebook</h1><p>{{ course.title }}</p></div><div class="portal-actions"><a class="btn btn-outline-primary" href="{% url 'course_builder' course.slug %}">Course builder</a><a class="btn btn-outline-primary" href="{% url 'instructor_dashboard' %}">Instructor workspace</a></div></div>
+
+  <div class="metric-grid">
+    <div class="metric"><strong>{{ rows|length }}</strong><span>Enrolled learners</span></div>
+    <div class="metric"><strong>{{ pending_submissions|length }}</strong><span>Assignments to review</span></div>
+    <div class="metric"><strong>{{ pending_quizzes|length }}</strong><span>Written quizzes to review</span></div>
+    <div class="metric"><strong>{{ course.certificates.count }}</strong><span>Certificates issued</span></div>
+  </div>
+
+  <section class="content-panel">
+    <div class="portal-section-head"><h2>Learner progress</h2></div>
+    {% if rows %}
+    <div class="responsive-table"><table class="table table-hover mb-0">
+      <thead><tr><th>Learner</th><th>Progress</th><th>Quiz average</th><th>Quiz attempts</th><th>Assignments graded</th><th>Status</th></tr></thead>
+      <tbody>{% for row in rows %}<tr>
+        <td><div class="d-flex align-items-center gap-2"><span class="avatar-sm">{{ row.enrollment.user|display_name|first|upper }}</span><div><strong>{{ row.enrollment.user|display_name }}</strong><div class="small text-muted">{{ row.enrollment.user.email }}</div></div></div></td>
+        <td style="min-width:150px"><div class="progress-label"><span></span><strong>{{ row.enrollment.progress_percent }}%</strong></div><div class="progress-track"><span class="progress-fill" style="width:{{ row.enrollment.progress_percent }}%"></span></div></td>
+        <td>{% if row.quiz_average != None %}{{ row.quiz_average|floatformat:0 }}%{% else %}<span class="text-muted">No score</span>{% endif %}</td>
+        <td>{{ row.quiz_attempts }}</td>
+        <td>{{ row.assignments_graded }}/{{ row.assignments_total }}</td>
+        <td><span class="status-pill {% if row.enrollment.status == 'COMPLETED' %}success{% else %}warning{% endif %}">{{ row.enrollment.get_status_display }}</span></td>
+      </tr>{% endfor %}</tbody>
+    </table></div>
+    {% else %}<div class="empty-state"><i class="bi bi-people"></i><h3>No learners enrolled yet</h3><p>Publish the course so students can add it from the free catalog.</p></div>{% endif %}
+  </section>
+
+  <div class="dashboard-grid portal-section">
+    <section class="content-panel">
+      <div class="portal-section-head"><h2>Pending assignments</h2></div>
+      {% for submission in pending_submissions %}<div class="d-flex justify-content-between align-items-center gap-2 py-2 {% if not forloop.last %}border-bottom{% endif %}"><div><strong>{{ submission.student|display_name }}</strong><div class="small text-muted">{{ submission.assignment.unit.title }}</div></div><a class="btn btn-sm btn-outline-primary" href="{% url 'grade_submission' submission.id %}">Review</a></div>{% empty %}<p class="text-muted small mb-0">Nothing is waiting.</p>{% endfor %}
+    </section>
+    <section class="content-panel">
+      <div class="portal-section-head"><h2>Pending written quizzes</h2></div>
+      {% for attempt in pending_quizzes %}<div class="d-flex justify-content-between align-items-center gap-2 py-2 {% if not forloop.last %}border-bottom{% endif %}"><div><strong>{{ attempt.user|display_name }}</strong><div class="small text-muted">{{ attempt.unit.title }}</div></div><a class="btn btn-sm btn-outline-primary" href="{% url 'grade_quiz_review' attempt.id %}">Grade</a></div>{% empty %}<p class="text-muted small mb-0">Nothing is waiting.</p>{% endfor %}
+    </section>
+  </div>
+</div>
+{% endblock %}

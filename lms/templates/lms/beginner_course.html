@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-<main class="bp-page" id="beginnerPathway" data-base="{% static 'lms/alc_beginner/' %}">
+<main class="bp-page" id="beginnerPathway" data-base="{% static 'lms/alc_beginner/' %}" data-progress-url="{% if user.is_authenticated %}{% url 'pathway_progress_api' 'beginner' %}{% endif %}">
   <header class="bp-head">
     <div>
       <div class="bp-kicker">SSPA Beginner English · ALC Books 4-5</div>
@@ -51,5 +51,6 @@
 </main>
 
 {{ beginner_lessons|json_script:"beginnerLessonData" }}
+<script src="{% static 'lms/pathway_sync.js' %}" defer></script>
 <script src="{% static 'lms/beginner_course.js' %}" defer></script>
 {% endblock %}

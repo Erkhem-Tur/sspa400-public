@@ -37,7 +37,77 @@ _LESSONS = (
 )
 
 
+_MODULES = (
+    {
+        "key": "checkpoint-basics",
+        "level": "A1",
+        "range": "Lessons 1-8",
+        "title": "Checkpoint Basics",
+        "summary": "Names, ranks, posts, time, places, equipment, badges, and short incident reports.",
+        "outcome": "Officers can introduce themselves, check simple information, and write a basic duty note.",
+        "lesson_numbers": range(1, 9),
+    },
+    {
+        "key": "access-communication",
+        "level": "A2",
+        "range": "Lessons 9-14",
+        "title": "Access & Radio Communication",
+        "summary": "Access decisions, escorting, radio checks, public questions, emergency commands, and backup requests.",
+        "outcome": "Officers can guide people, deny access politely, and send short operational radio messages.",
+        "lesson_numbers": range(9, 15),
+    },
+    {
+        "key": "vip-media-reporting",
+        "level": "A2",
+        "range": "Lessons 15-20",
+        "title": "VIP, Media & Duty Reports",
+        "summary": "VIP arrival, media control, signs, notices, end-of-shift reporting, and integrated A2 practice.",
+        "outcome": "Officers can handle VIP/media situations and produce a clear duty or incident report.",
+        "lesson_numbers": range(15, 21),
+    },
+    {
+        "key": "policy-briefing",
+        "level": "B1",
+        "range": "Lessons 21-26",
+        "title": "Policy, Briefing & Coordination",
+        "summary": "Policy explanations, de-escalation, briefings, suspicious behaviour, diplomatic language, and international coordination.",
+        "outcome": "Officers can explain rules, coordinate with partners, and manage sensitive conversations.",
+        "lesson_numbers": range(21, 27),
+    },
+    {
+        "key": "professional-output",
+        "level": "B1",
+        "range": "Lessons 27-32",
+        "title": "Professional Output & Final Assessment",
+        "summary": "Formal reports, email and memo writing, presentations, professional Q&A, review, and final assessment.",
+        "outcome": "Officers can deliver formal written and spoken outputs for operational English assessment.",
+        "lesson_numbers": range(27, 33),
+    },
+)
+
+
 def get_course_lessons():
     fields = ("number", "level", "title", "grammar", "scenario", "vocabulary", "role_play", "writing")
     return [dict(zip(fields, lesson)) for lesson in _LESSONS]
 
+
+def get_course_modules():
+    lessons_by_number = {lesson["number"]: lesson for lesson in get_course_lessons()}
+    modules = []
+    for module in _MODULES:
+        module_lessons = [
+            lessons_by_number[number]
+            for number in module["lesson_numbers"]
+            if number in lessons_by_number
+        ]
+        modules.append({
+            key: value
+            for key, value in module.items()
+            if key != "lesson_numbers"
+        } | {
+            "lessons": module_lessons,
+            "count": len(module_lessons),
+            "start": module_lessons[0]["number"] if module_lessons else None,
+            "end": module_lessons[-1]["number"] if module_lessons else None,
+        })
+    return modules

@@ -168,19 +168,41 @@
   }
 
   function speak(text) {
-    if (!('speechSynthesis' in window)) {
+    const engine = window.NeuralListeningEngine;
+    if (!engine || !engine.isSupported()) {
       showError('Audio is not supported in this browser. Please use a current version of Chrome or Edge.');
       return;
     }
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-US';
-    utterance.rate = state.speed;
-    const voices = window.speechSynthesis.getVoices();
-    utterance.voice = voices.find((voice) => voice.lang.startsWith('en-US'))
-      || voices.find((voice) => voice.lang.startsWith('en'))
-      || null;
-    window.speechSynthesis.speak(utterance);
+    engine.speak(text, {
+      rate: state.speed,
+      label: 'Neural listening active.',
+      onStatus: updateListeningEngine,
+    });
+  }
+
+  function stopAudio() {
+    window.NeuralListeningEngine?.stop(updateListeningEngine);
+  }
+
+  function updateListeningEngine(info = {}) {
+    if (el('listenEngineStatus')) {
+      el('listenEngineStatus').textContent = info.detail || info.status || 'Ready for clear English playback.';
+    }
+    if (el('listenVoice')) {
+      el('listenVoice').textContent = info.voice || window.NeuralListeningEngine?.getVoiceLabel?.() || 'Browser voice';
+    }
+  }
+
+  function renderListeningSupport() {
+    const support = el('listenSupport');
+    if (!support || !state.currentListen || !window.NeuralListeningEngine) return;
+    const info = window.NeuralListeningEngine.explain(listeningText());
+    support.classList.add('active');
+    support.innerHTML = `
+      <strong>Comprehension guide:</strong>
+      <span>${esc(info.steps.join(' '))}</span>
+      ${info.keyWords.length ? `<div><strong>Key sounds:</strong> ${info.keyWords.map((word) => `<span class="term-badge">${esc(word)}</span>`).join(' ')}</div>` : ''}
+    `;
   }
 
   function showError(message) {
@@ -211,6 +233,7 @@
     state.currentListen = (candidates.length ? candidates : pool)[Math.floor(Math.random() * (candidates.length || pool.length))];
     state.answered = false;
     renderListeningQuestion();
+    renderListeningSupport();
     window.setTimeout(() => speak(listeningText()), 120);
   }
 
@@ -246,6 +269,7 @@
         <button class="listen-option" type="button" data-answer="${esc(option)}">${esc(option)}</button>
       `).join('')}</div>`;
     }
+    renderListeningSupport();
   }
 
   function answerListening(correct, answerText = '') {
@@ -334,6 +358,13 @@
       speak(listeningText());
     });
     el('listenPlay').addEventListener('click', () => speak(listeningText()));
+    el('listenSlowRepeat').addEventListener('click', () => {
+      const previousSpeed = state.speed;
+      state.speed = 0.72;
+      speak(listeningText());
+      state.speed = previousSpeed;
+    });
+    el('listenStop').addEventListener('click', stopAudio);
     el('listenNext').addEventListener('click', nextListeningItem);
     el('listenQuestion').addEventListener('click', (event) => {
       const button = event.target.closest('[data-answer]');
@@ -361,6 +392,10 @@
         button.classList.toggle('active', button.dataset.level === state.level);
       });
       updateProgress();
+      updateListeningEngine({
+        detail: 'Ready for clear English playback.',
+        voice: window.NeuralListeningEngine?.getVoiceLabel?.() || 'Browser voice',
+      });
       applyFilters({ resetListening: false });
       setMode(state.mode, false);
     } catch (_) {

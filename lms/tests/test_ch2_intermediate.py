@@ -78,6 +78,8 @@ class PublicViewsTest(TestCase):
         self.assertContains(response, "COP17 Registration")
         self.assertContains(response, "Teacher guide")
         self.assertContains(response, "Learner handouts")
+        self.assertContains(response, "Study steps")
+        self.assertIn("lesson_outline", response.context)
         self.assertNotContains(response, "400 Questions")
 
     def test_alc_support_lesson_links_docx_and_pdf(self):
@@ -144,7 +146,10 @@ class PublicViewsTest(TestCase):
         self.assertTemplateUsed(response, "lms/course_library.html")
         self.assertEqual(len(response.context["course_lessons"]), 32)
         self.assertEqual(response.context["course_counts"], {"A1": 8, "A2": 12, "B1": 12})
+        self.assertEqual(len(response.context["course_modules"]), 5)
         self.assertContains(response, 'id="courseRows"')
+        self.assertContains(response, "Checkpoint Basics")
+        self.assertContains(response, "Professional Output &amp; Final Assessment")
         self.assertContains(response, 'data-number="32"')
         self.assertContains(response, "500 Worksheets")
 
@@ -181,6 +186,56 @@ class PublicViewsTest(TestCase):
         response = self.client.get(reverse("course_library"))
         self.assertContains(response, reverse("intermediate_course"))
         self.assertContains(response, "8 foundation lessons + 12 operational applications")
+
+    def test_prompt_guides_index_lists_all_guides(self):
+        response = self.client.get(reverse("prompt_guides"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "lms/prompt_guides.html")
+        self.assertEqual(response.context["guide_count"], 2)
+        self.assertEqual(response.context["prompt_total"], 43)
+        self.assertContains(response, "Prompt Design for LMS Content Creation")
+        self.assertContains(response, "AI in Instructional Design Prompt Library")
+        self.assertContains(response, reverse("authoring_studio"))
+
+    def test_prompt_design_guide_is_readable_and_complete(self):
+        response = self.client.get(reverse("prompt_guide_detail", args=["prompt-design-lms"]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "lms/prompt_guide_detail.html")
+        self.assertEqual(response.context["guide"]["prompt_count"], 10)
+        self.assertContains(response, "Course Structure Prompt")
+        self.assertContains(response, "Translation and Localisation Prompt")
+        self.assertContains(response, "How to use AI content in an LMS")
+
+    def test_instructional_design_prompt_library_includes_all_supplied_prompts(self):
+        response = self.client.get(reverse("prompt_guide_detail", args=["ai-instructional-design"]))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["guide"]["prompt_count"], 33)
+        self.assertContains(response, "Create Learner Personas")
+        self.assertContains(response, "Leadership Style Scenario")
+        self.assertContains(response, "all 33 supplied prompts")
+
+    def test_unknown_prompt_guide_returns_404(self):
+        response = self.client.get(reverse("prompt_guide_detail", args=["missing-guide"]))
+        self.assertEqual(response.status_code, 404)
+
+    def test_course_library_links_to_prompt_guides(self):
+        response = self.client.get(reverse("course_library"))
+        self.assertContains(response, reverse("prompt_guides"))
+        self.assertContains(response, "AI templates for lessons, quizzes, and scenarios")
+        self.assertContains(response, reverse("authoring_studio"))
+
+    def test_authoring_studio_turns_prompt_guides_into_workflow(self):
+        response = self.client.get(reverse("authoring_studio"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "lms/authoring_studio.html")
+        self.assertEqual(response.context["recipe_count"], 43)
+        self.assertEqual(len(response.context["authoring_steps"]), 7)
+        self.assertEqual(len(response.context["course_pack_defaults"]["modules"]), 5)
+        self.assertContains(response, "Prompt-driven LMS builder")
+        self.assertContains(response, "Course Structure Prompt")
+        self.assertContains(response, "Course Pack Builder")
+        self.assertContains(response, "Copy course pack")
+        self.assertContains(response, "Publishing checklist")
 
     def test_beginner_alc_pack_contains_study_guide_and_four_lessons(self):
         response = self.client.get(reverse("beginner_course"))
@@ -284,6 +339,8 @@ class PublicViewsTest(TestCase):
         self.assertContains(response, reverse("course_library"))
         self.assertContains(response, "Course Library")
         self.assertContains(response, "Practice Center")
+        self.assertContains(response, "Study blocks")
+        self.assertContains(response, reverse("authoring_studio"))
 
     def test_videos_view_returns_200(self):
         self.assertEqual(self.client.get(reverse("videos")).status_code, 200)
@@ -321,17 +378,32 @@ class LoginViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "lms/login.html")
 
-    def test_get_when_already_authenticated_redirects_to_dashboard(self):
+    def test_get_when_already_authenticated_redirects_to_profile_setup(self):
         user = User.objects.create_user(username="u", password="p")
         self.client.force_login(user)
-        self.assertRedirects(self.client.get(reverse("login")), reverse("dashboard"))
+        self.assertRedirects(self.client.get(reverse("login")), reverse("setup_profile"))
 
-    def test_post_valid_credentials_redirects_to_dashboard(self):
+    def test_post_valid_credentials_redirects_to_profile_setup(self):
         User.objects.create_user(username="validuser", password="validpass")
         response = self.client.post(reverse("login"), {
             "username": "validuser", "password": "validpass",
         })
-        self.assertRedirects(response, reverse("dashboard"))
+        self.assertRedirects(response, reverse("setup_profile"))
+
+    def test_post_valid_credentials_blocks_external_next_redirect(self):
+        User.objects.create_user(username="validuser", password="validpass")
+        response = self.client.post(reverse("login") + "?next=https://evil.example/", {
+            "username": "validuser", "password": "validpass",
+        })
+        self.assertRedirects(response, reverse("setup_profile"))
+
+    def test_post_valid_credentials_allows_local_next_redirect(self):
+        User.objects.create_user(username="validuser", password="validpass")
+        response = self.client.post(reverse("login") + "?next=/course/", {
+            "username": "validuser", "password": "validpass",
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["Location"], "/course/")
 
     def test_post_invalid_credentials_shows_error(self):
         response = self.client.post(reverse("login"), {
@@ -344,18 +416,30 @@ class LoginViewTest(TestCase):
         response = self.client.get(reverse("login"))
         self.assertIn("firebase_config", response.context)
 
+    def test_google_login_has_redirect_fallback(self):
+        response = self.client.get(reverse("login"))
+        self.assertContains(response, "signInWithPopup")
+        self.assertContains(response, "signInWithRedirect")
+        self.assertContains(response, "getRedirectResult")
 
-class StubViewsTest(TestCase):
-    """Remaining stub views should redirect to dashboard."""
 
-    def test_register_redirects_to_dashboard(self):
-        self.assertRedirects(self.client.get(reverse("register")), reverse("dashboard"))
+class AccountRouteTest(TestCase):
+    """Account and progress routes expose the implemented LMS behavior."""
 
-    def test_profile_redirects_to_dashboard(self):
-        self.assertRedirects(self.client.get(reverse("profile")), reverse("dashboard"))
+    def test_register_renders_account_form(self):
+        response = self.client.get(reverse("register"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "lms/register.html")
 
-    def test_departments_redirects_to_dashboard(self):
-        self.assertRedirects(self.client.get(reverse("departments")), reverse("dashboard"))
+    def test_profile_requires_login(self):
+        response = self.client.get(reverse("profile"))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("login"), response["Location"])
+
+    def test_departments_requires_admin_login(self):
+        response = self.client.get(reverse("departments"))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("login"), response["Location"])
 
     def test_logout_redirects_to_dashboard(self):
         user = User.objects.create_user(username="u", password="p")
@@ -484,6 +568,23 @@ class LogbookViewTest(TestCase):
         response = self.client.post(reverse("logbook"), {"full_name": ""})
         self.assertIsNotNone(response.context["error"])
 
+    def test_post_invalid_department_id_is_rejected_cleanly(self):
+        response = self.client.post(reverse("logbook"), {
+            "full_name": "Tampered",
+            "department": "not-a-number",
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(response.context["error"])
+        self.assertEqual(LogEntry.objects.count(), 0)
+
+    def test_post_too_long_name_is_rejected_cleanly(self):
+        response = self.client.post(reverse("logbook"), {
+            "full_name": "A" * 201,
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(response.context["error"])
+        self.assertEqual(LogEntry.objects.count(), 0)
+
 
 # ── padlet_view ───────────────────────────────────────────────────────────────
 
@@ -540,55 +641,72 @@ class PadletViewTest(TestCase):
         })
         self.assertTrue(response.context["success"])
 
+    def test_post_too_long_content_is_rejected_cleanly(self):
+        response = self.client.post(reverse("padlet"), {
+            "author_name": "Naran",
+            "prompt": "learned",
+            "content": "A" * 301,
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(response.context["error"])
+        self.assertEqual(WallPost.objects.count(), 0)
+
+    def test_post_too_long_author_is_rejected_cleanly(self):
+        response = self.client.post(reverse("padlet"), {
+            "author_name": "N" * 101,
+            "prompt": "learned",
+            "content": "Some content",
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(response.context["error"])
+        self.assertEqual(WallPost.objects.count(), 0)
+
 
 # ── RegisterForm ──────────────────────────────────────────────────────────────
 
 class RegisterFormTest(TestCase):
-    def test_valid_form_is_valid(self):
-        form = RegisterForm(data={
+    def valid_data(self, **overrides):
+        data = {
             "username": "newuser",
-            "password": "secret123",
-            "password2": "secret123",
-        })
+            "full_name": "New User",
+            "email": "newuser@example.com",
+            "role": "STUDENT",
+            "password": "StrongSecret123!",
+            "password2": "StrongSecret123!",
+        }
+        data.update(overrides)
+        return data
+
+    def test_valid_form_is_valid(self):
+        form = RegisterForm(data=self.valid_data())
         self.assertTrue(form.is_valid())
 
     def test_password_mismatch_is_invalid(self):
-        form = RegisterForm(data={
-            "username": "newuser",
-            "password": "secret123",
-            "password2": "different",
-        })
+        form = RegisterForm(data=self.valid_data(password2="different"))
         self.assertFalse(form.is_valid())
         self.assertIn("Нууц үг таарахгүй байна", str(form.errors))
 
     def test_duplicate_username_is_invalid(self):
         User.objects.create_user(username="existing", password="pass")
-        form = RegisterForm(data={
-            "username": "existing",
-            "password": "secret123",
-            "password2": "secret123",
-        })
+        form = RegisterForm(data=self.valid_data(username="existing"))
         self.assertFalse(form.is_valid())
         self.assertIn("Энэ нэр бүртгэлтэй байна", str(form.errors))
 
     def test_save_stores_hashed_password(self):
-        form = RegisterForm(data={
-            "username": "hashtest",
-            "password": "mypassword",
-            "password2": "mypassword",
-        })
+        form = RegisterForm(data=self.valid_data(
+            username="hashtest",
+            email="hashtest@example.com",
+            password="MyStrongPassword734!",
+            password2="MyStrongPassword734!",
+        ))
         self.assertTrue(form.is_valid())
         user = form.save()
-        self.assertTrue(user.check_password("mypassword"))
+        self.assertTrue(user.check_password("MyStrongPassword734!"))
         self.assertFalse(user.check_password("wrongpassword"))
 
     def test_save_creates_user_in_database(self):
-        form = RegisterForm(data={
-            "username": "dbtest",
-            "password": "mypassword",
-            "password2": "mypassword",
-        })
-        form.is_valid()
+        form = RegisterForm(data=self.valid_data(username="dbtest", email="dbtest@example.com"))
+        self.assertTrue(form.is_valid())
         form.save()
         self.assertTrue(User.objects.filter(username="dbtest").exists())
 

@@ -1,0 +1,71 @@
+{% extends 'lms/base.html' %}
+{% block title %}Course catalog | SSPA400{% endblock %}
+{% block content %}
+<div class="portal-shell">
+  <div class="portal-page-head">
+    <div>
+      <h1>Course catalog</h1>
+      <p>Practical English courses for daily conversation, workplace communication, and operational speaking. Every course is free.</p>
+    </div>
+    {% if user.is_authenticated %}<a class="btn btn-outline-primary" href="{% url 'learning_dashboard' %}"><i class="bi bi-speedometer2 me-1"></i> My learning</a>{% endif %}
+  </div>
+
+  <form class="filter-bar" method="get" role="search">
+    <div>
+      <label class="form-label" for="catalogSearch">Search</label>
+      <input class="form-control" id="catalogSearch" name="q" value="{{ query }}" placeholder="Course title or topic">
+    </div>
+    <div>
+      <label class="form-label" for="levelFilter">Level</label>
+      <select class="form-select" id="levelFilter" name="level">
+        <option value="">All levels</option>
+        {% for value, label in levels %}<option value="{{ value }}" {% if selected_level == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </div>
+    <div>
+      <label class="form-label" for="categoryFilter">Category</label>
+      <select class="form-select" id="categoryFilter" name="category">
+        <option value="">All categories</option>
+        {% for category in categories %}<option value="{{ category.id }}" {% if selected_category == category.id|stringformat:'s' %}selected{% endif %}>{{ category.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <button class="btn btn-primary" type="submit"><i class="bi bi-search me-1"></i> Search</button>
+  </form>
+
+  {% if courses %}
+  <div class="course-grid">
+    {% for course in courses %}
+    <article class="course-tile">
+      <div class="course-meta">
+        <span class="level-pill">{{ course.get_level_display }}</span>
+        {% if course.category %}<span>{{ course.category.name }}</span>{% endif %}
+        {% if course.is_featured %}<span class="status-pill warning">Featured</span>{% endif %}
+      </div>
+      <h3><a class="text-decoration-none text-dark" href="{{ course.get_absolute_url }}">{{ course.title }}</a></h3>
+      <p>{{ course.short_description|default:course.description|truncatewords:28 }}</p>
+      <div class="course-meta">
+        <span><i class="bi bi-folder2-open me-1"></i>{{ course.module_total }} modules</span>
+        <span><i class="bi bi-clock me-1"></i>{{ course.estimated_minutes }} min</span>
+        <span><i class="bi bi-people me-1"></i>{{ course.learner_total }}</span>
+      </div>
+      <div class="course-footer">
+        <strong class="text-success">Free</strong>
+        {% if course.id in enrolled_ids %}
+        <a class="btn btn-sm btn-primary" href="{% url 'course_player_start' course.slug %}">Continue</a>
+        {% else %}
+        <a class="btn btn-sm btn-outline-primary" href="{{ course.get_absolute_url }}">View course</a>
+        {% endif %}
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <i class="bi bi-search"></i>
+    <h2>No courses matched</h2>
+    <p>Try a different word or clear the level and category filters.</p>
+    <a class="btn btn-outline-primary" href="{% url 'catalog' %}">Clear filters</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -107,6 +107,8 @@
 .ip-icon-button { align-items: center; background: #fff; border: 1px solid #c7d3df; color: var(--ip-blue); display: inline-flex; height: 32px; justify-content: center; width: 32px; }
 
 .ip-reading-toolbar { display: flex; gap: 7px; margin-bottom: 10px; }
+.ip-listening-status { background: #f1f6fb; border: 1px solid #d8e4ef; color: #466178; font-size: 12px; margin-bottom: 10px; padding: 9px 11px; }
+.ip-listening-guide { background: #fffaf0; border: 1px solid #f1d99e; color: #66511d; font-size: 12px; line-height: 1.55; margin-bottom: 12px; padding: 11px 12px; }
 .ip-reading { background: #f8fafc; border-left: 4px solid var(--ip-green); line-height: 1.75; padding: 15px 16px; white-space: pre-line; }
 .ip-question { border-top: 1px solid var(--ip-line); padding: 11px 0; }
 .ip-question:first-child { border-top: 0; }

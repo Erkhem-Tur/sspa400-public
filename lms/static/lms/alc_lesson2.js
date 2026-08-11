@@ -25,12 +25,11 @@
   }
 
   function speak(text, rate) {
-    if (!('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-US';
-    utterance.rate = rate || 0.82;
-    window.speechSynthesis.speak(utterance);
+    if (!window.NeuralListeningEngine?.isSupported()) return;
+    window.NeuralListeningEngine.speak(text, {
+      rate: rate || 0.82,
+      label: 'ALC neural listening active.',
+    });
   }
 
   function shuffle(items) {

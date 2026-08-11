@@ -1,0 +1,19 @@
+{% if form.non_field_errors %}
+<div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
+{% endif %}
+{% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+{% for field in form.visible_fields %}
+<div class="mb-3 {% if field.name == 'description' or field.name == 'learning_outcomes' or field.name == 'body' or field.name == 'audio_script' or field.name == 'instructions' or field.name == 'rubric' or field.name == 'prompt' or field.name == 'options_text' or field.name == 'explanation' or field.name == 'feedback' %}full{% endif %}">
+  {% if field.field.widget.input_type == 'checkbox' %}
+  <div class="form-check">
+    {{ field }}
+    <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+  </div>
+  {% else %}
+  <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+  {{ field }}
+  {% endif %}
+  {% if field.help_text %}<span class="helptext">{{ field.help_text|safe }}</span>{% endif %}
+  {% if field.errors %}<div class="field-errors">{{ field.errors }}</div>{% endif %}
+</div>
+{% endfor %}

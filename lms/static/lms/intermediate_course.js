@@ -5,6 +5,7 @@
   if (!root) return;
 
   const STORAGE_KEY = 'sspa-intermediate-pathway';
+  const progressSync = window.PathwayProgressSync.create(root.dataset.progressUrl);
   const operational = JSON.parse(document.getElementById('operationalLessonData').textContent);
   const params = new URLSearchParams(window.location.search);
   const state = {
@@ -37,6 +38,7 @@
 
   function saveProgress() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state.progress));
+    progressSync.save(state.progress);
   }
 
   function lessonKey(lesson) {
@@ -133,8 +135,9 @@
         <article class="ip-vocab-item"><div class="ip-vocab-top"><strong>${esc(item.word)}</strong><button class="ip-icon-button" type="button" data-speak-vocab="${index}" title="Listen" aria-label="Listen to ${esc(item.word)}"><i class="bi bi-volume-up"></i></button></div><p>${esc(item.meaning)}</p><small>${esc(item.example)}</small></article>
       `).join('')}</div></div>`;
     } else if (state.tab === 'reading') {
+      const support = window.NeuralListeningEngine?.explain?.(lesson.reading);
       panel = `
-        <div class="ip-section"><h3>${esc(lesson.reading_title)}</h3><div class="ip-reading-toolbar"><button class="btn btn-outline-primary btn-sm" type="button" data-action="speak-reading"><i class="bi bi-volume-up me-1"></i>Listen</button><button class="btn btn-outline-secondary btn-sm" type="button" data-action="stop-audio"><i class="bi bi-stop-fill me-1"></i>Stop</button></div><div class="ip-reading">${esc(lesson.reading)}</div></div>
+        <div class="ip-section"><h3>${esc(lesson.reading_title)}</h3><div class="ip-reading-toolbar"><button class="btn btn-outline-primary btn-sm" type="button" data-action="speak-reading"><i class="bi bi-volume-up me-1"></i>Neural listen</button><button class="btn btn-outline-primary btn-sm" type="button" data-action="slow-reading"><i class="bi bi-speedometer2 me-1"></i>Slow repeat</button><button class="btn btn-outline-secondary btn-sm" type="button" data-action="stop-audio"><i class="bi bi-stop-fill me-1"></i>Stop</button></div><div class="ip-listening-status" id="ipListeningStatus">Ready for clear English playback.</div>${support ? `<div class="ip-listening-guide"><strong>Comprehension guide:</strong> ${esc(support.steps.join(' '))}<br><strong>Key sounds:</strong> ${support.keyWords.map((word) => `<span class="ip-chip">${esc(word)}</span>`).join('')}</div>` : ''}<div class="ip-reading">${esc(lesson.reading)}</div></div>
         <div class="ip-section"><h3>Reading check</h3>${questionInputs(lesson, 'reading')}</div>`;
     } else {
       panel = `
@@ -238,12 +241,32 @@
   }
 
   function speak(text) {
-    if (!('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-US';
-    utterance.rate = 0.92;
-    window.speechSynthesis.speak(utterance);
+    const engine = window.NeuralListeningEngine;
+    if (!engine || !engine.isSupported()) return;
+    engine.speak(text, {
+      rate: 0.92,
+      label: 'Intermediate neural listening active.',
+      onStatus: updateListeningStatus,
+    });
+  }
+
+  function speakSlow(text) {
+    const engine = window.NeuralListeningEngine;
+    if (!engine || !engine.isSupported()) return;
+    engine.speak(text, {
+      rate: 0.72,
+      label: 'Slow repeat active.',
+      onStatus: updateListeningStatus,
+    });
+  }
+
+  function stopAudio() {
+    window.NeuralListeningEngine?.stop(updateListeningStatus);
+  }
+
+  function updateListeningStatus(info = {}) {
+    const status = el('ipListeningStatus');
+    if (status) status.textContent = `${info.detail || info.status || 'Ready'} ${info.voice ? `Voice: ${info.voice}` : ''}`.trim();
   }
 
   function bindEvents() {
@@ -267,7 +290,11 @@
         const lesson = state.lessons.find((item) => item.pathway_number === state.current);
         speak(lesson.reading);
       }
-      if (action === 'stop-audio' && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+      if (action === 'slow-reading') {
+        const lesson = state.lessons.find((item) => item.pathway_number === state.current);
+        speakSlow(lesson.reading);
+      }
+      if (action === 'stop-audio') stopAudio();
       if (action === 'return-lesson') selectLesson(state.current);
       if (action === 'submit-diagnostic') { state.diagnosticSubmitted = true; renderDiagnostic(); }
       const vocabButton = event.target.closest('[data-speak-vocab]');
@@ -292,6 +319,9 @@
   async function init() {
     bindEvents();
     try {
+      const synced = await progressSync.hydrate(state.progress);
+      state.progress = {completed: synced.completed, drafts: synced.drafts, scores: synced.scores};
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.progress));
       const response = await fetch(root.dataset.source);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();

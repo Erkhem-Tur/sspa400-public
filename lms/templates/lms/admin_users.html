@@ -1,0 +1,14 @@
+{% extends 'lms/base.html' %}
+{% load lms_extras %}
+{% block title %}Manage users | SSPA400{% endblock %}
+{% block content %}
+<div class="portal-shell">
+  <div class="portal-page-head"><div><h1>Manage users</h1><p>Roles control access to course creation. Admin rights remain protected in Advanced admin.</p></div><a class="btn btn-outline-primary" href="{% url 'admin_dashboard' %}">Management home</a></div>
+  <form class="filter-bar" method="get" style="grid-template-columns:minmax(220px,1fr) auto"><div><label class="form-label" for="userSearch">Search accounts</label><input class="form-control" id="userSearch" name="q" value="{{ query }}" placeholder="Name, username, or email"></div><button class="btn btn-primary" type="submit">Search</button></form>
+  <section class="content-panel">
+    <div class="responsive-table"><table class="table table-hover mb-0"><thead><tr><th>User</th><th>Role</th><th>Joined</th><th>Status</th><th class="text-end">Actions</th></tr></thead><tbody>
+    {% for account in users %}<tr><td><div class="d-flex align-items-center gap-2"><span class="avatar-sm">{{ account|display_name|first|upper }}</span><div><strong>{{ account|display_name }}</strong>{% if account.progress.instructor_requested %}<span class="status-pill warning ms-1">Instructor request</span>{% endif %}<div class="small text-muted">{{ account.username }} · {{ account.email|default:'No email' }}</div></div></div></td><td>{% if account.is_staff %}<span class="status-pill warning">Admin</span>{% else %}<form class="d-flex gap-1" method="post">{% csrf_token %}<input type="hidden" name="user_id" value="{{ account.id }}"><input type="hidden" name="action" value="set-role"><select class="form-select form-select-sm" name="role" aria-label="Role for {{ account.username }}">{% for value, label in roles %}<option value="{{ value }}" {% if account.progress.role == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select><button class="btn btn-sm btn-outline-primary" type="submit" title="Save role"><i class="bi bi-check2"></i></button></form>{% endif %}</td><td>{{ account.date_joined|date:'M j, Y' }}</td><td><span class="status-pill {% if account.is_active %}success{% else %}muted{% endif %}">{% if account.is_active %}Active{% else %}Disabled{% endif %}</span></td><td class="text-end">{% if account != request.user %}<form method="post">{% csrf_token %}<input type="hidden" name="user_id" value="{{ account.id }}"><input type="hidden" name="action" value="toggle-active"><button class="btn btn-sm {% if account.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %}" type="submit">{% if account.is_active %}Disable{% else %}Enable{% endif %}</button></form>{% endif %}</td></tr>{% empty %}<tr><td colspan="5" class="text-center text-muted py-4">No accounts matched.</td></tr>{% endfor %}
+    </tbody></table></div>
+  </section>
+</div>
+{% endblock %}

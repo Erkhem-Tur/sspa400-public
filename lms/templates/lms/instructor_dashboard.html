@@ -1,0 +1,64 @@
+{% extends 'lms/base.html' %}
+{% load lms_extras %}
+{% block title %}Instructor workspace | SSPA400{% endblock %}
+{% block content %}
+<div class="portal-shell">
+  <div class="portal-page-head">
+    <div><h1>Instructor workspace</h1><p>Create structured lessons, review learner work, and see progress without leaving the LMS.</p></div>
+    <a class="btn btn-primary" href="{% url 'course_create' %}"><i class="bi bi-plus-lg me-1"></i> Create course</a>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric"><strong>{{ courses|length }}</strong><span>Courses managed</span></div>
+    <div class="metric"><strong>{{ learner_total }}</strong><span>Unique learners</span></div>
+    <div class="metric"><strong>{{ pending_submissions|length }}</strong><span>Assignments waiting</span></div>
+    <div class="metric"><strong>{{ pending_quizzes|length }}</strong><span>Written quizzes waiting</span></div>
+  </div>
+
+  <section class="portal-section" aria-labelledby="coursesTitle">
+    <div class="portal-section-head"><h2 id="coursesTitle">My courses</h2></div>
+    {% if courses %}
+    <div class="course-grid">
+      {% for course in courses %}
+      <article class="course-tile">
+        <div class="course-meta">
+          <span class="level-pill">{{ course.get_level_display }}</span>
+          <span class="status-pill {% if course.status == 'PUBLISHED' %}success{% elif course.status == 'DRAFT' %}warning{% else %}muted{% endif %}">{{ course.get_status_display }}</span>
+        </div>
+        <h3>{{ course.title }}</h3>
+        <p>{{ course.short_description|default:'Add a clear one-sentence course description.' }}</p>
+        <div class="course-meta"><span>{{ course.module_count_value }} modules</span><span>{{ course.learner_count }} learners</span></div>
+        <div class="course-footer">
+          <a class="btn btn-sm btn-outline-primary" href="{% url 'course_gradebook' course.slug %}"><i class="bi bi-table me-1"></i> Gradebook</a>
+          <a class="btn btn-sm btn-primary" href="{% url 'course_builder' course.slug %}"><i class="bi bi-tools me-1"></i> Builder</a>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state"><i class="bi bi-journal-plus"></i><h2>Create your first course</h2><p>Start with a title, then add modules, lessons, speaking practice, and assessments.</p><a class="btn btn-primary" href="{% url 'course_create' %}">Create course</a></div>
+    {% endif %}
+  </section>
+
+  <div class="dashboard-grid portal-section">
+    <section class="content-panel" aria-labelledby="submissionsTitle">
+      <div class="portal-section-head"><h2 id="submissionsTitle">Assignments to review</h2></div>
+      {% for submission in pending_submissions %}
+      <div class="d-flex justify-content-between align-items-center gap-3 py-2 {% if not forloop.last %}border-bottom{% endif %}">
+        <div><strong>{{ submission.student|display_name }}</strong><div class="small text-muted">{{ submission.assignment.unit.title }} · {{ submission.assignment.unit.module.course.title }}</div></div>
+        <a class="btn btn-sm btn-outline-primary" href="{% url 'grade_submission' submission.id %}">Review</a>
+      </div>
+      {% empty %}<p class="text-muted small mb-0">No assignments are waiting.</p>{% endfor %}
+    </section>
+    <section class="content-panel" aria-labelledby="quizReviewTitle">
+      <div class="portal-section-head"><h2 id="quizReviewTitle">Written quizzes to review</h2></div>
+      {% for attempt in pending_quizzes %}
+      <div class="d-flex justify-content-between align-items-center gap-3 py-2 {% if not forloop.last %}border-bottom{% endif %}">
+        <div><strong>{{ attempt.user|display_name }}</strong><div class="small text-muted">{{ attempt.unit.title }} · {{ attempt.unit.module.course.title }}</div></div>
+        <a class="btn btn-sm btn-outline-primary" href="{% url 'grade_quiz_review' attempt.id %}">Grade</a>
+      </div>
+      {% empty %}<p class="text-muted small mb-0">No written responses are waiting.</p>{% endfor %}
+    </section>
+  </div>
+</div>
+{% endblock %}

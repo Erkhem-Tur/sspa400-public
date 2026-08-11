@@ -1,0 +1,22 @@
+{% extends 'lms/base.html' %}
+{% load static lms_extras %}
+{% block title %}Certificate | {{ certificate.course.title }}{% endblock %}
+{% block content %}
+<div class="portal-shell">
+  <div class="certificate-actions d-flex justify-content-between align-items-center gap-2 mb-3">
+    <a class="btn btn-outline-primary" href="{% url 'learning_dashboard' %}"><i class="bi bi-arrow-left me-1"></i> My learning</a>
+    <button class="btn btn-primary" type="button" onclick="window.print()"><i class="bi bi-printer me-1"></i> Print or save PDF</button>
+  </div>
+  <article class="certificate-sheet">
+    <img src="{% static 'lms/logo.png' %}" alt="SSPA" style="width:90px;height:90px;object-fit:contain;">
+    <h1>Certificate of Completion</h1>
+    <p>This certificate confirms that</p>
+    <div class="certificate-name">{{ certificate.user|display_name }}</div>
+    <p>successfully completed</p>
+    <div class="certificate-course">{{ certificate.course.title }}</div>
+    <p class="mt-4">Issued {{ certificate.issued_at|date:'F j, Y' }}</p>
+    {% if certificate.course.instructor %}<p>Instructor: {{ certificate.course.instructor|display_name }}</p>{% endif %}
+    <div class="certificate-code">Verification code: {{ certificate.code }}<br>Verify at {{ request.build_absolute_uri }}</div>
+  </article>
+</div>
+{% endblock %}

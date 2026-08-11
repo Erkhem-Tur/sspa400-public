@@ -1,0 +1,83 @@
+{% extends 'lms/base.html' %}
+{% block title %}{{ course.title }} | SSPA400{% endblock %}
+{% block content %}
+<div class="portal-shell">
+  <div class="portal-page-head">
+    <div>
+      <div class="course-meta mb-2">
+        <span class="level-pill">{{ course.get_level_display }}</span>
+        {% if course.category %}<span>{{ course.category.name }}</span>{% endif %}
+        <span class="status-pill success">Free</span>
+        {% if course.status != 'PUBLISHED' %}<span class="status-pill warning">{{ course.get_status_display }}</span>{% endif %}
+      </div>
+      <h1>{{ course.title }}</h1>
+      <p>{{ course.short_description|default:course.description }}</p>
+    </div>
+    <div class="portal-actions">
+      {% if can_manage %}
+      <a class="btn btn-outline-primary" href="{% url 'course_builder' course.slug %}"><i class="bi bi-tools me-1"></i> Open builder</a>
+      {% elif enrollment %}
+      <a class="btn btn-primary" href="{% url 'course_player_start' course.slug %}"><i class="bi bi-play-fill me-1"></i> {% if enrollment.progress_percent %}Continue{% else %}Start{% endif %}</a>
+      {% elif user.is_authenticated %}
+      <form method="post" action="{% url 'enroll_course' course.slug %}">{% csrf_token %}<button class="btn btn-primary" type="submit"><i class="bi bi-plus-lg me-1"></i> Add free course</button></form>
+      {% else %}
+      <a class="btn btn-primary" href="{% url 'login' %}?next={{ request.path|urlencode }}">Sign in to enroll</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <div>
+      <section class="content-panel">
+        <h2>About this course</h2>
+        <div class="lesson-copy">{{ course.description|linebreaks }}</div>
+      </section>
+
+      <section class="portal-section" aria-labelledby="curriculumTitle">
+        <div class="portal-section-head"><h2 id="curriculumTitle">Course outline</h2></div>
+        {% for module in modules %}
+        <div class="builder-module">
+          <div class="builder-module-head">
+            <div><strong>Module {{ forloop.counter }}: {{ module.title }}</strong>{% if module.summary %}<div class="small text-muted mt-1">{{ module.summary }}</div>{% endif %}</div>
+            <span class="text-muted small">{{ module.units.all|length }} activities</span>
+          </div>
+          {% for unit in module.units.all %}
+          <div class="builder-unit">
+            <span class="unit-icon">
+              {% if unit.kind == 'VIDEO' %}<i class="bi bi-play-btn"></i>{% elif unit.kind == 'QUIZ' %}<i class="bi bi-ui-checks"></i>{% elif unit.kind == 'LISTENING' %}<i class="bi bi-headphones"></i>{% elif unit.kind == 'ASSIGNMENT' %}<i class="bi bi-pencil-square"></i>{% else %}<i class="bi bi-file-text"></i>{% endif %}
+            </span>
+            <div><div class="fw-semibold">{{ unit.title }}</div><small class="text-muted">{{ unit.get_kind_display }} · {{ unit.duration_minutes }} min</small></div>
+            {% if enrollment %}<a class="btn btn-sm btn-outline-primary" href="{{ unit.get_absolute_url }}" aria-label="Open {{ unit.title }}"><i class="bi bi-arrow-right"></i></a>{% endif %}
+          </div>
+          {% empty %}
+          <div class="p-3 text-muted small">Lessons are being prepared.</div>
+          {% endfor %}
+        </div>
+        {% empty %}
+        <div class="empty-state"><i class="bi bi-journal"></i><h3>Course outline coming soon</h3></div>
+        {% endfor %}
+      </section>
+    </div>
+
+    <aside>
+      <section class="content-panel">
+        <h2>Course facts</h2>
+        <dl class="row small mb-0">
+          <dt class="col-6 py-2">Level</dt><dd class="col-6 py-2 text-end">{{ course.get_level_display }}</dd>
+          <dt class="col-6 py-2 border-top">Duration</dt><dd class="col-6 py-2 border-top text-end">{{ course.estimated_minutes }} min</dd>
+          <dt class="col-6 py-2 border-top">Modules</dt><dd class="col-6 py-2 border-top text-end">{{ modules|length }}</dd>
+          <dt class="col-6 py-2 border-top">Access</dt><dd class="col-6 py-2 border-top text-end text-success fw-bold">Free</dd>
+        </dl>
+      </section>
+      {% if learning_outcomes %}
+      <section class="content-panel mt-3">
+        <h2>You will be able to</h2>
+        <ul class="mb-0 ps-3">
+          {% for outcome in learning_outcomes %}<li class="mb-2">{{ outcome }}</li>{% endfor %}
+        </ul>
+      </section>
+      {% endif %}
+    </aside>
+  </div>
+</div>
+{% endblock %}

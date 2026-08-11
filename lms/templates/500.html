@@ -1,0 +1,3 @@
+{% extends 'lms/base.html' %}
+{% block title %}Service unavailable | SSPA400{% endblock %}
+{% block content %}<div class="portal-shell form-page"><div class="empty-state"><i class="bi bi-exclamation-circle"></i><h2>Something did not load correctly</h2><p>Your saved progress is still protected. Refresh the page or return to the learning dashboard.</p><a class="btn btn-primary" href="{% url 'dashboard' %}">Return home</a></div></div>{% endblock %}

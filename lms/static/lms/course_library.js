@@ -5,7 +5,9 @@
   if (!root) return;
 
   const rows = Array.from(document.querySelectorAll('.course-row'));
+  const groups = Array.from(document.querySelectorAll('[data-module-group]'));
   const storageKey = 'sspa-course-library-complete';
+  const progressSync = window.PathwayProgressSync.create(root.dataset.progressUrl);
   let completed;
   try {
     completed = new Set(JSON.parse(localStorage.getItem(storageKey) || '[]').map(Number));
@@ -16,7 +18,9 @@
   let activeLevel = ['A1', 'A2', 'B1'].includes(requestedLevel) ? requestedLevel : 'all';
 
   function saveCompleted() {
-    localStorage.setItem(storageKey, JSON.stringify(Array.from(completed).sort((a, b) => a - b)));
+    const values = Array.from(completed).sort((a, b) => a - b);
+    localStorage.setItem(storageKey, JSON.stringify(values));
+    progressSync.save({completed: values, drafts: {}, scores: {}});
   }
 
   function updateProgress() {
@@ -41,6 +45,10 @@
       const show = levelMatch && searchMatch;
       row.hidden = !show;
       if (show) visible += 1;
+    });
+    groups.forEach((group) => {
+      const hasVisibleRows = Array.from(group.querySelectorAll('.course-row')).some((row) => !row.hidden);
+      group.hidden = !hasVisibleRows;
     });
     document.getElementById('courseVisibleCount').textContent = `${visible} lesson${visible === 1 ? '' : 's'}`;
     document.getElementById('courseEmpty').style.display = visible ? 'none' : 'block';
@@ -92,4 +100,9 @@
 
   updateProgress();
   applyFilters();
+  progressSync.hydrate({completed: Array.from(completed), drafts: {}, scores: {}}).then((synced) => {
+    completed = new Set(synced.completed.map(Number).filter(Number.isFinite));
+    localStorage.setItem(storageKey, JSON.stringify(Array.from(completed).sort((a, b) => a - b)));
+    updateProgress();
+  });
 }());

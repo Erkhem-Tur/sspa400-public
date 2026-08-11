@@ -6,6 +6,7 @@
 
   const lessons = JSON.parse(document.getElementById('beginnerLessonData').textContent);
   const storageKey = 'sspa-beginner-alc-pack';
+  const progressSync = window.PathwayProgressSync.create(root.dataset.progressUrl);
   const draftVersion = 2;
   const requested = new URLSearchParams(window.location.search).get('lesson');
   const state = {
@@ -31,6 +32,7 @@
 
   function saveState() {
     localStorage.setItem(storageKey, JSON.stringify(state.saved));
+    progressSync.save(state.saved);
   }
 
   function currentLesson() {
@@ -130,6 +132,18 @@
   document.getElementById('bpNext').addEventListener('click', () => move(1));
   frame.addEventListener('load', syncFrame);
 
-  updateUi();
-  frame.src = `${root.dataset.base}${state.current}.html`;
+  async function init() {
+    const synced = await progressSync.hydrate(state.saved);
+    state.saved = {
+      completed: synced.completed,
+      drafts: synced.drafts,
+      scores: synced.scores,
+      draftVersion,
+    };
+    localStorage.setItem(storageKey, JSON.stringify(state.saved));
+    updateUi();
+    frame.src = `${root.dataset.base}${state.current}.html`;
+  }
+
+  init();
 })();

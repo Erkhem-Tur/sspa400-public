@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-<main class="ip-page" id="intermediatePathway" data-source="{% static 'lms/intermediate_course.json' %}">
+<main class="ip-page" id="intermediatePathway" data-source="{% static 'lms/intermediate_course.json' %}" data-progress-url="{% if user.is_authenticated %}{% url 'pathway_progress_api' 'intermediate' %}{% endif %}">
   <header class="ip-head">
     <div>
       <div class="ip-kicker">SSPA English · Intermediate A2-B1</div>
@@ -46,7 +46,7 @@
 
   <div class="ip-layout">
     <aside class="ip-sidebar" aria-label="Intermediate lessons">
-      <label class="ip-search" for="ipSearch"><i class="bi bi-search"></i><input class="form-control" id="ipSearch" type="search" placeholder="Search lessons..."></label>
+      <label class="ip-search" for="ipSearch"><i class="bi bi-search" aria-hidden="true"></i><input class="form-control" id="ipSearch" type="search" placeholder="Search lessons..." aria-label="Search intermediate lessons"></label>
       <div class="ip-lesson-list" id="ipLessonList"></div>
     </aside>
 
@@ -59,5 +59,7 @@
 </main>
 
 {{ operational_lessons|json_script:"operationalLessonData" }}
+<script src="{% static 'lms/neural_listening.js' %}" defer></script>
+<script src="{% static 'lms/pathway_sync.js' %}" defer></script>
 <script src="{% static 'lms/intermediate_course.js' %}" defer></script>
 {% endblock %}

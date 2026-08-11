@@ -1,5 +1,7 @@
-"""Creates 12 demo student accounts with realistic progress data."""
+"""Creates 12 optional demo student accounts with realistic progress data."""
+import os
 import random
+import secrets
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -25,6 +27,11 @@ class Command(BaseCommand):
     help = 'Create demo student data'
 
     def handle(self, *args, **kwargs):
+        password = os.environ.get('DEMO_USER_PASSWORD') or secrets.token_urlsafe(16)
+        if len(password) < 12:
+            self.stdout.write(self.style.ERROR('DEMO_USER_PASSWORD must contain at least 12 characters.'))
+            return
+
         depts = list(Department.objects.all())
         if not depts:
             self.stdout.write(self.style.ERROR('No departments found. Run seed first.'))
@@ -40,7 +47,7 @@ class Command(BaseCommand):
             if User.objects.filter(username=username).exists():
                 continue
 
-            user = User.objects.create_user(username=username, password='demo1234')
+            user = User.objects.create_user(username=username, password=password)
             dept = depts[dept_idx - 1] if dept_idx - 1 < len(depts) else depts[0]
 
             days_ago = random.randint(5, 60)
@@ -82,4 +89,7 @@ class Command(BaseCommand):
             created += 1
             self.stdout.write(f'  Created: {username}')
 
-        self.stdout.write(self.style.SUCCESS(f'Done: {created} demo students. Password: demo1234'))
+        if created:
+            self.stdout.write(self.style.SUCCESS(f'Done: {created} demo students. Temporary password: {password}'))
+        else:
+            self.stdout.write(self.style.SUCCESS('Done: no new demo students were needed.'))

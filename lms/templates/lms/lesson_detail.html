@@ -8,62 +8,125 @@
 
 {% block extra_head %}
 <style>
-  .lesson-hero {
-    background: linear-gradient(135deg, #0f2744, #1b3a6b);
-    border-radius: 16px;
-    color: #fff;
-    padding: 28px;
-    box-shadow: 0 14px 32px rgba(15, 39, 68, .18);
+  .lesson-page { max-width: 1080px; margin: 0 auto; }
+  .lesson-hero { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 20px; background: #102b4e; color: #fff; padding: 26px; border-bottom: 4px solid #c9a227; }
+  .lesson-kicker { color: #f2cb58; font-size: 11px; font-weight: 900; text-transform: uppercase; }
+  .lesson-hero h1 { margin: 5px 0 8px; font-size: 28px; letter-spacing: 0; }
+  .lesson-hero p { margin: 0; color: #dce6f2; line-height: 1.55; font-size: 14px; }
+  .lesson-summary { display: grid; gap: 8px; align-content: start; }
+  .lesson-summary div { border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.08); padding: 11px 12px; }
+  .lesson-summary strong { display: block; font-size: 18px; }
+  .lesson-summary span { color: #dce6f2; font-size: 11px; font-weight: 800; }
+  .lesson-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 18px; margin-top: 18px; align-items: start; }
+  .lesson-panel, .resource-card, .step-card { border: 1px solid #dbe2ea; background: #fff; }
+  .lesson-panel { padding: 18px; }
+  .lesson-panel h2 { color: #102b4e; font-size: 18px; margin: 0 0 12px; }
+  .lesson-intro { color: #354256; font-size: 14px; line-height: 1.65; margin-bottom: 16px; }
+  .outline-section { border-top: 1px solid #e3e8ee; padding-top: 15px; margin-top: 15px; }
+  .outline-section h3 { color: #102b4e; font-size: 15px; margin: 0 0 8px; }
+  .outline-section p { color: #354256; font-size: 13px; line-height: 1.55; margin: 0 0 8px; }
+  .outline-section ul { margin: 0; padding-left: 18px; color: #354256; font-size: 13px; line-height: 1.65; }
+  .resource-stack { display: grid; gap: 10px; }
+  .resource-card { border-left: 4px solid #c9a227; padding: 14px; }
+  .resource-card h3 { color: #102b4e; font-size: 15px; margin: 0 0 4px; }
+  .resource-card p { color: #5d6878; font-size: 12px; line-height: 1.45; margin: 0 0 12px; }
+  .lesson-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 18px 0; }
+  .step-card { padding: 13px; }
+  .step-card span { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; margin-bottom: 9px; color: #102b4e; background: #e8f4fd; font-weight: 900; }
+  .step-card strong { display: block; color: #102b4e; font-size: 13px; }
+  .step-card p { margin: 4px 0 0; color: #5d6878; font-size: 12px; line-height: 1.4; }
+  .lesson-aside { position: sticky; top: 74px; display: grid; gap: 12px; }
+  .aside-box { border: 1px solid #dbe2ea; background: #fff; padding: 14px; }
+  .aside-box h2 { color: #102b4e; font-size: 15px; margin: 0 0 8px; }
+  .aside-box a { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 0; border-top: 1px solid #e3e8ee; color: #29415d; text-decoration: none; font-size: 13px; font-weight: 800; }
+  .aside-box a:first-of-type { border-top: 0; }
+  .aside-box a:hover { color: #102b4e; }
+  @media (max-width: 900px) {
+    .lesson-hero, .lesson-layout { grid-template-columns: 1fr; }
+    .lesson-aside { position: static; }
+    .lesson-steps { grid-template-columns: repeat(2, 1fr); }
   }
-  .lesson-kicker {
-    color: #f5c55a;
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-  }
-  .lesson-body {
-    white-space: pre-wrap;
-    line-height: 1.65;
-  }
-  .resource-card {
-    border-left: 4px solid #c9a227;
+  @media (max-width: 560px) {
+    .lesson-hero { padding: 20px 16px; }
+    .lesson-hero h1 { font-size: 23px; }
+    .lesson-steps { grid-template-columns: 1fr; }
   }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="lesson-hero mb-4">
-  <div class="lesson-kicker mb-2">A1 English lesson resource</div>
-  <h1 class="fw-bold mb-2">{{ lesson.title }}</h1>
-  <p class="mb-0 opacity-75">Teacher guide, learner handouts, role-play cards, homework, and answer key.</p>
-</div>
-
-{% for resource in resource_files %}
-<div class="card resource-card mb-4">
-  <div class="card-body d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+<main class="lesson-page">
+  <header class="lesson-hero">
     <div>
-      <h5 class="fw-bold mb-1" style="color:#1b3a6b;">{{ resource.title }}</h5>
-      <p class="text-muted small mb-0">{{ resource.description }}</p>
+      <div class="lesson-kicker">Lesson resource pack</div>
+      <h1>{{ lesson.title }}</h1>
+      <p>Use this page as a classroom-ready lesson guide: download the resources, follow the steps, then finish with speaking and writing practice.</p>
     </div>
-    <a href="{% static resource.path %}" class="btn btn-primary"{% if '.pdf' not in resource.path %} download{% endif %}>
-      <i class="bi bi-download me-1"></i> {{ resource.button }}
-    </a>
-  </div>
-</div>
-{% endfor %}
+    <div class="lesson-summary" aria-label="Lesson contents">
+      <div><strong>{{ resource_files|length }}</strong><span>Downloadable resources</span></div>
+      <div><strong>4</strong><span>Study steps</span></div>
+    </div>
+  </header>
 
-<div class="card">
-  <div class="card-header d-flex align-items-center gap-2">
-    <i class="bi bi-journal-text" style="color:#1b3a6b;"></i>
-    <span>Lesson resource pack</span>
+  <section class="lesson-steps" aria-label="How to use this lesson">
+    <article class="step-card"><span>1</span><strong>Preview</strong><p>Read the topic and operational scenario first.</p></article>
+    <article class="step-card"><span>2</span><strong>Practise</strong><p>Work through vocabulary, phrases, and pronunciation.</p></article>
+    <article class="step-card"><span>3</span><strong>Role-play</strong><p>Act out the duty situation with a partner or trainer.</p></article>
+    <article class="step-card"><span>4</span><strong>Write</strong><p>Finish with the report, checklist, or homework task.</p></article>
+  </section>
+
+  <div class="lesson-layout">
+    <section class="lesson-panel">
+      <h2>Lesson resource pack</h2>
+      {% if lesson_outline.intro %}
+        <div class="lesson-intro">
+          {% for paragraph in lesson_outline.intro %}
+            <p>{{ paragraph }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if lesson_outline.sections %}
+        {% for section in lesson_outline.sections %}
+        <section class="outline-section">
+          <h3>{{ section.title }}</h3>
+          {% for copy in section.copy %}<p>{{ copy }}</p>{% endfor %}
+          {% if section.bullets %}
+          <ul>
+            {% for item in section.bullets %}<li>{{ item }}</li>{% endfor %}
+          </ul>
+          {% endif %}
+        </section>
+        {% endfor %}
+      {% elif lesson.description %}
+        <div class="lesson-intro">{{ lesson.description|linebreaksbr }}</div>
+      {% else %}
+        <p class="text-muted mb-0">No lesson content has been added yet.</p>
+      {% endif %}
+    </section>
+
+    <aside class="lesson-aside" aria-label="Lesson downloads and next actions">
+      {% if resource_files %}
+      <div class="resource-stack">
+        {% for resource in resource_files %}
+        <article class="resource-card">
+          <h3>{{ resource.title }}</h3>
+          <p>{{ resource.description }}</p>
+          <a href="{% static resource.path %}" class="btn btn-primary btn-sm w-100"{% if '.pdf' not in resource.path %} download{% endif %}>
+            <i class="bi bi-download me-1"></i> {{ resource.button }}
+          </a>
+        </article>
+        {% endfor %}
+      </div>
+      {% endif %}
+      <div class="aside-box">
+        <h2>Next practice</h2>
+        <a href="{% url 'course_library' %}"><span>Course Library</span><i class="bi bi-chevron-right"></i></a>
+        <a href="{% url 'worksheets' %}"><span>Practice Center</span><i class="bi bi-chevron-right"></i></a>
+        <a href="{% url 'terminology' %}"><span>Vocabulary</span><i class="bi bi-chevron-right"></i></a>
+        <a href="{% url 'videos' %}"><span>Video Lessons</span><i class="bi bi-chevron-right"></i></a>
+      </div>
+    </aside>
   </div>
-  <div class="card-body">
-    {% if lesson.description %}
-      <div class="lesson-body">{{ lesson.description|linebreaksbr }}</div>
-    {% else %}
-      <p class="text-muted mb-0">No lesson content has been added yet.</p>
-    {% endif %}
-  </div>
-</div>
+</main>
 {% endblock %}

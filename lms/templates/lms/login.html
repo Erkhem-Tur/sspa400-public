@@ -63,18 +63,24 @@
 
   <form method="post">
     {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
     <div class="mb-3">
-      <label class="form-label"><i class="bi bi-person me-1"></i>Хэрэглэгчийн нэр</label>
-      <input type="text" name="username" class="form-control" placeholder="Нэрээ оруулна уу" autocomplete="username">
+      <label class="form-label" for="loginUsername"><i class="bi bi-person me-1"></i>Хэрэглэгчийн нэр</label>
+      <input type="text" name="username" id="loginUsername" class="form-control" placeholder="Нэрээ оруулна уу" autocomplete="username" value="{{ form.username.value|default:'' }}" required>
       {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors }}</div>{% endif %}
     </div>
     <div class="mb-4">
-      <label class="form-label"><i class="bi bi-lock me-1"></i>Нууц үг</label>
-      <input type="password" name="password" class="form-control" placeholder="Нууц үгээ оруулна уу" autocomplete="current-password">
+      <label class="form-label" for="loginPassword"><i class="bi bi-lock me-1"></i>Нууц үг</label>
+      <input type="password" name="password" id="loginPassword" class="form-control" placeholder="Нууц үгээ оруулна уу" autocomplete="current-password" required>
       {% if form.password.errors %}<div class="text-danger small mt-1">{{ form.password.errors }}</div>{% endif %}
     </div>
     <button type="submit" class="btn-login btn">Нэвтрэх <i class="bi bi-arrow-right ms-1"></i></button>
   </form>
+
+  <div class="d-flex justify-content-between align-items-center mt-3" style="font-size:13px;">
+    <a href="{% url 'password_reset' %}" style="color:#1b3a6b;">Нууц үг мартсан?</a>
+    <a href="{% url 'register' %}" style="color:#1b3a6b;font-weight:700;">Шинээр бүртгүүлэх</a>
+  </div>
 
   <div class="text-center mt-4 pt-3" style="border-top:1px solid #f1f5f9;">
     <button type="button" onclick="fillAdmin()"
@@ -93,10 +99,24 @@
 <script>
 // Firebase web config — injected from Django settings
 const FIREBASE_CONFIG = {{ firebase_config|safe }};
+const REDIRECT_PENDING_KEY = 'firebaseRedirectPending';
+const NEXT_URL = '{{ next|escapejs }}';
+let firebaseReady = false;
 
-if (FIREBASE_CONFIG.apiKey) {
-  firebase.initializeApp(FIREBASE_CONFIG);
-} else {
+try {
+  if (FIREBASE_CONFIG.apiKey && window.firebase) {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    firebaseReady = true;
+    handleRedirectResult();
+  } else {
+    hideGoogleButton();
+  }
+} catch (err) {
+  hideGoogleButton();
+  showError(firebaseErrorMessage(err));
+}
+
+function hideGoogleButton() {
   // Hide Google button if Firebase is not configured yet
   document.getElementById('googleBtn').style.display = 'none';
 }
@@ -106,42 +126,135 @@ async function googleSignIn() {
   const errEl = document.getElementById('firebaseError');
   const originalHtml = btn.innerHTML;
 
+  if (!firebaseReady) {
+    showError('Firebase тохиргоо эсвэл SDK ачаалагдаагүй байна.');
+    return;
+  }
+
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Холбогдож байна...';
   errEl.style.display = 'none';
 
   try {
-    const provider = new firebase.auth.GoogleAuthProvider();
+    const provider = googleProvider();
     const result = await firebase.auth().signInWithPopup(provider);
-    const idToken = await result.user.getIdToken();
-
-    // Read Django CSRF token from cookie
-    const csrf = (document.cookie.match(/csrftoken=([^;]+)/) || [])[1] || '';
-
-    const res = await fetch('/api/auth/firebase/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrf },
-      body: JSON.stringify({ idToken }),
-    });
-    const data = await res.json();
-
-    if (data.ok) {
-      window.location.href = '/';
-    } else {
-      showError('Серверийн алдаа: ' + data.error);
-    }
+    await finishFirebaseLogin(result.user);
   } catch (err) {
     if (err.code === 'auth/popup-closed-by-user') {
       // User dismissed — silent
-    } else if (err.code === 'auth/popup-blocked') {
-      showError('Попап хаагдсан байна. Браузерийн тохиргооноос зөвшөөр.');
+    } else if (shouldUseRedirect(err)) {
+      try {
+        sessionStorage.setItem(REDIRECT_PENDING_KEY, '1');
+        await firebase.auth().signInWithRedirect(googleProvider());
+      } catch (redirectErr) {
+        showError(firebaseErrorMessage(redirectErr));
+      }
     } else {
-      showError('Google нэвтрэх алдаа: ' + (err.message || err.code));
+      showError(firebaseErrorMessage(err));
     }
   } finally {
     btn.disabled = false;
     btn.innerHTML = originalHtml;
   }
+}
+
+function googleProvider() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' });
+  return provider;
+}
+
+function shouldUseRedirect(err) {
+  return [
+    'auth/popup-blocked',
+    'auth/cancelled-popup-request',
+    'auth/operation-not-supported-in-this-environment',
+    'auth/web-storage-unsupported',
+  ].includes(err && err.code);
+}
+
+async function handleRedirectResult() {
+  const pendingRedirect = sessionStorage.getItem(REDIRECT_PENDING_KEY) === '1';
+  if (!pendingRedirect) return;
+
+  const btn = document.getElementById('googleBtn');
+  const originalHtml = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Нэвтрэлтийг шалгаж байна...';
+
+  try {
+    const result = await firebase.auth().getRedirectResult();
+    sessionStorage.removeItem(REDIRECT_PENDING_KEY);
+    if (result && result.user) {
+      await finishFirebaseLogin(result.user);
+    }
+  } catch (err) {
+    sessionStorage.removeItem(REDIRECT_PENDING_KEY);
+    showError(firebaseErrorMessage(err));
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalHtml;
+  }
+}
+
+async function finishFirebaseLogin(user) {
+  if (!user) throw new Error('Firebase user not returned.');
+
+  const idToken = await user.getIdToken();
+  const res = await fetch('/api/auth/firebase/', {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrfToken(),
+    },
+    body: JSON.stringify({ idToken, next: NEXT_URL }),
+  });
+
+  const text = await res.text();
+  let data = {};
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch (err) {
+    throw new Error('Server returned a non-JSON response (HTTP ' + res.status + ').');
+  }
+
+  if (!res.ok || !data.ok) {
+    throw new Error(data.error || ('Server rejected Firebase login (HTTP ' + res.status + ').'));
+  }
+
+  window.location.href = data.redirect || '/learning/';
+}
+
+function csrfToken() {
+  const input = document.querySelector('[name=csrfmiddlewaretoken]');
+  if (input && input.value) return input.value;
+  const match = document.cookie.match(/(?:^|; )csrftoken=([^;]+)/);
+  return match ? decodeURIComponent(match[1]) : '';
+}
+
+function firebaseErrorMessage(err) {
+  if (!err) return 'Google нэвтрэх алдаа гарлаа.';
+
+  const code = err.code || '';
+  if (code === 'auth/unauthorized-domain') {
+    return 'Firebase дээр энэ домэйныг зөвшөөрөөгүй байна. Authentication > Settings > Authorized domains хэсэгт sspa400-public.onrender.com нэмнэ үү.';
+  }
+  if (code === 'auth/operation-not-allowed') {
+    return 'Firebase Authentication дээр Google sign-in provider идэвхгүй байна.';
+  }
+  if (code === 'auth/invalid-api-key') {
+    return 'Firebase API key буруу байна. Render-ийн FIREBASE_API_KEY тохиргоог шалгана уу.';
+  }
+  if (code === 'auth/network-request-failed') {
+    return 'Сүлжээний алдаа гарлаа. Интернэт холболтоо шалгаад дахин оролдоно уу.';
+  }
+  if (code === 'auth/popup-blocked') {
+    return 'Попап хаагдсан байна. Redirect нэвтрэлтээр дахин оролдоно.';
+  }
+
+  return 'Google нэвтрэх алдаа: ' + (err.message || code || err);
 }
 
 function showError(msg) {

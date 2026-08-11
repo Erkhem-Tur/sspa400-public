@@ -28,6 +28,7 @@
   <section class="term-tools" aria-label="Terminology filters">
     <div class="term-search">
       <i class="bi bi-search" aria-hidden="true"></i>
+      <label class="visually-hidden" for="termSearch">Search terminology</label>
       <input class="form-control" id="termSearch" type="search" placeholder="Search English, Mongolian, tags..." autocomplete="off">
     </div>
     <div>
@@ -96,7 +97,18 @@
         </div>
         <p class="listen-prompt" id="listenPrompt">Listen carefully, then choose the Mongolian meaning.</p>
         <button class="listen-play" id="listenPlay" type="button" title="Play audio" aria-label="Play audio"><i class="bi bi-volume-up-fill"></i></button>
+        <div class="listen-engine" aria-live="polite">
+          <div>
+            <strong>Neural Listening Engine</strong>
+            <span id="listenEngineStatus">Ready for clear English playback.</span>
+          </div>
+          <div class="listen-engine-actions">
+            <button class="btn btn-outline-primary btn-sm" id="listenSlowRepeat" type="button"><i class="bi bi-speedometer2 me-1"></i>Slow repeat</button>
+            <button class="btn btn-outline-secondary btn-sm" id="listenStop" type="button"><i class="bi bi-stop-fill me-1"></i>Stop</button>
+          </div>
+        </div>
         <div id="listenQuestion"></div>
+        <div class="listen-support" id="listenSupport"></div>
         <div class="listen-feedback" id="listenFeedback" aria-live="polite"></div>
         <div class="text-center mt-2">
           <button class="btn btn-primary" id="listenNext" type="button">Next item <i class="bi bi-arrow-right ms-1"></i></button>
@@ -108,6 +120,7 @@
         <div class="listen-stat"><span>Attempts</span><strong id="listenAttempts">0</strong></div>
         <div class="listen-stat"><span>Accuracy</span><strong id="listenAccuracy">0%</strong></div>
         <div class="listen-stat"><span>Streak</span><strong id="listenStreak">0</strong></div>
+        <div class="listen-stat"><span>Voice</span><strong class="listen-voice" id="listenVoice">Loading</strong></div>
         <p class="listen-note">The Listening Lab uses the active filters above. Use headphones and replay each item before answering.</p>
       </aside>
     </div>
@@ -115,5 +128,6 @@
 
   <div class="alert alert-danger mt-3 d-none" id="termError" role="alert"></div>
 </main>
+<script src="{% static 'lms/neural_listening.js' %}" defer></script>
 <script src="{% static 'lms/terminology.js' %}" defer></script>
 {% endblock %}

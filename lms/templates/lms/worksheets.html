@@ -160,15 +160,18 @@
         <div class="card-body">
           <div class="row g-2 mb-2">
             <div class="col-12">
+              <label class="visually-hidden" for="wsSearch">Search worksheets</label>
               <input type="text" id="wsSearch" class="form-control form-control-sm" placeholder="Search badge, radio, passive, Gate 1…" oninput="wsRenderList()">
             </div>
             <div class="col-6">
+              <label class="visually-hidden" for="wsLvlFilter">Filter worksheets by level</label>
               <select id="wsLvlFilter" class="form-select form-select-sm" onchange="wsRenderList()">
                 <option value="">All levels</option>
                 <option>A1</option><option>A2</option><option>B1</option>
               </select>
             </div>
             <div class="col-6">
+              <label class="visually-hidden" for="wsGrFilter">Filter worksheets by grammar</label>
               <select id="wsGrFilter" class="form-select form-select-sm" onchange="wsRenderList()">
                 <option value="">All grammar</option>
               </select>
@@ -339,6 +342,7 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'lms/neural_listening.js' %}"></script>
 <script>
 /* ═══════════════════════════════════════════════════
    DATA
@@ -735,8 +739,17 @@ if('speechSynthesis'in window){
   setTimeout(()=>{if(!_wsVoice){const v=speechSynthesis.getVoices();if(v.length)_wsVoice=_wsPickVoice(v);}},3000);
 }
 function _wsSetBtn(btn,on){if(!btn)return;if(on){btn.dataset.orig=btn.innerHTML;btn.innerHTML='<i class="bi bi-stop-fill me-1"></i>Stop';}else{btn.innerHTML=btn.dataset.orig||'<i class="bi bi-volume-up me-1"></i>Speak';}}
-function wsStop(){clearInterval(_wsKeepAlive);_wsKeepAlive=null;if(_wsSpeakBtn){_wsSetBtn(_wsSpeakBtn,false);_wsSpeakBtn=null;}_wsUtt=null;if('speechSynthesis'in window)speechSynthesis.cancel();}
+function wsStop(){clearInterval(_wsKeepAlive);_wsKeepAlive=null;if(_wsSpeakBtn){_wsSetBtn(_wsSpeakBtn,false);_wsSpeakBtn=null;}_wsUtt=null;if(window.NeuralListeningEngine)window.NeuralListeningEngine.stop();if('speechSynthesis'in window)speechSynthesis.cancel();}
 function speak(text,btn){
+  const clean=String(text||'').replace(/_____/g,'blank').replace(/\([^)]*\)/g,'').replace(/[^\w\s'.,!?;:-]/g,' ').replace(/\s+/g,' ').trim().slice(0,300);
+  if(!clean)return;
+  if(window.NeuralListeningEngine&&window.NeuralListeningEngine.isSupported()){
+    if(btn&&btn===_wsSpeakBtn){wsStop();return;}
+    wsStop();
+    _wsSpeakBtn=btn||null;
+    window.NeuralListeningEngine.speak(clean,{rate:0.88,button:btn,label:'Worksheet neural listening active.',onStatus:(info)=>{if(info.status==='complete'||info.status==='stopped'||info.status==='error')_wsSpeakBtn=null;}});
+    return;
+  }
   if(!('speechSynthesis'in window)){
     if(btn){btn.title='Таны браузер дуут унших боломжгүй байна.';}
     return;
@@ -745,8 +758,6 @@ function speak(text,btn){
   wsStop();
   // Pull voices one more time in case they loaded since page load
   if(!_wsVoice){const vv=speechSynthesis.getVoices();if(vv.length)_wsVoice=_wsPickVoice(vv);}
-  const clean=String(text||'').replace(/_____/g,'blank').replace(/\([^)]*\)/g,'').replace(/[^\w\s'.,!?;:-]/g,' ').replace(/\s+/g,' ').trim().slice(0,300);
-  if(!clean)return;
   const u=new SpeechSynthesisUtterance(clean);
   if(_wsVoice){u.voice=_wsVoice;u.lang=_wsVoice.lang||'en-US';}else{u.lang='en-US';}
   u.rate=0.88;u.pitch=1.0;u.volume=1.0;
@@ -833,7 +844,7 @@ function wsOpen(id){
   const w=wsAll.find(x=>x.id==id);
   document.getElementById('wsDetailBadge').innerHTML=`<span class="lv lv-${w.level}">${w.level}</span>`;
   const vocab=w.vocab.map(v=>`<span class="badge bg-light text-dark border me-1 mb-1" style="font-size:11px;">${v}</span>`).join('');
-  const comp=w.comp.map((c,i)=>`<div class="mb-2"><label class="form-label small mb-1">${i+1}. ${c[0]}</label><input class="form-control form-control-sm" data-ans="${wsEsc(c[1])}" placeholder="answer"></div>`).join('');
+  const comp=w.comp.map((c,i)=>`<div class="mb-2"><label class="form-label small mb-1" for="wsComp${w.id}_${i}">${i+1}. ${c[0]}</label><input class="form-control form-control-sm" id="wsComp${w.id}_${i}" data-ans="${wsEsc(c[1])}" placeholder="answer" autocomplete="off"></div>`).join('');
   document.getElementById('wsDetail').innerHTML=`
     <h6 class="fw-bold mb-1">${w.title}</h6>
     <p class="text-muted small mb-2">${w.module}</p>
@@ -857,8 +868,8 @@ function wsOpen(id){
     <div class="ws-block ws-chk">
       <div class="small fw-bold mb-2" style="color:#1b3a6b;">2. Transformation practice</div>
       <p class="small mb-2"><strong>Positive:</strong> ${w.positive}</p>
-      <div class="mb-2"><label class="form-label small mb-1">Write the negative form:</label><input class="form-control form-control-sm" data-ans="${wsEsc(w.negative)}" placeholder="negative sentence"></div>
-      <div class="mb-2"><label class="form-label small mb-1">Write the question form:</label><input class="form-control form-control-sm" data-ans="${wsEsc(w.question)}" placeholder="question form"></div>
+      <div class="mb-2"><label class="form-label small mb-1" for="wsNegative${w.id}">Write the negative form:</label><input class="form-control form-control-sm" id="wsNegative${w.id}" data-ans="${wsEsc(w.negative)}" placeholder="negative sentence" autocomplete="off"></div>
+      <div class="mb-2"><label class="form-label small mb-1" for="wsQuestion${w.id}">Write the question form:</label><input class="form-control form-control-sm" id="wsQuestion${w.id}" data-ans="${wsEsc(w.question)}" placeholder="question form" autocomplete="off"></div>
       <div class="d-flex gap-2 mt-2">
         <button class="btn btn-sm btn-primary" onclick="wsCheck(this.closest('.ws-chk'))">Check</button>
         <button class="btn btn-sm btn-outline-secondary" onclick="this.closest('.ws-chk').classList.toggle('show-ak')">Show key</button>
@@ -869,9 +880,9 @@ function wsOpen(id){
 
     <div class="ws-block">
       <div class="small fw-bold mb-2" style="color:#1b3a6b;">3. Build your own sentences</div>
-      <div class="mb-2"><label class="form-label small mb-1">Positive:</label><input class="form-control form-control-sm" placeholder="The officer..."></div>
-      <div class="mb-2"><label class="form-label small mb-1">Negative:</label><input class="form-control form-control-sm" placeholder="The visitor does not..."></div>
-      <div class="mb-2"><label class="form-label small mb-1">Question:</label><input class="form-control form-control-sm" placeholder="Does the officer...?"></div>
+      <div class="mb-2"><label class="form-label small mb-1" for="wsOwnPositive${w.id}">Positive:</label><input class="form-control form-control-sm" id="wsOwnPositive${w.id}" placeholder="The officer..." autocomplete="off"></div>
+      <div class="mb-2"><label class="form-label small mb-1" for="wsOwnNegative${w.id}">Negative:</label><input class="form-control form-control-sm" id="wsOwnNegative${w.id}" placeholder="The visitor does not..." autocomplete="off"></div>
+      <div class="mb-2"><label class="form-label small mb-1" for="wsOwnQuestion${w.id}">Question:</label><input class="form-control form-control-sm" id="wsOwnQuestion${w.id}" placeholder="Does the officer...?" autocomplete="off"></div>
     </div>
 
     <div class="ws-block ws-chk">
@@ -891,7 +902,8 @@ function wsOpen(id){
       <div class="small fw-bold mb-2" style="color:#1b3a6b;">5. Role-play</div>
       <div class="sc-block">${w.roleplay}</div>
       <div class="small fw-bold mb-2 mt-3" style="color:#1b3a6b;">6. Writing task</div>
-      <textarea class="form-control form-control-sm" rows="4" placeholder="${wsEsc(w.writing)}"></textarea>
+      <label class="form-label small mb-1" for="wsWriting${w.id}">Writing answer</label>
+      <textarea class="form-control form-control-sm" id="wsWriting${w.id}" rows="4" placeholder="${wsEsc(w.writing)}"></textarea>
     </div>
 
     <div class="d-flex gap-2 flex-wrap">
@@ -1067,7 +1079,8 @@ function wsStartTest(kind){
   html+=`</div><div class="ws-block mt-2">
     <div class="small fw-bold mb-1" style="color:#1b3a6b;">Writing task</div>
     <p class="text-muted small">${writing}</p>
-    <textarea class="form-control form-control-sm" rows="5" placeholder="${writing}"></textarea>
+    <label class="form-label small mb-1" for="wsTestWriting">Writing answer</label>
+    <textarea class="form-control form-control-sm" id="wsTestWriting" rows="5" placeholder="${writing}"></textarea>
   </div>
   <div class="d-flex gap-2 mt-3 flex-wrap">
     <button class="btn btn-primary" onclick="wsSubmit('${kind}','${title}')">Submit test</button>
@@ -1225,7 +1238,7 @@ function wsTransEdit(box){
         '<button class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size:11px;" onclick="wsTransCancel(this.closest(\'.ws-trans-box\'))">Цуцлах</button>'+
       '</div>'+
     '</div>'+
-    '<textarea class="form-control form-control-sm ws-trans-input" rows="3" style="font-size:13px;line-height:1.5;">'+wsEsc(val)+'</textarea>'+
+    '<textarea class="form-control form-control-sm ws-trans-input" rows="3" aria-label="Translation text" style="font-size:13px;line-height:1.5;">'+wsEsc(val)+'</textarea>'+
     '<div class="text-muted mt-1" style="font-size:10px;">Зөв орчуулгыг энд бичнэ үү. Хадгалсны дараа автоматаар санагдана.</div>';
 }
 

@@ -1,0 +1,11 @@
+{% extends 'lms/base.html' %}
+{% load lms_extras %}
+{% block title %}Review assignment | SSPA400{% endblock %}
+{% block content %}
+<div class="portal-shell form-page">
+  <div class="portal-page-head"><div><h1>Review assignment</h1><p>{{ submission.student|display_name }} · {{ submission.assignment.unit.title }}</p></div><a class="btn btn-outline-primary" href="{% url 'course_gradebook' course.slug %}">Back to gradebook</a></div>
+  <section class="content-panel"><h2>Instructions</h2><div>{{ submission.assignment.instructions|linebreaks }}</div></section>
+  <section class="content-panel"><h2>Student response</h2><div class="lesson-copy">{{ submission.response_text|default:'No written response.'|linebreaks }}</div>{% if submission.attachment_url %}<a class="btn btn-sm btn-outline-primary" href="{{ submission.attachment_url }}" target="_blank" rel="noopener">Open attachment link</a>{% endif %}</section>
+  <section class="content-panel"><h2>Grade and feedback</h2><form method="post">{% csrf_token %}{% include 'lms/includes/form_fields.html' with form=form %}<div class="text-end"><button class="btn btn-primary" type="submit">Save review</button></div></form></section>
+</div>
+{% endblock %}

@@ -493,6 +493,12 @@ class LogbookAdminValidFilterTest(TestCase):
         self.assertIn("Today", names)
         self.assertNotIn("Old", names)
 
+    def test_invalid_department_filter_does_not_error(self):
+        self.client.force_login(self.staff)
+        response = self.client.get(reverse("logbook_admin"), {"dept": "bad-id"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["dept_filter"], "")
+
 
 # ── dept_manage order assignment ──────────────────────────────────────────────
 
@@ -510,6 +516,18 @@ class DeptManageOrderAssignmentTest(TestCase):
         self.client.post(reverse("dept_manage"), {"name": "TestNewDept"})
         new_dept = Department.objects.get(name="TestNewDept")
         self.assertEqual(new_dept.order, count_before)
+
+    def test_invalid_dept_order_does_not_error(self):
+        self.client.force_login(self.staff)
+        dept = Department.objects.create(name="Existing", order=7)
+        response = self.client.post(
+            reverse("dept_edit", args=[dept.pk]),
+            {"name": "Existing", "order": "bad"},
+        )
+        dept.refresh_from_db()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(dept.order, 7)
+        self.assertContains(response, "Order must be a whole number.")
 
 
 # ── Management command: seed ──────────────────────────────────────────────────
@@ -532,13 +550,19 @@ class SeedCommandTest(TestCase):
             Department.objects.filter(name__icontains="Хамгаалалтын").exists()
         )
 
-    def test_seed_creates_admin_superuser(self):
+    def test_seed_creates_only_environment_configured_superuser(self):
         from django.core.management import call_command
         from django.contrib.auth.models import User
-        call_command("seed", verbosity=0)
-        admin = User.objects.filter(username="admin").first()
+        with patch.dict('os.environ', {
+            'DJANGO_SUPERUSER_USERNAME': 'configured-owner',
+            'DJANGO_SUPERUSER_PASSWORD': 'EnvironmentPass734!',
+            'DJANGO_SUPERUSER_EMAIL': 'owner@example.com',
+        }):
+            call_command("seed", verbosity=0)
+        admin = User.objects.filter(username="configured-owner").first()
         self.assertIsNotNone(admin)
         self.assertTrue(admin.is_superuser)
+        self.assertTrue(admin.check_password('EnvironmentPass734!'))
 
     def test_seed_is_idempotent(self):
         from django.core.management import call_command

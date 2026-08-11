@@ -1,0 +1,144 @@
+{% extends 'lms/base.html' %}
+{% load lms_extras %}
+{% block title %}My learning | SSPA400{% endblock %}
+{% block content %}
+<div class="portal-shell">
+  <div class="portal-page-head">
+    <div>
+      <h1>Welcome back, {{ request.user|display_name }}</h1>
+      <p>Continue where you stopped, review your progress, and keep your speaking practice moving.</p>
+    </div>
+    <div class="portal-actions">
+      <a class="btn btn-outline-primary" href="{% url 'profile' %}"><i class="bi bi-person me-1"></i> Profile</a>
+      <a class="btn btn-primary" href="{% url 'catalog' %}"><i class="bi bi-search me-1"></i> Find a course</a>
+    </div>
+  </div>
+
+  <div class="metric-grid" aria-label="Learning summary">
+    <div class="metric"><strong>{{ enrollments|length }}</strong><span>Courses on your dashboard</span></div>
+    <div class="metric"><strong>{{ completed_count }}</strong><span>Courses completed</span></div>
+    <div class="metric"><strong>{{ profile.study_hours }}</strong><span>Recorded study hours</span></div>
+    <div class="metric"><strong>{{ certificates|length }}</strong><span>Certificates earned</span></div>
+  </div>
+
+  <div class="dashboard-grid">
+    <div>
+      <section class="portal-section mt-0" aria-labelledby="currentCoursesTitle">
+        <div class="portal-section-head">
+          <h2 id="currentCoursesTitle">My courses</h2>
+          <a href="{% url 'catalog' %}">View catalog</a>
+        </div>
+        {% if enrollments %}
+        <div class="course-grid">
+          {% for enrollment in enrollments %}
+          <article class="course-tile">
+            <div class="course-meta">
+              <span class="level-pill">{{ enrollment.course.get_level_display }}</span>
+              {% if enrollment.status == 'COMPLETED' %}<span class="status-pill success">Completed</span>{% endif %}
+            </div>
+            <h3>{{ enrollment.course.title }}</h3>
+            <p>{{ enrollment.course.short_description|default:enrollment.course.description|truncatewords:24 }}</p>
+            <div class="progress-label"><span>Progress</span><strong>{{ enrollment.progress_percent }}%</strong></div>
+            <div class="progress-track" role="progressbar" aria-label="{{ enrollment.course.title }} progress" aria-valuenow="{{ enrollment.progress_percent }}" aria-valuemin="0" aria-valuemax="100">
+              <span class="progress-fill" style="width:{{ enrollment.progress_percent }}%"></span>
+            </div>
+            <div class="course-footer">
+              <small class="text-muted">{{ enrollment.course.estimated_minutes }} min</small>
+              <a class="btn btn-sm btn-primary" href="{% url 'course_player_start' enrollment.course.slug %}">
+                {% if enrollment.progress_percent %}Continue{% else %}Start{% endif %} <i class="bi bi-arrow-right ms-1"></i>
+              </a>
+            </div>
+          </article>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <i class="bi bi-journal-plus"></i>
+          <h2>Your dashboard is ready</h2>
+          <p>All SSPA400 courses are free. Choose a course and it will appear here with progress tracking.</p>
+          <a class="btn btn-primary" href="{% url 'catalog' %}">Browse courses</a>
+        </div>
+        {% endif %}
+      </section>
+
+      {% if pathway_records %}
+      <section class="portal-section" aria-labelledby="pathwayTitle">
+        <div class="portal-section-head"><h2 id="pathwayTitle">Practice pathway progress</h2></div>
+        <div class="content-panel">
+          {% for pathway in pathway_records %}
+          <div class="d-flex justify-content-between align-items-center gap-3 py-2 {% if not forloop.last %}border-bottom{% endif %}">
+            <span class="fw-semibold text-capitalize">{{ pathway.pathway }}</span>
+            <span class="status-pill success">{{ pathway.completion_count }} activities complete</span>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+      {% endif %}
+    </div>
+
+    <aside>
+      <section class="content-panel" aria-labelledby="notificationsTitle">
+        <div class="portal-section-head"><h2 id="notificationsTitle">Notifications</h2></div>
+        {% if notifications %}
+        <ul class="notification-list">
+          {% for notification in notifications %}
+          <li>
+            <div class="fw-semibold">{{ notification.title }}</div>
+            <div class="small text-muted my-1">{{ notification.message }}</div>
+            <form method="post" action="{% url 'mark_notification_read' notification.id %}">
+              {% csrf_token %}
+              <button class="btn btn-sm btn-link p-0" type="submit">Open</button>
+            </form>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-muted small mb-0">You are all caught up.</p>
+        {% endif %}
+      </section>
+
+      {% if certificates %}
+      <section class="content-panel mt-3" aria-labelledby="certificateTitle">
+        <div class="portal-section-head"><h2 id="certificateTitle">Certificates</h2></div>
+        {% for certificate in certificates %}
+        <a class="d-flex justify-content-between align-items-center gap-2 py-2 {% if not forloop.last %}border-bottom{% endif %}" href="{{ certificate.get_absolute_url }}">
+          <span>{{ certificate.course.title }}</span><i class="bi bi-award"></i>
+        </a>
+        {% endfor %}
+      </section>
+      {% endif %}
+
+      {% if recent_quiz_attempts or recent_submissions %}
+      <section class="content-panel mt-3" aria-labelledby="gradesTitle">
+        <div class="portal-section-head"><h2 id="gradesTitle">Recent grades</h2></div>
+        {% for attempt in recent_quiz_attempts %}
+        <div class="d-flex justify-content-between gap-2 py-2 {% if not forloop.last or recent_submissions %}border-bottom{% endif %}"><span><strong>{{ attempt.unit.title }}</strong><small class="d-block text-muted">{{ attempt.unit.module.course.title }}</small></span><span class="status-pill {% if attempt.passed %}success{% elif attempt.requires_review %}warning{% else %}muted{% endif %}">{% if attempt.requires_review %}Reviewing{% else %}{{ attempt.percentage }}%{% endif %}</span></div>
+        {% endfor %}
+        {% for submission in recent_submissions %}
+        <div class="d-flex justify-content-between gap-2 py-2 {% if not forloop.last %}border-bottom{% endif %}"><span><strong>{{ submission.assignment.unit.title }}</strong><small class="d-block text-muted">{{ submission.assignment.unit.module.course.title }}</small></span><span class="status-pill success">{{ submission.grade }}/{{ submission.assignment.max_points }}</span></div>
+        {% endfor %}
+      </section>
+      {% endif %}
+    </aside>
+  </div>
+
+  {% if recommended_courses %}
+  <section class="portal-section" aria-labelledby="recommendedTitle">
+    <div class="portal-section-head"><h2 id="recommendedTitle">Recommended next</h2></div>
+    <div class="course-grid">
+      {% for course in recommended_courses %}
+      <article class="course-tile">
+        <div class="course-meta"><span class="level-pill">{{ course.get_level_display }}</span></div>
+        <h3>{{ course.title }}</h3>
+        <p>{{ course.short_description|default:course.description|truncatewords:24 }}</p>
+        <div class="course-footer">
+          <small class="text-muted">Free</small>
+          <a class="btn btn-sm btn-outline-primary" href="{{ course.get_absolute_url }}">View course</a>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

@@ -23,7 +23,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 from lms.admin import extract_youtube_id
-from lms.course_catalog import get_course_lessons
+from lms.course_catalog import get_course_lessons, get_course_modules
 from lms.models import (
     Department, Lesson, LogEntry, QuizResult,
     TlOverride, UserProgress, Video, WallPost,
@@ -78,6 +78,13 @@ class CourseCatalogTest(TestCase):
             for level in ("A1", "A2", "B1")
         }
         self.assertEqual(counts, {"A1": 8, "A2": 12, "B1": 12})
+
+    def test_catalog_is_split_into_study_blocks(self):
+        modules = get_course_modules()
+        self.assertEqual(len(modules), 5)
+        self.assertEqual(sum(module["count"] for module in modules), 32)
+        self.assertEqual(modules[0]["title"], "Checkpoint Basics")
+        self.assertEqual(modules[-1]["end"], 32)
 
 
 # ── QuizResult ────────────────────────────────────────────────────────────────

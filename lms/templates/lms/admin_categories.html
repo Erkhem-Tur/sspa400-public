@@ -1,0 +1,11 @@
+{% extends 'lms/base.html' %}
+{% block title %}Course categories | SSPA400{% endblock %}
+{% block content %}
+<div class="portal-shell">
+  <div class="portal-page-head"><div><h1>Course categories</h1><p>Use a small, clear category list so learners can find relevant practice quickly.</p></div><a class="btn btn-outline-primary" href="{% url 'admin_dashboard' %}">Management home</a></div>
+  <div class="dashboard-grid">
+    <section class="content-panel"><div class="portal-section-head"><h2>Current categories</h2></div>{% for category in categories %}<div class="d-flex justify-content-between align-items-center gap-3 py-3 {% if not forloop.last %}border-bottom{% endif %}"><div><strong>{{ category.name }}</strong><div class="small text-muted">{{ category.course_count }} courses · order {{ category.order }} · {% if category.is_active %}visible{% else %}hidden{% endif %}</div></div><a class="btn btn-sm btn-outline-primary" href="{% url 'admin_category_edit' category.id %}">Edit</a></div>{% empty %}<p class="text-muted">No categories yet.</p>{% endfor %}</section>
+    <section class="content-panel"><h2>Add category</h2><form method="post">{% csrf_token %}{% include 'lms/includes/form_fields.html' with form=form %}<button class="btn btn-primary" type="submit">Create category</button></form></section>
+  </div>
+</div>
+{% endblock %}

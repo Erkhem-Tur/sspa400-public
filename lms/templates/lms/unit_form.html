@@ -1,0 +1,11 @@
+{% extends 'lms/base.html' %}
+{% block title %}{{ page_title }} | SSPA400{% endblock %}
+{% block content %}
+<div class="portal-shell form-page">
+  <div class="portal-page-head"><div><h1>{{ page_title }}</h1><p>{{ course.title }} · {{ module.title }}</p></div><a class="btn btn-outline-primary" href="{% url 'course_builder' course.slug %}">Back to builder</a></div>
+  <div class="content-panel">
+    <div class="alert alert-info small"><strong>Tip:</strong> Use Listening for a script learners can hear at natural and slow speed. Use Quiz for multiple-choice, true/false, or written questions.</div>
+    <form method="post">{% csrf_token %}<div class="form-grid">{% include 'lms/includes/form_fields.html' with form=form %}</div><div class="text-end mt-3"><button class="btn btn-primary" type="submit">Save lesson</button></div></form>
+  </div>
+</div>
+{% endblock %}

@@ -17,6 +17,7 @@
             {{ user.username|first|upper }}
           </div>
           <div class="fw-bold">{{ user.username }}</div>
+          <div class="status-pill mt-1">{{ progress.get_role_display }}</div>
           {% if progress.rank %}<div class="small text-muted">{{ progress.rank }}</div>{% endif %}
         </div>
 
@@ -114,6 +115,23 @@
       <div class="card-body text-muted small">Одоогоор quiz өгөөгүй байна.</div>
       {% endif %}
     </div>
+
+    <div class="content-panel mt-4">
+      <div class="portal-section-head"><h2>Course progress</h2><a href="{% url 'learning_dashboard' %}">My learning</a></div>
+      {% for enrollment in enrollments %}
+      <div class="py-2 {% if not forloop.last %}border-bottom{% endif %}">
+        <div class="d-flex justify-content-between gap-2"><a class="fw-semibold" href="{% url 'course_player_start' enrollment.course.slug %}">{{ enrollment.course.title }}</a><strong>{{ enrollment.progress_percent }}%</strong></div>
+        <div class="progress-track mt-2"><span class="progress-fill" style="width:{{ enrollment.progress_percent }}%"></span></div>
+      </div>
+      {% empty %}<p class="text-muted small mb-0">No LMS courses enrolled yet. <a href="{% url 'catalog' %}">Browse the free catalog.</a></p>{% endfor %}
+    </div>
+
+    {% if certificates %}
+    <div class="content-panel mt-4">
+      <div class="portal-section-head"><h2>Certificates</h2></div>
+      {% for certificate in certificates %}<a class="d-flex justify-content-between py-2 {% if not forloop.last %}border-bottom{% endif %}" href="{{ certificate.get_absolute_url }}"><span>{{ certificate.course.title }}</span><i class="bi bi-award"></i></a>{% endfor %}
+    </div>
+    {% endif %}
   </div>
 </div>
 {% endblock %}

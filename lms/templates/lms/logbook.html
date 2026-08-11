@@ -46,10 +46,12 @@
 
           <!-- Name -->
           <div class="mb-3">
-            <label class="form-label fw-semibold small mb-1">Нэр <span class="text-danger">*</span></label>
-            <input type="text" name="full_name" class="form-control"
+            <label class="form-label fw-semibold small mb-1" for="logbookFullName">Нэр <span class="text-danger">*</span></label>
+            <input type="text" name="full_name" id="logbookFullName" class="form-control"
                    placeholder="Бүтэн нэрээ оруулна уу" autofocus required
+                   maxlength="200" value="{{ form.full_name.value|default:'' }}"
                    style="border-radius:8px;">
+            <div class="form-text" style="font-size:11px;">Ирцийн жагсаалтад харагдах бүтэн нэрээ бичнэ үү.</div>
           </div>
 
           <!-- Optional: rank + department (collapsible) -->
@@ -64,27 +66,27 @@
             <div class="collapse mt-2" id="extraFields">
               <div class="p-3 border" style="border-radius:8px;background:#f8fafc;">
                 <div class="mb-3">
-                  <label class="form-label fw-semibold small mb-1">Цол</label>
-                  <select name="rank" class="form-select form-select-sm" style="border-radius:6px;">
+                  <label class="form-label fw-semibold small mb-1" for="logbookRank">Цол</label>
+                  <select name="rank" id="logbookRank" class="form-select form-select-sm" style="border-radius:6px;">
                     <option value="">-- Цол сонгох --</option>
                     {% for val, label in RANK_CHOICES %}
-                    <option value="{{ val }}">{{ label }}</option>
+                    <option value="{{ val }}" {% if form.rank.value == val %}selected{% endif %}>{{ label }}</option>
                     {% endfor %}
                   </select>
                 </div>
                 <div class="mb-3">
-                  <label class="form-label fw-semibold small mb-1">Хэлтэс</label>
-                  <select name="department" class="form-select form-select-sm" style="border-radius:6px;">
+                  <label class="form-label fw-semibold small mb-1" for="logbookDepartment">Хэлтэс</label>
+                  <select name="department" id="logbookDepartment" class="form-select form-select-sm" style="border-radius:6px;">
                     <option value="">-- Хэлтэс сонгох --</option>
                     {% for d in departments %}
-                    <option value="{{ d.id }}">{{ d.name }}</option>
+                    <option value="{{ d.id }}" {% if form.department.value|stringformat:"s" == d.id|stringformat:"s" %}selected{% endif %}>{{ d.name }}</option>
                     {% endfor %}
                   </select>
                 </div>
                 <div class="mb-0">
-                  <label class="form-label fw-semibold small mb-1">Тасаг</label>
-                  <input type="text" name="tasag" class="form-control form-control-sm"
-                         placeholder="жишээ: 1-р тасаг" style="border-radius:6px;">
+                  <label class="form-label fw-semibold small mb-1" for="logbookTasag">Тасаг</label>
+                  <input type="text" name="tasag" id="logbookTasag" class="form-control form-control-sm"
+                         placeholder="жишээ: 1-р тасаг" maxlength="200" value="{{ form.tasag.value|default:'' }}" style="border-radius:6px;">
                 </div>
               </div>
             </div>
@@ -105,19 +107,19 @@
                   Өнөөдөр хичээлийн явцад монгол болон англи хэлийг хэрхэн ашигласан талаар бичнэ үү.
                 </p>
                 <div class="mb-2">
-                  <label class="form-label fw-semibold small mb-1">Англиар хэлж чадсан зүйл</label>
-                  <input type="text" name="tl_english" class="form-control form-control-sm"
-                         placeholder="жишээ: I can introduce myself" style="border-radius:6px;">
+                  <label class="form-label fw-semibold small mb-1" for="logbookTlEnglish">Англиар хэлж чадсан зүйл</label>
+                  <input type="text" name="tl_english" id="logbookTlEnglish" class="form-control form-control-sm"
+                         placeholder="жишээ: I can introduce myself" maxlength="200" value="{{ form.tl_english.value|default:'' }}" style="border-radius:6px;">
                 </div>
                 <div class="mb-2">
-                  <label class="form-label fw-semibold small mb-1">Монголоор тайлбарлах хэрэгтэй болсон зүйл</label>
-                  <input type="text" name="tl_mongolian" class="form-control form-control-sm"
-                         placeholder="жишээ: Командлалын нэр томьёо" style="border-radius:6px;">
+                  <label class="form-label fw-semibold small mb-1" for="logbookTlMongolian">Монголоор тайлбарлах хэрэгтэй болсон зүйл</label>
+                  <input type="text" name="tl_mongolian" id="logbookTlMongolian" class="form-control form-control-sm"
+                         placeholder="жишээ: Командлалын нэр томьёо" maxlength="200" value="{{ form.tl_mongolian.value|default:'' }}" style="border-radius:6px;">
                 </div>
                 <div class="mb-0">
-                  <label class="form-label fw-semibold small mb-1">Нийт тэмдэглэл</label>
-                  <textarea name="note" class="form-control form-control-sm" rows="2"
-                            placeholder="Өнөөдөр юу судалсан, юу хэцүү байсан..." style="border-radius:6px;"></textarea>
+                  <label class="form-label fw-semibold small mb-1" for="logbookNote">Нийт тэмдэглэл</label>
+                  <textarea name="note" id="logbookNote" class="form-control form-control-sm" rows="2"
+                            maxlength="1000" placeholder="Өнөөдөр юу судалсан, юу хэцүү байсан..." style="border-radius:6px;">{{ form.note.value|default:'' }}</textarea>
                 </div>
               </div>
             </div>

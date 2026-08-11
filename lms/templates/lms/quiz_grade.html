@@ -1,0 +1,18 @@
+{% extends 'lms/base.html' %}
+{% load lms_extras %}
+{% block title %}Grade written quiz | SSPA400{% endblock %}
+{% block content %}
+<div class="portal-shell form-page">
+  <div class="portal-page-head"><div><h1>Grade written quiz</h1><p>{{ attempt.user|display_name }} · {{ attempt.unit.title }}</p></div><a class="btn btn-outline-primary" href="{% url 'course_gradebook' course.slug %}">Back to gradebook</a></div>
+  <section class="content-panel">
+    {% for question in questions %}
+    <div class="quiz-question"><div class="fw-bold">{{ forloop.counter }}. {{ question.prompt }} <span class="text-muted">({{ question.points }} pt)</span></div><div class="mt-2 p-3 bg-light border rounded">{{ attempt.answers|get_item:question.id|default:'No response'|linebreaksbr }}</div>{% if question.explanation %}<div class="small text-muted mt-2">Instructor note: {{ question.explanation }}</div>{% endif %}</div>
+    {% endfor %}
+  </section>
+  <section class="content-panel">
+    <h2>Final grade</h2>
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    <form method="post">{% csrf_token %}<div class="mb-3"><label class="form-label" for="quizScore">Score (maximum {{ attempt.max_score }})</label><input class="form-control" id="quizScore" name="score" type="number" min="0" max="{{ attempt.max_score }}" step="0.01" value="{{ attempt.score }}" required></div><div class="mb-3"><label class="form-label" for="quizFeedback">Feedback</label><textarea class="form-control" id="quizFeedback" name="feedback" rows="5">{{ attempt.feedback }}</textarea></div><div class="text-end"><button class="btn btn-primary" type="submit">Save quiz grade</button></div></form>
+  </section>
+</div>
+{% endblock %}

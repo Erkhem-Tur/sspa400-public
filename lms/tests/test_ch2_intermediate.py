@@ -187,56 +187,6 @@ class PublicViewsTest(TestCase):
         self.assertContains(response, reverse("intermediate_course"))
         self.assertContains(response, "8 foundation lessons + 12 operational applications")
 
-    def test_prompt_guides_index_lists_all_guides(self):
-        response = self.client.get(reverse("prompt_guides"))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "lms/prompt_guides.html")
-        self.assertEqual(response.context["guide_count"], 2)
-        self.assertEqual(response.context["prompt_total"], 43)
-        self.assertContains(response, "Prompt Design for LMS Content Creation")
-        self.assertContains(response, "AI in Instructional Design Prompt Library")
-        self.assertContains(response, reverse("authoring_studio"))
-
-    def test_prompt_design_guide_is_readable_and_complete(self):
-        response = self.client.get(reverse("prompt_guide_detail", args=["prompt-design-lms"]))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "lms/prompt_guide_detail.html")
-        self.assertEqual(response.context["guide"]["prompt_count"], 10)
-        self.assertContains(response, "Course Structure Prompt")
-        self.assertContains(response, "Translation and Localisation Prompt")
-        self.assertContains(response, "How to use AI content in an LMS")
-
-    def test_instructional_design_prompt_library_includes_all_supplied_prompts(self):
-        response = self.client.get(reverse("prompt_guide_detail", args=["ai-instructional-design"]))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["guide"]["prompt_count"], 33)
-        self.assertContains(response, "Create Learner Personas")
-        self.assertContains(response, "Leadership Style Scenario")
-        self.assertContains(response, "all 33 supplied prompts")
-
-    def test_unknown_prompt_guide_returns_404(self):
-        response = self.client.get(reverse("prompt_guide_detail", args=["missing-guide"]))
-        self.assertEqual(response.status_code, 404)
-
-    def test_course_library_links_to_prompt_guides(self):
-        response = self.client.get(reverse("course_library"))
-        self.assertContains(response, reverse("prompt_guides"))
-        self.assertContains(response, "AI templates for lessons, quizzes, and scenarios")
-        self.assertContains(response, reverse("authoring_studio"))
-
-    def test_authoring_studio_turns_prompt_guides_into_workflow(self):
-        response = self.client.get(reverse("authoring_studio"))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "lms/authoring_studio.html")
-        self.assertEqual(response.context["recipe_count"], 43)
-        self.assertEqual(len(response.context["authoring_steps"]), 7)
-        self.assertEqual(len(response.context["course_pack_defaults"]["modules"]), 5)
-        self.assertContains(response, "Prompt-driven LMS builder")
-        self.assertContains(response, "Course Structure Prompt")
-        self.assertContains(response, "Course Pack Builder")
-        self.assertContains(response, "Copy course pack")
-        self.assertContains(response, "Publishing checklist")
-
     def test_beginner_alc_pack_contains_study_guide_and_four_lessons(self):
         response = self.client.get(reverse("beginner_course"))
         self.assertEqual(response.status_code, 200)
@@ -340,7 +290,6 @@ class PublicViewsTest(TestCase):
         self.assertContains(response, "Course Library")
         self.assertContains(response, "Practice Center")
         self.assertContains(response, "Study blocks")
-        self.assertContains(response, reverse("authoring_studio"))
 
     def test_videos_view_returns_200(self):
         self.assertEqual(self.client.get(reverse("videos")).status_code, 200)

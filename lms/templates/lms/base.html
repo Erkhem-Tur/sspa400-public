@@ -257,12 +257,6 @@
     <a href="{% url 'intermediate_course' %}" class="{% if request.resolver_match.url_name == 'intermediate_course' %}active{% endif %}">
       <i class="bi bi-signpost-split"></i> Intermediate Pathway
     </a>
-    <a href="{% url 'prompt_guides' %}" class="{% if request.resolver_match.url_name == 'prompt_guides' or request.resolver_match.url_name == 'prompt_guide_detail' %}active{% endif %}">
-      <i class="bi bi-magic"></i> Prompt Guides
-    </a>
-    <a href="{% url 'authoring_studio' %}" class="{% if request.resolver_match.url_name == 'authoring_studio' %}active{% endif %}">
-      <i class="bi bi-tools"></i> Authoring Studio
-    </a>
     <div class="sidebar-title">Practice</div>
     <a href="{% url 'worksheets' %}" class="{% if request.resolver_match.url_name == 'worksheets' and not request.GET.tab %}active{% endif %}">
       <i class="bi bi-journal-text"></i> Practice Center

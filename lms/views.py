@@ -4,7 +4,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.db.models import Avg, Sum
-from django.http import Http404, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
@@ -13,8 +13,6 @@ from django.views.decorators.http import require_POST
 from .models import Lesson, QuizResult, UserProgress, Department, Video, LogEntry, TlOverride, WallPost, RANK_CHOICES, PROMPT_CHOICES
 from .course_catalog import get_course_lessons, get_course_modules
 from .forms import LoginForm, LogbookEntryForm, WallPostForm
-from .authoring import AUTHORING_CHECKLIST, AUTHORING_STEPS, COURSE_PACK_DEFAULTS, list_authoring_recipes
-from .prompt_guides import get_prompt_guide, list_prompt_guides
 
 
 LESSON_RESOURCE_FILES = [
@@ -123,35 +121,6 @@ def course_library_view(request):
             level: sum(lesson['level'] == level for lesson in lessons)
             for level in ('A1', 'A2', 'B1')
         },
-    })
-
-
-def prompt_guides_view(request):
-    guides = list_prompt_guides()
-    return render(request, 'lms/prompt_guides.html', {
-        'prompt_guides': guides,
-        'guide_count': len(guides),
-        'prompt_total': sum(guide['prompt_count'] for guide in guides),
-    })
-
-
-def prompt_guide_detail_view(request, slug):
-    guide = get_prompt_guide(slug)
-    if guide is None:
-        raise Http404('Prompt guide not found')
-    return render(request, 'lms/prompt_guide_detail.html', {
-        'guide': guide,
-    })
-
-
-def authoring_studio_view(request):
-    recipes = list_authoring_recipes()
-    return render(request, 'lms/authoring_studio.html', {
-        'authoring_steps': AUTHORING_STEPS,
-        'authoring_checklist': AUTHORING_CHECKLIST,
-        'course_pack_defaults': COURSE_PACK_DEFAULTS,
-        'prompt_recipes': recipes,
-        'recipe_count': len(recipes),
     })
 
 

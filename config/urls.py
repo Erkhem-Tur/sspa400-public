@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 from django.contrib.auth import views as auth_views
+from django.views.generic import RedirectView
 from lms import portal_views, views
 
 urlpatterns = [
@@ -25,6 +26,11 @@ urlpatterns = [
         template_name='lms/password_reset_complete.html',
     ), name='password_reset_complete'),
     path('lesson/<int:lesson_id>/', views.lesson_view, name='lesson'),
+    path(
+        'alc-book18-lesson3/',
+        RedirectView.as_view(url='/static/lms/alc_book18_lesson3/index.html', permanent=False),
+        name='alc_book18_lesson3',
+    ),
     path('api/quiz/submit/', views.submit_quiz, name='submit_quiz'),
     path('api/study/time/', views.track_study_time, name='track_study_time'),
     path('profile/', portal_views.profile_view, name='profile'),

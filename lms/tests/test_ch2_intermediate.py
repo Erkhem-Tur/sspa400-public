@@ -163,6 +163,23 @@ class PublicViewsTest(TestCase):
         self.assertContains(response, "Intermediate English Pathway")
         self.assertContains(response, 'id="diagnosticOpen"')
         self.assertContains(response, 'id="finalOpen"')
+        self.assertContains(response, reverse("alc_book18_lesson3"))
+
+    def test_alc_book18_lesson3_redirects_to_interactive_static_lesson(self):
+        response = self.client.get(reverse("alc_book18_lesson3"))
+        self.assertRedirects(
+            response,
+            "/static/lms/alc_book18_lesson3/index.html",
+            fetch_redirect_response=False,
+        )
+        lesson_root = settings.BASE_DIR / "lms" / "static" / "lms" / "alc_book18_lesson3"
+        self.assertTrue((lesson_root / "index.html").exists())
+        self.assertTrue((lesson_root / "app.js").exists())
+        self.assertTrue((lesson_root / "grader.js").exists())
+        self.assertEqual(len(list((lesson_root / "assets").glob("page-*.jpg"))), 28)
+        app_text = (lesson_root / "app.js").read_text(encoding="utf-8")
+        self.assertIn("checkSingleAnswer", app_text)
+        self.assertIn("correctionGuide", app_text)
 
     def test_intermediate_course_json_contains_complete_docx_import(self):
         data_path = settings.BASE_DIR / "lms" / "static" / "lms" / "intermediate_course.json"

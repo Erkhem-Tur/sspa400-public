@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest identifier="ALC_BOOK18_LESSON3_EMPLOYMENT" version="1.0"
+  xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2"
+  xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.imsproject.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd">
+  <metadata>
+    <schema>ADL SCORM</schema>
+    <schemaversion>1.2</schemaversion>
+  </metadata>
+  <organizations default="ORG_ALC18_L3">
+    <organization identifier="ORG_ALC18_L3">
+      <title>ALC Book 18 · Lesson 3 · Employment</title>
+      <item identifier="ITEM_ALC18_L3" identifierref="RES_ALC18_L3" isvisible="true">
+        <title>Lesson 3: Employment</title>
+        <adlcp:masteryscore>80</adlcp:masteryscore>
+      </item>
+    </organization>
+  </organizations>
+  <resources>
+    <resource identifier="RES_ALC18_L3" type="webcontent" adlcp:scormtype="sco" href="index.html">
+      <file href="index.html"/>
+      <file href="styles.css"/>
+      <file href="app.js"/>
+      <file href="activities.js"/>
+      <file href="grader.js"/>
+      <file href="scorm.js"/>
+      <file href="assets/page-01.jpg"/><file href="assets/page-02.jpg"/>
+      <file href="assets/page-03.jpg"/><file href="assets/page-04.jpg"/>
+      <file href="assets/page-05.jpg"/><file href="assets/page-06.jpg"/>
+      <file href="assets/page-07.jpg"/><file href="assets/page-08.jpg"/>
+      <file href="assets/page-09.jpg"/><file href="assets/page-10.jpg"/>
+      <file href="assets/page-11.jpg"/><file href="assets/page-12.jpg"/>
+      <file href="assets/page-13.jpg"/><file href="assets/page-14.jpg"/>
+      <file href="assets/page-15.jpg"/><file href="assets/page-16.jpg"/>
+      <file href="assets/page-17.jpg"/><file href="assets/page-18.jpg"/>
+      <file href="assets/page-19.jpg"/><file href="assets/page-20.jpg"/>
+      <file href="assets/page-21.jpg"/><file href="assets/page-22.jpg"/>
+      <file href="assets/page-23.jpg"/><file href="assets/page-24.jpg"/>
+      <file href="assets/page-25.jpg"/><file href="assets/page-26.jpg"/>
+      <file href="assets/page-27.jpg"/><file href="assets/page-28.jpg"/>
+    </resource>
+  </resources>
+</manifest>

@@ -75,6 +75,11 @@
     scrim: document.getElementById("scrim"),
     fullscreenButton: document.getElementById("fullscreenButton"),
     practiceJump: document.getElementById("practiceJump"),
+    translanguagingToggle: document.getElementById("translanguagingToggle"),
+    translanguagingPanel: document.getElementById("translanguagingPanel"),
+    translanguagingMn: document.getElementById("translanguagingMn"),
+    translanguagingKeywords: document.getElementById("translanguagingKeywords"),
+    translanguagingFrame: document.getElementById("translanguagingFrame"),
     workbook: document.getElementById("workbook"),
     workbookTitle: document.getElementById("workbookTitle"),
     workbookIntro: document.getElementById("workbookIntro"),
@@ -93,7 +98,7 @@
     statusDot: document.getElementById("statusDot")
   };
 
-  let state = { current: 0, viewed: [0], completed: false, zoom: "fit", practice: {}, grades: {}, attempts: {}, itemAttempts: {} };
+  let state = { current: 0, viewed: [0], completed: false, zoom: "fit", translanguaging: true, practice: {}, grades: {}, attempts: {}, itemAttempts: {} };
   let answers = safeParse(localStorage.getItem(answersKey)) || {};
   let scormConnected = false;
   let answerSaveTimer = null;
@@ -117,6 +122,7 @@
     if (!state.viewed.includes(state.current)) state.viewed.push(state.current);
     state.completed = Boolean(candidate.completed) || state.viewed.length === pages.length;
     if (["fit", "100", "125", "150", "200"].includes(candidate.zoom)) state.zoom = candidate.zoom;
+    if (typeof candidate.translanguaging === "boolean") state.translanguaging = candidate.translanguaging;
     if (candidate.practice && typeof candidate.practice === "object") state.practice = candidate.practice;
     if (candidate.grades && typeof candidate.grades === "object") state.grades = candidate.grades;
     if (candidate.attempts && typeof candidate.attempts === "object") state.attempts = candidate.attempts;
@@ -152,6 +158,7 @@
         viewed: state.viewed,
         completed: state.completed,
         zoom: state.zoom,
+        translanguaging: state.translanguaging,
         practice: state.practice,
         grades: state.grades,
         attempts: state.attempts
@@ -272,6 +279,46 @@
     return window.AnswerGrader.label(expected);
   }
 
+  function withMongolian(english, mongolian) {
+    return state.translanguaging ? `${english} · Монгол: ${mongolian}` : english;
+  }
+
+  function renderTranslanguaging(pageIndex) {
+    const support = window.TRANSLANGUAGING_SUPPORT[pageIndex];
+    ui.translanguagingPanel.hidden = !state.translanguaging;
+    ui.translanguagingToggle.setAttribute("aria-pressed", String(state.translanguaging));
+    ui.translanguagingToggle.textContent = `EN ↔ MN Support: ${state.translanguaging ? "On" : "Off"}`;
+    if (!support) return;
+    ui.translanguagingMn.textContent = support.mn;
+    ui.translanguagingKeywords.textContent = support.keywords.join(" · ");
+    ui.translanguagingFrame.textContent = support.frame;
+    ui.workbookIntro.textContent = state.translanguaging
+      ? "Type one answer, then Check · Шалгах. Буруу бол English + Монгол correction guide ашиглаад дахин оролдоорой."
+      : "Type one answer and select Check for instant feedback. If it is wrong, use the correction guide and try again.";
+    ui.activityForm.querySelectorAll(".item-check").forEach(button => {
+      const reviewOnly = button.dataset.reviewOnly === "true";
+      button.textContent = state.translanguaging
+        ? (reviewOnly ? "Submit · Илгээх" : "Check · Шалгах")
+        : (reviewOnly ? "Submit" : "Check");
+    });
+    ui.activityForm.querySelectorAll(".item-reveal").forEach(button => {
+      button.textContent = state.translanguaging ? "Show answer · Хариу харах" : "Show answer";
+    });
+    const reviewOnlyPage = ui.checkAnswers.dataset.reviewOnly === "true";
+    ui.checkAnswers.textContent = state.translanguaging
+      ? (reviewOnlyPage ? "Submit page · Багшид илгээх" : "Check page · Хуудсаар шалгах")
+      : (reviewOnlyPage ? "Submit for teacher review" : "Check answers");
+  }
+
+  function toggleTranslanguaging() {
+    state.translanguaging = !state.translanguaging;
+    renderTranslanguaging(state.current);
+    persistState();
+    ui.announcement.textContent = state.translanguaging
+      ? "English and Mongolian translanguaging support is on."
+      : "English and Mongolian translanguaging support is off.";
+  }
+
   function expectedWordCount(expected) {
     const label = expectedLabel(expected).split(" / ")[0].trim();
     return label ? label.split(/\s+/).length : 0;
@@ -286,38 +333,74 @@
     const extraClue = attempt >= 2 && firstLetter
       ? ` It starts with “${firstLetter}”${wordCount > 1 ? ` and has ${wordCount} words` : ""}.`
       : "";
+    const extraClueMn = attempt >= 2 && firstLetter
+      ? ` Эхний үсэг нь “${firstLetter}”${wordCount > 1 ? `, нийт ${wordCount} үгтэй` : ""}.`
+      : "";
 
     if (expected && typeof expected === "object" && Array.isArray(expected.all)) {
-      return `This item needs ${expected.all.length} related forms. Check the part of speech for every blank and include all forms.${extraClue}`;
+      return withMongolian(
+        `This item needs ${expected.all.length} related forms. Check the part of speech for every blank and include all forms.${extraClue}`,
+        `Энэ item-д холбоотой ${expected.all.length} form хэрэгтэй. Blank бүрийн part of speech-ийг шалгаад бүх form-ыг оруул.${extraClueMn}`
+      );
     }
     if (hint.includes("t or f")) {
-      return `Re-read the exact statement on the book page. Start with T if every detail is true, or F and then correct the false detail.${extraClue}`;
+      return withMongolian(
+        `Re-read the exact statement on the book page. Start with T if every detail is true, or F and then correct the false detail.${extraClue}`,
+        `Өгүүлбэрийн бүх мэдээллийг дахин шалга. Бүгд зөв бол T; нэг хэсэг буруу бол F гэж эхлээд буруу detail-ийг зас.${extraClueMn}`
+      );
     }
     if (hint.includes("matching letter")) {
-      return `Match the whole meaning, not just one familiar word. Compare the item with every option, then enter one letter.${extraClue}`;
+      return withMongolian(
+        `Match the whole meaning, not just one familiar word. Compare the item with every option, then enter one letter.${extraClue}`,
+        `Зөвхөн танил нэг үгээр биш, бүтэн утгаар нь match хий. Item-ийг бүх option-той харьцуулаад нэг үсэг бич.${extraClueMn}`
+      );
     }
     if (title.includes("exercise d") && hint.includes("a, s/a, or i")) {
-      return "Check the speaker’s purpose: A = agreement, S/A = surprise or annoyance, and I = asking for information.";
+      return withMongolian(
+        "Check the speaker’s purpose: A = agreement, S/A = surprise or annoyance, and I = asking for information.",
+        "Speaker-ийн зорилгыг шалга: A = санал нийлэх, S/A = гайхах эсвэл дургүйцэх, I = мэдээлэл асуух."
+      );
     }
     if (label.endsWith("?")) {
-      return `Use negative auxiliary + subject + main verb, keep the original tense, and finish with a question mark.${extraClue}`;
+      return withMongolian(
+        `Use negative auxiliary + subject + main verb, keep the original tense, and finish with a question mark.${extraClue}`,
+        `Negative auxiliary + subject + main verb бүтцийг хэрэглэж, эх tense-ийг хадгалаад question mark-аар төгсгө.${extraClueMn}`
+      );
     }
     if (hint.includes("a, b, or c")) {
-      return `Return to the sentence and test all three choices for meaning and grammar. Enter only a, b, or c.${extraClue}`;
+      return withMongolian(
+        `Return to the sentence and test all three choices for meaning and grammar. Enter only a, b, or c.${extraClue}`,
+        `Өгүүлбэрт буцаж очоод гурван choice-ийг утга ба grammar хоёроор шалга. Зөвхөн a, b, эсвэл c бич.${extraClueMn}`
+      );
     }
     if (hint.includes("word from the box") || hint.includes("words from the box") || hint.includes("replacement word")) {
-      return `Use the word box and check both meaning and grammar. Make sure the word form fits the sentence exactly.${extraClue}`;
+      return withMongolian(
+        `Use the word box and check both meaning and grammar. Make sure the word form fits the sentence exactly.${extraClue}`,
+        `Word box-оо ашиглаад утга болон grammar-ийг хамтад нь шалга. Word form өгүүлбэрт яг таарч байгаа эсэхийг нягтал.${extraClueMn}`
+      );
     }
     if (hint.includes("-ness")) {
-      return `The blank needs the noun form. Check spelling when adding -ness, especially final y → i.${extraClue}`;
+      return withMongolian(
+        `The blank needs the noun form. Check spelling when adding -ness, especially final y → i.${extraClue}`,
+        `Blank-д noun form хэрэгтэй. -ness залгах spelling, ялангуяа төгсгөлийн y → i өөрчлөлтийг шалга.${extraClueMn}`
+      );
     }
     if (hint.includes("-ment") || hint.includes("verb or noun")) {
-      return `Decide whether the blank needs a verb or a noun. Use -ment only when the sentence needs the noun form.${extraClue}`;
+      return withMongolian(
+        `Decide whether the blank needs a verb or a noun. Use -ment only when the sentence needs the noun form.${extraClue}`,
+        `Blank-д verb эсвэл noun аль нь хэрэгтэйг эхлээд шийд. Sentence noun form шаардаж байвал -ment хэрэглэ.${extraClueMn}`
+      );
     }
     if (hint.includes("word form") || hint.includes("related word")) {
-      return `Use the sentence position to identify the part of speech, then check singular/plural and the correct suffix.${extraClue}`;
+      return withMongolian(
+        `Use the sentence position to identify the part of speech, then check singular/plural and the correct suffix.${extraClue}`,
+        `Sentence position-оос part of speech-ийг тогтоогоод singular/plural болон зөв suffix-ийг шалга.${extraClueMn}`
+      );
     }
-    return `Check the source sentence again for meaning, spelling, and the exact word form.${extraClue}`;
+    return withMongolian(
+      `Check the source sentence again for meaning, spelling, and the exact word form.${extraClue}`,
+      `Source sentence-ээ дахин уншаад утга, spelling болон яг зөв word form-оо шалга.${extraClueMn}`
+    );
   }
 
   function setFieldResult(wrapper, status, message) {
@@ -334,7 +417,11 @@
     if (expected === null || expected === undefined) return;
     const field = document.getElementById(answerKey(pageIndex, groupIndex, itemIndex));
     const wrapper = field.closest(".answer-field");
-    setFieldResult(wrapper, matchesExpected(field.value, expected) ? "correct" : "incorrect", `Correct answer: ${expectedLabel(expected)}`);
+    setFieldResult(
+      wrapper,
+      matchesExpected(field.value, expected) ? "correct" : "incorrect",
+      withMongolian(`Correct answer: ${expectedLabel(expected)}`, `Зөв хариу: ${expectedLabel(expected)}`)
+    );
     wrapper.querySelector(".item-reveal").hidden = true;
     field.focus();
   }
@@ -350,14 +437,19 @@
     const value = field.value.trim();
 
     if (expected === null || expected === undefined) {
-      setFieldResult(wrapper, "review", value ? "Saved for teacher review." : "Write a response before submitting it.");
+      setFieldResult(wrapper, "review", value
+        ? withMongolian("Saved for teacher review.", "Багш шалгахаар хадгалагдлаа.")
+        : withMongolian("Write a response before submitting it.", "Илгээхийн өмнө хариултаа бичээрэй."));
       revealButton.hidden = true;
       ui.announcement.textContent = value ? "Response saved for teacher review." : "A response is required.";
       return;
     }
 
     if (!value) {
-      setFieldResult(wrapper, "incorrect", "Write an answer first, then select Check.");
+      setFieldResult(wrapper, "incorrect", withMongolian(
+        "Write an answer first, then select Check.",
+        "Эхлээд хариултаа бичээд Check товчийг дар."
+      ));
       revealButton.hidden = true;
       field.focus();
       ui.announcement.textContent = `Item ${displayNumber} needs an answer.`;
@@ -367,11 +459,13 @@
     state.itemAttempts[key] = (Number(state.itemAttempts[key]) || 0) + 1;
     const attempt = state.itemAttempts[key];
     if (matchesExpected(value, expected)) {
-      setFieldResult(wrapper, "correct", attempt === 1 ? "Correct — well done!" : "Correct — good correction!");
+      setFieldResult(wrapper, "correct", attempt === 1
+        ? withMongolian("Correct — well done!", "Зөв — маш сайн!")
+        : withMongolian("Correct — good correction!", "Зөв — алдаагаа сайн заслаа!"));
       revealButton.hidden = true;
       ui.announcement.textContent = `Item ${displayNumber} is correct.`;
     } else {
-      setFieldResult(wrapper, "incorrect", `Not yet. ${correctionGuide(activityGroup, expected, attempt)}`);
+      setFieldResult(wrapper, "incorrect", `${withMongolian("Not yet.", "Одоохондоо буруу байна.")} ${correctionGuide(activityGroup, expected, attempt)}`);
       revealButton.hidden = attempt < 2;
       ui.announcement.textContent = `Item ${displayNumber} is not correct yet. Use the guidance and try again.`;
     }
@@ -380,10 +474,14 @@
     ui.gradeSummary.classList.remove("success");
     ui.gradeSummary.classList.toggle("needs-work", !matchesExpected(value, expected));
     ui.gradeScore.textContent = matchesExpected(value, expected) ? "✓" : "Try";
-    ui.gradeTitle.textContent = matchesExpected(value, expected) ? "This answer is correct" : "Correct this answer and check again";
+    ui.gradeTitle.textContent = matchesExpected(value, expected)
+      ? withMongolian("This answer is correct", "Энэ хариулт зөв байна")
+      : withMongolian("Correct this answer and check again", "Хариултаа засаад дахин шалга");
     ui.gradeMessage.textContent = matchesExpected(value, expected)
-      ? "Continue to the next item."
-      : attempt >= 2 ? "A stronger clue is shown. You may also reveal only this answer." : "Use the hint directly below the field.";
+      ? withMongolian("Continue to the next item.", "Дараагийн item рүү үргэлжлүүл.")
+      : attempt >= 2
+        ? withMongolian("A stronger clue is shown. You may also reveal only this answer.", "Нэмэлт clue гарлаа. Зөвхөн энэ item-ийн answer-ийг харж болно.")
+        : withMongolian("Use the hint directly below the field.", "Field-ийн доорх clue-г ашигла.");
     saveAnswersLocally();
     persistState();
   }
@@ -425,18 +523,20 @@
         if (expected === null || expected === undefined) {
           review += 1;
           if (field.value.trim()) answeredForReview += 1;
-          setFieldResult(wrapper, "review", field.value.trim() ? "Saved for teacher review" : "Teacher review item");
+          setFieldResult(wrapper, "review", field.value.trim()
+            ? withMongolian("Saved for teacher review", "Багш шалгахаар хадгалагдлаа")
+            : withMongolian("Teacher review item", "Багш шалгах item"));
           continue;
         }
 
         total += 1;
         if (matchesExpected(field.value, expected)) {
           correct += 1;
-          setFieldResult(wrapper, "correct", "Correct — well done!");
+          setFieldResult(wrapper, "correct", withMongolian("Correct — well done!", "Зөв — маш сайн!"));
         } else {
           setFieldResult(wrapper, "incorrect", field.value.trim()
-            ? `Not yet. ${correctionGuide(activityGroup, expected, attempts || 1)}`
-            : "Answer required");
+            ? `${withMongolian("Not yet.", "Одоохондоо буруу байна.")} ${correctionGuide(activityGroup, expected, attempts || 1)}`
+            : withMongolian("Answer required", "Хариулт бичих шаардлагатай"));
           const revealButton = wrapper.querySelector(".item-reveal");
           if (revealButton) revealButton.hidden = attempts < 2;
         }
@@ -474,7 +574,10 @@
         const field = document.getElementById(answerKey(state.current, groupIndex, itemIndex));
         const wrapper = field.closest(".answer-field");
         if (!matchesExpected(field.value, expected)) {
-          setFieldResult(wrapper, "incorrect", `Correct answer: ${expectedLabel(expected)}`);
+          setFieldResult(wrapper, "incorrect", withMongolian(
+            `Correct answer: ${expectedLabel(expected)}`,
+            `Зөв хариу: ${expectedLabel(expected)}`
+          ));
           wrapper.querySelector(".item-reveal").hidden = true;
         }
       });
@@ -525,13 +628,17 @@
     itemCheck.type = "button";
     itemCheck.className = "item-check";
     const expected = Array.isArray(activityGroup.answers) ? activityGroup.answers[itemIndex] : undefined;
-    itemCheck.textContent = expected === null || expected === undefined ? "Submit" : "Check";
+    const reviewOnly = expected === null || expected === undefined;
+    itemCheck.dataset.reviewOnly = String(reviewOnly);
+    itemCheck.textContent = reviewOnly
+      ? (state.translanguaging ? "Submit · Илгээх" : "Submit")
+      : (state.translanguaging ? "Check · Шалгах" : "Check");
     itemCheck.setAttribute("aria-label", `${itemCheck.textContent} item ${displayNumber}`);
     itemCheck.addEventListener("click", () => checkSingleAnswer(pageIndex, groupIndex, itemIndex));
     const itemReveal = document.createElement("button");
     itemReveal.type = "button";
     itemReveal.className = "item-reveal";
-    itemReveal.textContent = "Show answer";
+    itemReveal.textContent = state.translanguaging ? "Show answer · Хариу харах" : "Show answer";
     itemReveal.hidden = true;
     itemReveal.setAttribute("aria-label", `Show the correct answer for item ${displayNumber}`);
     itemReveal.addEventListener("click", () => showSingleAnswer(pageIndex, groupIndex, itemIndex));
@@ -552,7 +659,9 @@
     const page = pages[pageIndex];
     const activity = window.LESSON_ACTIVITIES[pageIndex];
     ui.workbookTitle.textContent = `Book page ${page.bookPage} practice`;
-    ui.workbookIntro.textContent = "Type one answer and select Check for instant feedback. If it is wrong, use the correction guide and try again.";
+    ui.workbookIntro.textContent = state.translanguaging
+      ? "Type one answer, then Check · Шалгах. Буруу бол English + Монгол correction guide ашиглаад дахин оролдоорой."
+      : "Type one answer and select Check for instant feedback. If it is wrong, use the correction guide and try again.";
     ui.activityForm.innerHTML = "";
     clearGradeDisplay();
 
@@ -592,7 +701,10 @@
       sum + (Array.isArray(activityGroup.answers)
         ? activityGroup.answers.filter(expected => expected !== null && expected !== undefined).length
         : 0), 0);
-    ui.checkAnswers.textContent = gradedTotal ? "Check answers" : "Submit for teacher review";
+    ui.checkAnswers.dataset.reviewOnly = String(!gradedTotal);
+    ui.checkAnswers.textContent = state.translanguaging
+      ? (gradedTotal ? "Check page · Хуудсаар шалгах" : "Submit page · Багшид илгээх")
+      : (gradedTotal ? "Check answers" : "Submit for teacher review");
     if (state.grades[pageIndex]) gradePage(pageIndex, false);
   }
 
@@ -630,6 +742,7 @@
     ui.nextButton.disabled = target === pages.length - 1;
 
     renderWorkbook(target);
+    renderTranslanguaging(target);
     updateContents();
     persistState();
     updateProgress();
@@ -687,6 +800,7 @@
     ui.pageSelect.addEventListener("change", event => showPage(Number(event.target.value)));
     ui.zoomSelect.addEventListener("change", event => applyZoom(event.target.value));
     ui.practiceJump.addEventListener("click", () => ui.workbook.scrollIntoView({ behavior: "smooth", block: "start" }));
+    ui.translanguagingToggle.addEventListener("click", toggleTranslanguaging);
     ui.activityForm.addEventListener("submit", event => event.preventDefault());
     ui.clearAnswers.addEventListener("click", clearCurrentPageAnswers);
     ui.checkAnswers.addEventListener("click", () => gradePage(state.current, true));

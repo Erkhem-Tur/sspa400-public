@@ -68,6 +68,7 @@
         </div>
         <div class="view-tools">
           <button class="practice-jump" id="practiceJump" type="button">Practice <span aria-hidden="true">↓</span></button>
+          <button class="tl-toggle" id="translanguagingToggle" type="button" aria-pressed="true" aria-controls="translanguagingPanel">EN ↔ MN Support: On</button>
           <label for="zoomSelect">View</label>
           <select id="zoomSelect">
             <option value="fit">Fit page</option>
@@ -100,6 +101,25 @@
             </div>
           </header>
           <div class="answer-progress-track" aria-hidden="true"><span id="answerProgressBar"></span></div>
+          <section class="tl-panel" id="translanguagingPanel" aria-labelledby="translanguagingTitle">
+            <header class="tl-head">
+              <span class="tl-icon" aria-hidden="true">EN↔MN</span>
+              <div>
+                <span class="eyebrow">Translanguaging bridge · Хэлний гүүр</span>
+                <h3 id="translanguagingTitle">Think in Mongolian → Produce in English</h3>
+              </div>
+            </header>
+            <p class="tl-mn" id="translanguagingMn"></p>
+            <ol class="tl-steps" aria-label="Three-step translanguaging strategy">
+              <li><strong>1 · Бод</strong><span>Санаагаа Монгол хэлээр товч боловсруул.</span></li>
+              <li><strong>2 · Bridge</strong><span>English түлхүүр үг, дүрмийн хэлбэрээ сонго.</span></li>
+              <li><strong>3 · Produce</strong><span>Эцсийн хариугаа English-ээр бүтэн хэлж эсвэл бич.</span></li>
+            </ol>
+            <div class="tl-tools">
+              <p><strong>Key English</strong><span id="translanguagingKeywords"></span></p>
+              <p><strong>English frame</strong><span id="translanguagingFrame"></span></p>
+            </div>
+          </section>
           <form id="activityForm" class="activity-form" autocomplete="off"></form>
           <section class="grade-summary" id="gradeSummary" hidden aria-live="polite">
             <div class="grade-score" id="gradeScore">—</div>
@@ -148,6 +168,7 @@
 
   <script src="scorm.js"></script>
   <script src="activities.js"></script>
+  <script src="translanguaging.js"></script>
   <script src="grader.js"></script>
   <script src="app.js"></script>
 </body>

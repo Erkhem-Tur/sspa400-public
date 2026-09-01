@@ -25,6 +25,16 @@ Interactive workbook
 - The SCORM resume record stores page-level practice counts; full written
   responses stay in the learner's browser to remain within SCORM 1.2 limits.
 
+Translanguaging support
+- EN ↔ MN Support is available on every page and is on by default.
+- The optional bridge does not replace or alter the English student-book text.
+- Learners first process the idea briefly in Mongolian, select English key
+  language, and then produce the final spoken or written response in English.
+- Each page has a task-specific Mongolian strategy, Key English list, and
+  reusable English sentence frame.
+- Wrong-answer correction guidance is bilingual while support is on.
+- Learners or teachers can switch the support off for English-only practice.
+
 Answer checking
 - Every response has its own Check button for immediate, on-the-spot feedback.
 - Incorrect answers receive a correction guide instead of revealing the answer immediately.

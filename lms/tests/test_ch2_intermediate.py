@@ -176,10 +176,15 @@ class PublicViewsTest(TestCase):
         self.assertTrue((lesson_root / "index.html").exists())
         self.assertTrue((lesson_root / "app.js").exists())
         self.assertTrue((lesson_root / "grader.js").exists())
+        self.assertTrue((lesson_root / "translanguaging.js").exists())
         self.assertEqual(len(list((lesson_root / "assets").glob("page-*.jpg"))), 28)
         app_text = (lesson_root / "app.js").read_text(encoding="utf-8")
         self.assertIn("checkSingleAnswer", app_text)
         self.assertIn("correctionGuide", app_text)
+        self.assertIn("renderTranslanguaging", app_text)
+        translanguaging_text = (lesson_root / "translanguaging.js").read_text(encoding="utf-8")
+        self.assertEqual(translanguaging_text.count("support("), 28)
+        self.assertIn("TRANSLANGUAGING_SUPPORT", translanguaging_text)
 
     def test_intermediate_course_json_contains_complete_docx_import(self):
         data_path = settings.BASE_DIR / "lms" / "static" / "lms" / "intermediate_course.json"

@@ -131,6 +131,7 @@ def grade_quiz(user, unit, answers):
         details.append({
             'question_id': question.pk,
             'correct': correct,
+            'selected_answer': answer,
             'correct_answer': question.correct_answer,
             'explanation': question.explanation,
         })

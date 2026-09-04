@@ -1,4 +1,6 @@
+import json
 import os
+from pathlib import Path
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
@@ -22,6 +24,7 @@ class Command(BaseCommand):
         self._seed_departments_and_legacy_lesson()
         self._seed_admin_from_environment()
         self._seed_starter_course()
+        self._seed_law_quiz_course()
         self.stdout.write(self.style.SUCCESS('Seed completed successfully'))
 
     def _seed_departments_and_legacy_lesson(self):
@@ -292,6 +295,105 @@ class Command(BaseCommand):
         self._question(final, 1, 'Which question asks for a location?', ['Where should we meet?', 'Who is responsible?', 'What happened next?'], 'Where should we meet?')
         self._question(final, 2, 'Asking a speaker to repeat an important detail is unprofessional.', ['True', 'False'], 'False', 'Clarification prevents mistakes and is professional.', QuizQuestion.Kind.TRUE_FALSE)
         self._question(final, 3, 'A clear situation report should include who, what, where, and action taken.', ['True', 'False'], 'True', kind=QuizQuestion.Kind.TRUE_FALSE)
+
+    def _seed_law_quiz_course(self):
+        source = Path(__file__).resolve().parents[2] / 'law_quiz.json'
+        if not source.exists():
+            self.stdout.write(self.style.WARNING('Law quiz data file is missing; skipped.'))
+            return
+
+        questions = json.loads(source.read_text(encoding='utf-8'))
+        answered = [item for item in questions if item.get('answer') in item.get('options', {})]
+        omitted = len(questions) - len(answered)
+        category, _ = CourseCategory.objects.get_or_create(
+            slug='law-and-regulation',
+            defaults={
+                'name': 'Хууль ба эрх зүй',
+                'description': 'Алба хаагчийн хууль, эрх зүйн мэдлэг шалгах сорилууд.',
+                'order': 3,
+            },
+        )
+        course, _ = Course.objects.update_or_create(
+            slug='law-quiz-448',
+            defaults={
+                'title': 'Хууль зүйн сорил - 448 асуулт',
+                'short_description': '11 хуулийн сэдвийг богино багцаар давтаж, алдаагаа тайлбартай шалгана.',
+                'description': (
+                    'Хариулсан эх PDF-ээс боловсруулсан, гар утсанд тохирсон шалгалтын сан. '
+                    'Бүлэг бүрийг 25 хүртэлх асуулттай багцаар өгч, илгээсний дараа зөв хариу '
+                    'болон алдааны тайлбарыг харна.'
+                ),
+                'learning_outcomes': (
+                    'Хуулийн гол нэр томьёо, зохицуулалтыг ялгах\n'
+                    'Бүлэг тус бүрээр ахицаа хэмжих\n'
+                    'Алдсан асуултаа зөв хариу, тайлбартай давтах'
+                ),
+                'category': category,
+                'level': Course.Level.MIXED,
+                'status': Course.Status.PUBLISHED,
+                'estimated_minutes': 450,
+                'order': 0,
+                'is_featured': True,
+            },
+        )
+
+        section_order = []
+        grouped = {}
+        for item in answered:
+            title = item['section']
+            if title not in grouped:
+                section_order.append(title)
+                grouped[title] = []
+            grouped[title].append(item)
+
+        for module_order, title in enumerate(section_order):
+            module, _ = CourseModule.objects.update_or_create(
+                course=course,
+                order=module_order,
+                defaults={
+                    'title': title,
+                    'summary': f'{len(grouped[title])} асуултыг богино багцаар ажиллана.',
+                },
+            )
+            chunks = [grouped[title][i:i + 25] for i in range(0, len(grouped[title]), 25)]
+            for unit_order, chunk in enumerate(chunks):
+                start, end = chunk[0]['number'], chunk[-1]['number']
+                unit, _ = CourseUnit.objects.update_or_create(
+                    module=module,
+                    order=unit_order,
+                    defaults={
+                        'title': f'{unit_order + 1}-р багц · Асуулт {start}-{end}',
+                        'summary': f'{len(chunk)} асуулт · Алдааны тайлбар илгээсний дараа гарна.',
+                        'kind': CourseUnit.Kind.QUIZ,
+                        'duration_minutes': max(8, len(chunk)),
+                        'pass_percent': 80,
+                        'is_required': True,
+                        'is_published': True,
+                    },
+                )
+                unit.questions.all().delete()
+                QuizQuestion.objects.bulk_create([
+                    QuizQuestion(
+                        unit=unit,
+                        order=index,
+                        prompt=item['prompt'],
+                        options=[item['options'][key] for key in item['options']],
+                        correct_answer=item['options'][item['answer']],
+                        explanation=(
+                            'Эх материалд энэ хувилбарыг зөв гэж тэмдэглэсэн. '
+                            'Таны сонголт үүнээс зөрсөн бол асуултын түлхүүр үг болон '
+                            'зөв хувилбарын бүрэн нөхцөлийг дахин харьцуулна уу.'
+                        ),
+                        points=1,
+                    )
+                    for index, item in enumerate(chunk)
+                ])
+
+        self.stdout.write(
+            self.style.SUCCESS(
+                f'Law quiz seeded: {len(answered)} scored questions; {omitted} unmarked source questions omitted.'
+            )
+        )
 
     @staticmethod
     def _question(unit, order, prompt, options, correct, explanation='', kind=QuizQuestion.Kind.MULTIPLE_CHOICE):

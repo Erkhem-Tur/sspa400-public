@@ -69,9 +69,12 @@
       {% endif %}
 
       {% if unit.kind == 'QUIZ' %}
-      <section id="quiz" class="content-panel my-4" aria-labelledby="quizTitle">
-        <h2 id="quizTitle">Knowledge check</h2>
-        <p class="text-muted">Pass mark: {{ unit.pass_percent }}%. You can try again after reviewing your answers.</p>
+      <section id="quiz" class="content-panel my-4 quiz-workspace" aria-labelledby="quizTitle">
+        <div class="quiz-heading-row">
+          <div><span class="quiz-kicker">БҮЛЭГЧИЛСЭН СОРИЛ</span><h2 id="quizTitle">Мэдлэг шалгах</h2></div>
+          <span class="quiz-count"><i class="bi bi-ui-checks me-1"></i>{{ unit.questions.count }} асуулт</span>
+        </div>
+        <p class="text-muted">Тэнцэх босго: {{ unit.pass_percent }}%. Илгээсний дараа алдсан асуулт бүрийн зөв хариу, тайлбарыг харна.</p>
         {% if latest_attempt %}
         <div class="alert {% if latest_attempt.requires_review %}alert-info{% elif latest_attempt.passed %}alert-success{% else %}alert-warning{% endif %}">
           {% if latest_attempt.requires_review %}<strong>Submitted for review.</strong> Current automatic score: {{ latest_attempt.percentage }}%.
@@ -82,10 +85,11 @@
         </div>
         {% endif %}
         {% if unit.questions.all %}
-        <form method="post" action="{% url 'submit_course_quiz' unit.id %}">
+        <form method="post" action="{% url 'submit_course_quiz' unit.id %}" id="quizForm">
           {% csrf_token %}
           {% for question in unit.questions.all %}
-          <fieldset class="quiz-question">
+          {% with detail=quiz_feedback|get_item:question.id selected=latest_attempt.answers|get_item:question.id %}
+          <fieldset class="quiz-question{% if detail and not detail.correct %} quiz-question-wrong{% elif detail.correct %} quiz-question-correct{% endif %}" data-question>
             <legend class="fs-6 fw-bold">{{ forloop.counter }}. {{ question.prompt }} <span class="text-muted fw-normal">({{ question.points }} pt)</span></legend>
             {% if question.kind == 'ESSAY' %}
             <textarea class="form-control" name="question_{{ question.id }}" rows="5" required>{% if latest_attempt %}{{ latest_attempt.answers|get_item:question.id }}{% endif %}</textarea>
@@ -93,25 +97,24 @@
             <div class="quiz-options">
               {% for option in question.options %}
               <label class="quiz-option" for="q{{ question.id }}o{{ forloop.counter }}">
-                <input class="form-check-input" id="q{{ question.id }}o{{ forloop.counter }}" type="radio" name="question_{{ question.id }}" value="{{ option }}" required>
+                <input class="form-check-input" id="q{{ question.id }}o{{ forloop.counter }}" type="radio" name="question_{{ question.id }}" value="{{ option }}" {% if selected == option %}checked{% endif %} required>
                 <span>{{ option }}</span>
               </label>
               {% endfor %}
             </div>
             {% endif %}
-            {% with detail=quiz_feedback|get_item:question.id %}
             {% if detail %}
-            <div class="mt-2 small {% if detail.correct %}text-success{% elif detail.correct == False %}text-danger{% else %}text-muted{% endif %}">
-              {% if detail.correct %}<i class="bi bi-check-circle me-1"></i>Correct.
-              {% elif detail.correct == False %}<i class="bi bi-x-circle me-1"></i>Correct answer: {{ detail.correct_answer }}.
+            <div class="quiz-feedback {% if detail.correct %}is-correct{% else %}is-wrong{% endif %}">
+              {% if detail.correct %}<i class="bi bi-check-circle-fill me-1"></i><strong>Зөв.</strong>
+              {% elif detail.correct == False %}<i class="bi bi-x-circle-fill me-1"></i><strong>Таны хариу:</strong> {{ detail.selected_answer|default:'Хариулаагүй' }}<br><i class="bi bi-arrow-right-circle me-1"></i><strong>Зөв хариу:</strong> {{ detail.correct_answer }}.
               {% endif %}
-              {{ detail.explanation }}
+              <div class="mt-1">{{ detail.explanation }}</div>
             </div>
             {% endif %}
-            {% endwith %}
           </fieldset>
+          {% endwith %}
           {% endfor %}
-          {% if not can_manage %}<button class="btn btn-primary mt-3" type="submit">Submit quiz</button>{% endif %}
+          {% if not can_manage %}<div class="quiz-submit-bar"><span id="quizAnswered">0 / {{ unit.questions.count }} хариулсан</span><button class="btn btn-primary" type="submit">Хариугаа шалгах <i class="bi bi-arrow-right ms-1"></i></button></div>{% endif %}
         </form>
         {% else %}<p class="text-muted mb-0">Questions have not been added yet.</p>{% endif %}
       </section>
@@ -215,6 +218,20 @@
         window.alert(result.error || 'Progress could not be saved.');
       }
     });
+  }
+
+  const quizForm = document.getElementById('quizForm');
+  const quizAnswered = document.getElementById('quizAnswered');
+  if (quizForm && quizAnswered) {
+    const total = quizForm.querySelectorAll('[data-question]').length;
+    function updateAnswered() {
+      const answered = new Set(
+        Array.from(quizForm.querySelectorAll('input[type="radio"]:checked')).map(input => input.name)
+      ).size;
+      quizAnswered.textContent = answered + ' / ' + total + ' хариулсан';
+    }
+    quizForm.addEventListener('change', updateAnswered);
+    updateAnswered();
   }
 
   {% if unit.kind == 'LISTENING' %}

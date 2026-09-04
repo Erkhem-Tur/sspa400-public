@@ -367,6 +367,17 @@ def course_player(request, slug, unit_id=None):
             quiz_feedback = {str(item['question_id']): item for item in feedback_items}
         if latest_attempt is None:
             latest_attempt = QuizAttempt.objects.filter(user=request.user, unit=unit).first()
+        if latest_attempt is not None and not quiz_feedback:
+            for question in unit.questions.all():
+                selected = latest_attempt.answers.get(str(question.pk), '')
+                correct = selected.strip().casefold() == question.correct_answer.strip().casefold()
+                quiz_feedback[str(question.pk)] = {
+                    'question_id': question.pk,
+                    'correct': correct,
+                    'selected_answer': selected,
+                    'correct_answer': question.correct_answer,
+                    'explanation': question.explanation,
+                }
 
     return render(request, 'lms/course_player.html', {
         'course': course,

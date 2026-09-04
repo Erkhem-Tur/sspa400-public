@@ -143,6 +143,18 @@
 .quiz-question:last-child { border-bottom: 0; }
 .quiz-options { display: grid; gap: 8px; margin-top: 10px; }
 .quiz-option { display: flex; align-items: flex-start; gap: 9px; padding: 10px; border: 1px solid var(--line); border-radius: 6px; background: #fbfcfe; }
+.quiz-workspace { border-top: 5px solid #c9a227; box-shadow: 0 12px 32px rgba(15, 39, 68, .08); }
+.quiz-heading-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
+.quiz-kicker { display: block; color: #8b6c00; font-size: 11px; font-weight: 900; letter-spacing: .12em; margin-bottom: 4px; }
+.quiz-count { flex: 0 0 auto; padding: 7px 10px; border-radius: 999px; background: #eef4fa; color: #153b66; font-size: 12px; font-weight: 800; }
+.quiz-option:hover { border-color: #7894b4; background: #f2f7fc; }
+.quiz-option:has(input:checked) { border-color: #1b3a6b; background: #eaf1f9; box-shadow: 0 0 0 2px rgba(27, 58, 107, .08); }
+.quiz-question-wrong { margin: 10px -10px; padding: 16px 10px; border-left: 4px solid #bd2c2c; background: #fff8f8; }
+.quiz-question-correct { margin: 10px -10px; padding: 16px 10px; border-left: 4px solid #238636; background: #f7fcf8; }
+.quiz-feedback { margin-top: 12px; padding: 12px 14px; border-radius: 8px; font-size: 13px; line-height: 1.55; }
+.quiz-feedback.is-correct { color: #17632c; background: #e9f7ed; }
+.quiz-feedback.is-wrong { color: #8f1f1f; background: #fdeaea; }
+.quiz-submit-bar { position: sticky; bottom: 12px; z-index: 10; display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-top: 18px; padding: 12px 14px; border: 1px solid #cfd9e5; border-radius: 10px; background: rgba(255,255,255,.96); box-shadow: 0 8px 25px rgba(15,39,68,.15); font-size: 13px; font-weight: 800; }
 
 .discussion-post { padding: 14px 0; border-bottom: 1px solid var(--line); }
 .discussion-post:last-child { border-bottom: 0; }
@@ -202,6 +214,9 @@
   .certificate-sheet { min-height: 0; padding: 38px 22px; border-width: 6px; }
   .certificate-sheet h1 { font-size: 28px; }
   .certificate-name { font-size: 24px; }
+  .quiz-heading-row { align-items: center; }
+  .quiz-submit-bar { bottom: 8px; }
+  .quiz-submit-bar .btn { min-height: 44px; }
 }
 
 @media print {

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="mn">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SSPA400 · Хууль зүйн сорил</title><link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header><div class="mark">S</div><div><small>SSPA400 · СУРГАЛТЫН СИСТЕМ</small><h1>Хууль зүйн сорил</h1></div></header>
+  <main>
+    <section id="home" class="panel">
+      <span class="eyebrow">448 АСУУЛТ · 11 БҮЛЭГ</span><h2>Бүлгээ сонгоод богино багцаар ажиллаарай.</h2>
+      <p>Хариулт бүрийг шууд шалгаж, алдсан шалтгаан болон зөв хувилбарыг харна. Ахиц энэ төхөөрөмж болон LMS-д хадгалагдана.</p>
+      <div id="sections" class="sections"></div>
+    </section>
+    <section id="player" class="panel hidden" aria-live="polite">
+      <div class="topline"><button id="back" class="link">← Бүлгүүд</button><span id="counter"></span></div>
+      <div class="track"><i id="bar"></i></div><h2 id="prompt"></h2><div id="options" class="options"></div>
+      <div id="feedback" class="feedback hidden"></div><button id="next" class="primary hidden">Дараах асуулт →</button>
+    </section>
+    <section id="result" class="panel hidden"><span class="eyebrow">БАГЦ ДУУСЛАА</span><h2 id="score"></h2><p id="resultText"></p><div id="mistakes"></div><button id="retry" class="primary">Дахин ажиллах</button><button id="choose" class="secondary">Өөр бүлэг сонгох</button></section>
+  </main>
+  <script src="quiz.js"></script>
+</body></html>

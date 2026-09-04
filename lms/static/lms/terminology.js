@@ -10,11 +10,13 @@
     items: [],
     filtered: [],
     selectedId: null,
-    mode: params.get('mode') === 'listening' ? 'listening' : 'vocabulary',
+    mode: ['listening', 'flashcards'].includes(params.get('mode')) ? params.get('mode') : 'vocabulary',
     level: ['A2', 'B1', 'B2', 'C1'].includes(params.get('level')) ? params.get('level') : 'all',
     activity: 'choice',
     speed: 1,
     currentListen: null,
+    flashIndex: 0,
+    flashFlipped: false,
     answered: false,
     session: { correct: 0, attempts: 0, streak: 0 },
     progress: loadProgress(),
@@ -44,7 +46,7 @@
 
   function updateProgress() {
     const count = state.progress.learned.length;
-    el('termProgressText').textContent = `${count} / ${state.items.length || 310}`;
+    el('termProgressText').textContent = `${count} / ${state.items.length || 508}`;
     el('termProgressFill').style.width = `${state.items.length ? (count / state.items.length) * 100 : 0}%`;
   }
 
@@ -109,7 +111,78 @@
     }
     renderList();
     renderDetail();
+    syncFlashDeck();
     if (resetListening && state.mode === 'listening') nextListeningItem();
+  }
+
+  function currentFlashItem() {
+    return state.filtered[state.flashIndex] || null;
+  }
+
+  function syncFlashDeck() {
+    if (state.flashIndex >= state.filtered.length) state.flashIndex = 0;
+    state.flashFlipped = false;
+    renderFlashcard();
+  }
+
+  function renderFlashcard() {
+    const item = currentFlashItem();
+    const total = state.filtered.length;
+    const learned = new Set(state.progress.learned);
+    el('flashCard').classList.toggle('flipped', state.flashFlipped);
+    el('flashDeckTotal').textContent = total;
+    el('flashKnown').textContent = state.filtered.filter((entry) => learned.has(entry.item_id)).length;
+    el('flashRemaining').textContent = state.filtered.filter((entry) => !learned.has(entry.item_id)).length;
+    el('flashPosition').textContent = total ? `${state.flashIndex + 1} / ${total}` : '0 / 0';
+    if (!item) {
+      el('flashFront').textContent = 'No cards match the filters';
+      el('flashBack').textContent = 'Шүүлтүүрээ өөрчилнө үү';
+      el('flashModule').textContent = '';
+      el('flashDefinition').textContent = '';
+      el('flashExample').textContent = '';
+      return;
+    }
+    el('flashFront').textContent = item.front;
+    el('flashBack').textContent = item.back_mn;
+    el('flashModule').textContent = `${item.module} · ${item.difficulty} · ${item.priority}`;
+    el('flashDefinition').textContent = item.definition_en || '';
+    el('flashExample').textContent = item.example_en || '';
+    el('flashKnow').classList.toggle('learned', learned.has(item.item_id));
+    el('flashKnow').innerHTML = learned.has(item.item_id)
+      ? '<i class="bi bi-check2-all"></i> Мэддэг'
+      : '<i class="bi bi-check2"></i> Мэддэг';
+  }
+
+  function moveFlash(step) {
+    if (!state.filtered.length) return;
+    state.flashIndex = (state.flashIndex + step + state.filtered.length) % state.filtered.length;
+    state.flashFlipped = false;
+    renderFlashcard();
+  }
+
+  function flipFlash() {
+    if (!currentFlashItem()) return;
+    state.flashFlipped = !state.flashFlipped;
+    renderFlashcard();
+  }
+
+  function markFlashKnown(known) {
+    const item = currentFlashItem();
+    if (!item) return;
+    const values = new Set(state.progress.learned);
+    if (known) values.add(item.item_id);
+    else values.delete(item.item_id);
+    state.progress.learned = [...values];
+    saveProgress();
+    moveFlash(1);
+  }
+
+  function shuffleFlashcards() {
+    state.filtered = shuffle(state.filtered);
+    state.flashIndex = 0;
+    state.flashFlipped = false;
+    renderList();
+    renderFlashcard();
   }
 
   function renderList() {
@@ -216,11 +289,12 @@
       button.classList.toggle('active', button.dataset.mode === mode);
     });
     el('vocabularyView').classList.toggle('active', mode === 'vocabulary');
+    el('flashcardView').classList.toggle('active', mode === 'flashcards');
     el('listeningView').classList.toggle('active', mode === 'listening');
     if (mode === 'listening' && !state.currentListen) nextListeningItem();
     if (updateUrl) {
       const url = new URL(window.location.href);
-      if (mode === 'listening') url.searchParams.set('mode', 'listening');
+      if (mode === 'listening' || mode === 'flashcards') url.searchParams.set('mode', mode);
       else url.searchParams.delete('mode');
       window.history.replaceState({}, '', url);
     }
@@ -343,6 +417,24 @@
       if (button.dataset.action === 'speak') speak(item.front);
       if (button.dataset.action === 'full-audio') speak(item.audio_script);
     });
+    el('flashCard').addEventListener('click', flipFlash);
+    el('flashPrev').addEventListener('click', () => moveFlash(-1));
+    el('flashNext').addEventListener('click', () => moveFlash(1));
+    el('flashAgain').addEventListener('click', () => markFlashKnown(false));
+    el('flashKnow').addEventListener('click', () => markFlashKnown(true));
+    el('flashSpeak').addEventListener('click', () => {
+      const item = currentFlashItem();
+      if (item) speak(item.front);
+    });
+    el('flashShuffle').addEventListener('click', shuffleFlashcards);
+    document.addEventListener('keydown', (event) => {
+      if (state.mode !== 'flashcards' || ['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target.tagName)) return;
+      if (event.code === 'Space') { event.preventDefault(); flipFlash(); }
+      if (event.key === 'ArrowLeft') moveFlash(-1);
+      if (event.key === 'ArrowRight') moveFlash(1);
+      if (event.key === '1') markFlashKnown(false);
+      if (event.key === '2') markFlashKnown(true);
+    });
     el('listenActivities').addEventListener('click', (event) => {
       const button = event.target.closest('[data-activity]');
       if (!button) return;
@@ -384,8 +476,9 @@
       const response = await fetch(root.dataset.source);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
-      if (!Array.isArray(data.items) || data.items.length !== 310) throw new Error('Unexpected terminology data');
+      if (!Array.isArray(data.items) || !data.items.length) throw new Error('Unexpected terminology data');
       state.items = data.items;
+      el('termTotalLead').textContent = state.items.length;
       initModules(data.meta.modules);
       state.selectedId = state.items[0].item_id;
       document.querySelectorAll('.term-level').forEach((button) => {

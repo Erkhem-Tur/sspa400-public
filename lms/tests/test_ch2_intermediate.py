@@ -126,16 +126,18 @@ class PublicViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "lms/terminology.html")
         self.assertContains(response, 'id="vocabularyView"')
+        self.assertContains(response, 'id="flashcardView"')
         self.assertContains(response, 'id="listeningView"')
-        self.assertContains(response, "310 verified terms")
+        self.assertContains(response, "508 professional terms")
 
     def test_terminology_json_contains_complete_import(self):
         data_path = settings.BASE_DIR / "lms" / "static" / "lms" / "terminology.json"
         data = json.loads(data_path.read_text(encoding="utf-8"))
         items = data["items"]
-        self.assertEqual(len(items), 310)
-        self.assertEqual(len(data["meta"]["modules"]), 13)
-        self.assertEqual(len({item["item_id"] for item in items}), 310)
+        self.assertEqual(len(items), 508)
+        self.assertEqual(len(data["meta"]["modules"]), 23)
+        self.assertEqual(len({item["item_id"] for item in items}), 508)
+        self.assertEqual(len({item["front"].lower().strip(" .") for item in items}), 508)
         self.assertTrue(all(item["audio_script"] for item in items))
         self.assertEqual(items[0]["front"], "Protectee")
         self.assertEqual(items[0]["back_mn"], "хамгаалалтад байгаа хүн")

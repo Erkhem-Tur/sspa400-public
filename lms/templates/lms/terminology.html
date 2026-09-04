@@ -12,18 +12,18 @@
     <div>
       <div class="term-kicker">SSPA Protection Operations English</div>
       <h1>Operational Terminology</h1>
-      <p>310 verified terms and duty phrases with Mongolian support and listening practice.</p>
+      <p><span id="termTotalLead">508</span> professional terms and duty phrases with Mongolian support, flashcards, and listening practice.</p>
     </div>
     <div class="term-progress" aria-label="Vocabulary progress">
-      <div class="term-progress-copy"><span>Learned</span><strong id="termProgressText">0 / 310</strong></div>
+      <div class="term-progress-copy"><span>Learned</span><strong id="termProgressText">0 / 508</strong></div>
       <div class="term-progress-track"><div class="term-progress-fill" id="termProgressFill"></div></div>
     </div>
   </header>
 
-  <section class="alert alert-primary d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4" aria-label="Download merged vocabulary document">
+  <section class="term-resource d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3" aria-label="Download merged vocabulary document">
     <div>
-      <strong>Англи хэлний мэргэжлийн үг хэллэг — нэгтгэсэн материал</strong>
-      <div class="small mt-1">Давхардлыг арилгасан 15 өвөрмөц материал, 33 хуудас.</div>
+      <strong>Сан баяжсан: 201 шинэ үг, хэллэг нэмэгдлээ</strong>
+      <div class="small mt-1">Нийт 508 давхардалгүй item-ийг доорх flashcard болон listening дасгалаар судлаарай.</div>
     </div>
     <a class="btn btn-primary flex-shrink-0" href="{% static 'lms/downloads/english-professional-vocabulary-merged.docx' %}" download>
       <i class="bi bi-file-earmark-word me-2"></i>DOCX татах
@@ -32,6 +32,7 @@
 
   <nav class="term-modebar" aria-label="Terminology sections">
     <button class="term-mode active" type="button" data-mode="vocabulary"><i class="bi bi-book me-2"></i>Vocabulary Library</button>
+    <button class="term-mode" type="button" data-mode="flashcards"><i class="bi bi-layers me-2"></i>Flashcards</button>
     <button class="term-mode" type="button" data-mode="listening"><i class="bi bi-headphones me-2"></i>Listening Lab</button>
   </nav>
 
@@ -88,6 +89,47 @@
         <div class="term-list" id="termList" aria-live="polite"></div>
       </div>
       <article class="term-panel term-detail" id="termDetail" aria-live="polite"></article>
+    </div>
+  </section>
+
+  <section class="term-view" id="flashcardView">
+    <div class="flash-layout">
+      <div class="flash-stage">
+        <div class="flash-toolbar">
+          <div><span class="term-kicker">Active study deck</span><strong id="flashPosition">1 / 508</strong></div>
+          <button class="btn btn-outline-primary btn-sm" id="flashShuffle" type="button"><i class="bi bi-shuffle me-1"></i>Shuffle</button>
+        </div>
+        <button class="flash-card" id="flashCard" type="button" aria-label="Flip flashcard">
+          <span class="flash-card-inner">
+            <span class="flash-face flash-front">
+              <span class="flash-hint">ENGLISH · TAP TO FLIP</span>
+              <strong id="flashFront">Loading...</strong>
+              <span class="flash-module" id="flashModule"></span>
+            </span>
+            <span class="flash-face flash-back">
+              <span class="flash-hint">МОНГОЛ УТГА</span>
+              <strong id="flashBack"></strong>
+              <span class="flash-definition" id="flashDefinition"></span>
+              <span class="flash-example" id="flashExample"></span>
+            </span>
+          </span>
+        </button>
+        <p class="flash-tip">Space: эргүүлэх · ←/→: өмнөх/дараах · 1: дахин үзэх · 2: мэддэг</p>
+        <div class="flash-actions">
+          <button class="btn btn-outline-secondary" id="flashPrev" type="button"><i class="bi bi-arrow-left"></i> Өмнөх</button>
+          <button class="btn btn-outline-primary" id="flashSpeak" type="button"><i class="bi bi-volume-up"></i> Сонсох</button>
+          <button class="btn btn-outline-danger" id="flashAgain" type="button"><i class="bi bi-arrow-repeat"></i> Дахин үзнэ</button>
+          <button class="btn btn-success" id="flashKnow" type="button"><i class="bi bi-check2"></i> Мэддэг</button>
+          <button class="btn btn-primary" id="flashNext" type="button">Дараах <i class="bi bi-arrow-right"></i></button>
+        </div>
+      </div>
+      <aside class="flash-stats">
+        <div class="term-panel-head"><strong>Deck progress</strong></div>
+        <div class="listen-stat"><span>Шүүгдсэн карт</span><strong id="flashDeckTotal">508</strong></div>
+        <div class="listen-stat"><span>Мэддэг</span><strong id="flashKnown">0</strong></div>
+        <div class="listen-stat"><span>Үлдсэн</span><strong id="flashRemaining">508</strong></div>
+        <p class="listen-note">Дээрх хайлт, module, level, priority шүүлтүүрүүд flashcard deck-д мөн үйлчилнэ.</p>
+      </aside>
     </div>
   </section>
 

@@ -36,6 +36,7 @@ urlpatterns = [
     path('profile/', portal_views.profile_view, name='profile'),
     path('learning/', portal_views.learning_dashboard, name='learning_dashboard'),
     path('catalog/', portal_views.course_catalog, name='catalog'),
+    path('law-quiz/', portal_views.public_law_quiz, name='public_law_quiz'),
     path('catalog/<slug:slug>/', portal_views.course_detail, name='course_detail'),
     path('catalog/<slug:slug>/enroll/', portal_views.enroll_course, name='enroll_course'),
     path('learn/<slug:slug>/', portal_views.course_player, name='course_player_start'),

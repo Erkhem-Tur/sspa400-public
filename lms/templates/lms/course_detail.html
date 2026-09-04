@@ -16,6 +16,8 @@
     <div class="portal-actions">
       {% if can_manage %}
       <a class="btn btn-outline-primary" href="{% url 'course_builder' course.slug %}"><i class="bi bi-tools me-1"></i> Open builder</a>
+      {% elif course.slug == 'law-quiz-448' %}
+      <a class="btn btn-primary" href="{% url 'public_law_quiz' %}"><i class="bi bi-play-fill me-1"></i> Нэвтрэхгүйгээр шууд эхлэх</a>
       {% elif enrollment %}
       <a class="btn btn-primary" href="{% url 'course_player_start' course.slug %}"><i class="bi bi-play-fill me-1"></i> {% if enrollment.progress_percent %}Continue{% else %}Start{% endif %}</a>
       {% elif user.is_authenticated %}
@@ -47,7 +49,7 @@
               {% if unit.kind == 'VIDEO' %}<i class="bi bi-play-btn"></i>{% elif unit.kind == 'QUIZ' %}<i class="bi bi-ui-checks"></i>{% elif unit.kind == 'LISTENING' %}<i class="bi bi-headphones"></i>{% elif unit.kind == 'ASSIGNMENT' %}<i class="bi bi-pencil-square"></i>{% else %}<i class="bi bi-file-text"></i>{% endif %}
             </span>
             <div><div class="fw-semibold">{{ unit.title }}</div><small class="text-muted">{{ unit.get_kind_display }} · {{ unit.duration_minutes }} min</small></div>
-            {% if enrollment %}<a class="btn btn-sm btn-outline-primary" href="{{ unit.get_absolute_url }}" aria-label="Open {{ unit.title }}"><i class="bi bi-arrow-right"></i></a>{% endif %}
+            {% if course.slug == 'law-quiz-448' %}<a class="btn btn-sm btn-outline-primary" href="{% url 'public_law_quiz' %}" aria-label="{{ unit.title }} сорилыг эхлэх"><i class="bi bi-arrow-right"></i></a>{% elif enrollment %}<a class="btn btn-sm btn-outline-primary" href="{{ unit.get_absolute_url }}" aria-label="Open {{ unit.title }}"><i class="bi bi-arrow-right"></i></a>{% endif %}
           </div>
           {% empty %}
           <div class="p-3 text-muted small">Lessons are being prepared.</div>

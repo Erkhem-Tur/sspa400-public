@@ -1,0 +1,33 @@
+{% load static %}
+<!doctype html>
+<html lang="mn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#102a4c">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>SSPA400 · Хууль зүйн сорил</title>
+  <link rel="manifest" href="{% static 'lms/manifest.json' %}">
+  <link rel="apple-touch-icon" href="{% static 'lms/icon-192.png' %}">
+  <link rel="stylesheet" href="{% static 'lms/law-quiz/styles.css' %}">
+</head>
+<body data-quiz-source="{% static 'lms/law-quiz/law_quiz.json' %}">
+  <header><div class="mark">S</div><div><small>SSPA400 · СУРГАЛТЫН СИСТЕМ</small><h1>Хууль зүйн сорил</h1></div></header>
+  <main>
+    <section id="home" class="panel">
+      <span class="eyebrow">448 АСУУЛТ · 11 БҮЛЭГ</span><h2>Бүлгээ сонгоод шууд эхлээрэй.</h2>
+      <p>Нэвтрэх шаардлагагүй. Хариулт бүрийг шууд шалгаж, алдсан шалтгаан болон зөв хувилбарыг харна. Ахиц энэ төхөөрөмж дээр хадгалагдана.</p>
+      <div class="home-actions"><a class="back-site" href="{% url 'course_detail' 'law-quiz-448' %}">← Курсын танилцуулга</a><span id="savedProgress"></span></div>
+      <div id="sections" class="sections"></div>
+    </section>
+    <section id="player" class="panel hidden" aria-live="polite">
+      <div class="topline"><button id="back" class="link">← Бүлгүүд</button><span id="counter"></span></div>
+      <div class="track"><i id="bar"></i></div><h2 id="prompt"></h2><div id="options" class="options"></div>
+      <div id="feedback" class="feedback hidden"></div><button id="next" class="primary hidden">Дараах асуулт →</button>
+    </section>
+    <section id="result" class="panel hidden"><span class="eyebrow">БАГЦ ДУУСЛАА</span><h2 id="score"></h2><p id="resultText"></p><div id="mistakes"></div><button id="retry" class="primary">Дахин ажиллах</button><button id="choose" class="secondary">Өөр бүлэг сонгох</button></section>
+  </main>
+  <script src="{% static 'lms/law-quiz/quiz.js' %}"></script>
+  <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('{% static "lms/sw.js" %}')}</script>
+</body></html>

@@ -282,6 +282,11 @@ def course_detail(request, slug):
     })
 
 
+def public_law_quiz(request):
+    """Public, device-local practice mode for the law question bank."""
+    return render(request, 'lms/public_law_quiz.html')
+
+
 @login_required
 @require_POST
 def enroll_course(request, slug):

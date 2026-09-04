@@ -13,7 +13,7 @@
     mode: ['listening', 'flashcards'].includes(params.get('mode')) ? params.get('mode') : 'vocabulary',
     level: ['A2', 'B1', 'B2', 'C1'].includes(params.get('level')) ? params.get('level') : 'all',
     activity: 'choice',
-    speed: 1,
+    speed: 0.9,
     currentListen: null,
     flashIndex: 0,
     flashFlipped: false,
@@ -193,15 +193,16 @@
       return;
     }
     el('termList').innerHTML = state.filtered.map((item) => `
-      <button class="term-row ${item.item_id === state.selectedId ? 'active' : ''}" type="button" data-id="${esc(item.item_id)}">
+      <div class="term-row ${item.item_id === state.selectedId ? 'active' : ''}" role="button" tabindex="0" data-id="${esc(item.item_id)}">
         <span class="term-id">${esc(item.item_id)}</span>
         <span><span class="term-word">${esc(item.front)}</span><span class="term-translation">${esc(item.back_mn)}</span></span>
         <span class="term-badges">
+          <button class="term-row-audio" type="button" data-speak-id="${esc(item.item_id)}" title="Pronounce ${esc(item.front)}" aria-label="Pronounce ${esc(item.front)}"><i class="bi bi-volume-up-fill"></i></button>
           <span class="term-badge">${esc(item.difficulty)}</span>
           <span class="term-badge ${item.priority === 'Core' ? 'core' : ''}">${esc(item.priority)}</span>
           ${learned.has(item.item_id) ? '<span class="term-badge learned"><i class="bi bi-check-lg"></i></span>' : ''}
         </span>
-      </button>
+      </div>
     `).join('');
   }
 
@@ -240,17 +241,42 @@
     applyFilters({ resetListening: false });
   }
 
-  function speak(text) {
+  function speak(text, button = null, rate = state.speed) {
     const engine = window.NeuralListeningEngine;
     if (!engine || !engine.isSupported()) {
       showError('Audio is not supported in this browser. Please use a current version of Chrome or Edge.');
       return;
     }
     engine.speak(text, {
-      rate: state.speed,
+      rate,
+      pitch: 1.02,
+      button,
       label: 'Neural listening active.',
-      onStatus: updateListeningEngine,
+      onStatus: updatePronunciationStatus,
     });
+  }
+
+  function updatePronunciationStatus(info = {}) {
+    updateListeningEngine(info);
+    if (!el('termVoiceStatus')) return;
+    const voice = info.voice || window.NeuralListeningEngine?.getVoiceLabel?.() || 'Browser voice';
+    el('termVoiceStatus').textContent = `${info.detail || 'Ready'} · ${voice}`;
+  }
+
+  function refreshVoiceChoices() {
+    const select = el('termVoiceSelect');
+    const engine = window.NeuralListeningEngine;
+    if (!select || !engine) return;
+    const voices = engine.listEnglishVoices?.() || [];
+    const current = engine.getVoiceLabel?.() || '';
+    if (!voices.length) {
+      el('termVoiceStatus').textContent = 'Төхөөрөмжийн English voice ашиглана';
+      return;
+    }
+    select.innerHTML = voices.map((voice) => `<option value="${esc(voice.name)}">${esc(voice.quality)} · ${esc(voice.name)} (${esc(voice.lang)})</option>`).join('');
+    const active = voices.find((voice) => current.startsWith(voice.name));
+    if (active) select.value = active.name;
+    el('termVoiceStatus').textContent = `${voices.length} English voice бэлэн · ${current}`;
   }
 
   function stopAudio() {
@@ -402,8 +428,24 @@
       button.addEventListener('click', () => setMode(button.dataset.mode));
     });
     el('termList').addEventListener('click', (event) => {
+      const audioButton = event.target.closest('[data-speak-id]');
+      if (audioButton) {
+        event.stopPropagation();
+        const audioItem = state.items.find((entry) => entry.item_id === audioButton.dataset.speakId);
+        if (audioItem) speak(audioItem.front, audioButton);
+        return;
+      }
       const row = event.target.closest('[data-id]');
       if (!row) return;
+      state.selectedId = row.dataset.id;
+      renderList();
+      renderDetail();
+    });
+    el('termList').addEventListener('keydown', (event) => {
+      if (!['Enter', ' '].includes(event.key) || event.target.closest('[data-speak-id]')) return;
+      const row = event.target.closest('[data-id]');
+      if (!row) return;
+      event.preventDefault();
       state.selectedId = row.dataset.id;
       renderList();
       renderDetail();
@@ -414,8 +456,8 @@
       if (!button || !item) return;
       if (button.dataset.action === 'favorite') toggleProgress('favorites', item.item_id);
       if (button.dataset.action === 'learned') toggleProgress('learned', item.item_id);
-      if (button.dataset.action === 'speak') speak(item.front);
-      if (button.dataset.action === 'full-audio') speak(item.audio_script);
+      if (button.dataset.action === 'speak') speak(item.front, button);
+      if (button.dataset.action === 'full-audio') speak(item.audio_script, button, 0.86);
     });
     el('flashCard').addEventListener('click', flipFlash);
     el('flashPrev').addEventListener('click', () => moveFlash(-1));
@@ -424,9 +466,24 @@
     el('flashKnow').addEventListener('click', () => markFlashKnown(true));
     el('flashSpeak').addEventListener('click', () => {
       const item = currentFlashItem();
-      if (item) speak(item.front);
+      if (item) speak(item.front, el('flashSpeak'));
     });
     el('flashShuffle').addEventListener('click', shuffleFlashcards);
+    el('termVoiceSelect').addEventListener('change', (event) => {
+      window.NeuralListeningEngine?.setVoice?.(event.target.value);
+      updatePronunciationStatus({ detail: 'Natural voice сонгогдлоо.', voice: window.NeuralListeningEngine?.getVoiceLabel?.() });
+      speak('Protective security. Stay alert, stay professional.', el('termVoiceSample'));
+    });
+    el('termSpeechRates').addEventListener('click', (event) => {
+      const button = event.target.closest('[data-speech-rate]');
+      if (!button) return;
+      state.speed = Number(button.dataset.speechRate);
+      document.querySelectorAll('[data-speech-rate]').forEach((entry) => entry.classList.toggle('active', entry === button));
+      speak('Clear communication keeps the protection team ready.', button);
+    });
+    el('termVoiceSample').addEventListener('click', (event) => speak(
+      'Protective security. Stay alert, stay professional.', event.currentTarget,
+    ));
     document.addEventListener('keydown', (event) => {
       if (state.mode !== 'flashcards' || ['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target.tagName)) return;
       if (event.code === 'Space') { event.preventDefault(); flipFlash(); }
@@ -489,6 +546,9 @@
         detail: 'Ready for clear English playback.',
         voice: window.NeuralListeningEngine?.getVoiceLabel?.() || 'Browser voice',
       });
+      refreshVoiceChoices();
+      window.setTimeout(refreshVoiceChoices, 500);
+      window.setTimeout(refreshVoiceChoices, 1600);
       applyFilters({ resetListening: false });
       setMode(state.mode, false);
     } catch (_) {

@@ -128,6 +128,8 @@ class PublicViewsTest(TestCase):
         self.assertContains(response, 'id="vocabularyView"')
         self.assertContains(response, 'id="flashcardView"')
         self.assertContains(response, 'id="listeningView"')
+        self.assertContains(response, 'id="termVoiceSelect"')
+        self.assertContains(response, "Pronunciation studio")
         self.assertContains(response, "508 professional terms")
 
     def test_terminology_json_contains_complete_import(self):

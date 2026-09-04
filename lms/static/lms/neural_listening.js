@@ -7,14 +7,17 @@
     activeButton: null,
     activeUtterance: null,
     keepAlive: null,
+    preferredVoice: localStorage.getItem('sspaPreferredEnglishVoice') || '',
     enabled: 'speechSynthesis' in window,
   };
 
   function pickVoice(voices) {
     const english = voices.filter((voice) => /^en[-_]/i.test(voice.lang || ''));
-    return english.find((voice) => /natural|neural|online/i.test(voice.name))
+    return english.find((voice) => voice.name === engine.preferredVoice)
+      || english.find((voice) => /microsoft.*(ava|andrew|emma|brian|aria|jenny).*natural/i.test(voice.name))
+      || english.find((voice) => /natural|neural|online/i.test(voice.name))
       || english.find((voice) => /google.*us english/i.test(voice.name))
-      || english.find((voice) => /microsoft.*(aria|jenny|guy|zira|david)/i.test(voice.name))
+      || english.find((voice) => /samantha|daniel|microsoft.*(aria|jenny|guy|zira|david)/i.test(voice.name))
       || english.find((voice) => /^en-US/i.test(voice.lang || ''))
       || english.find((voice) => /^en-GB/i.test(voice.lang || ''))
       || english[0]
@@ -27,6 +30,29 @@
     engine.voices = window.speechSynthesis.getVoices();
     engine.voice = pickVoice(engine.voices);
     return engine.voices;
+  }
+
+  function voiceQuality(voice) {
+    if (/natural|neural|online/i.test(voice.name)) return 'Natural';
+    if (/google|microsoft|samantha|daniel/i.test(voice.name)) return 'Enhanced';
+    return voice.localService ? 'Device' : 'Online';
+  }
+
+  function listEnglishVoices() {
+    refreshVoices();
+    return engine.voices
+      .filter((voice) => /^en[-_]/i.test(voice.lang || ''))
+      .map((voice) => ({ name: voice.name, lang: voice.lang, quality: voiceQuality(voice) }));
+  }
+
+  function setVoice(name) {
+    refreshVoices();
+    const selected = engine.voices.find((voice) => voice.name === name);
+    if (!selected) return false;
+    engine.voice = selected;
+    engine.preferredVoice = selected.name;
+    localStorage.setItem('sspaPreferredEnglishVoice', selected.name);
+    return true;
   }
 
   if (engine.enabled) {
@@ -159,6 +185,8 @@
     explain,
     refreshVoices,
     getVoiceLabel: () => (engine.voice ? `${engine.voice.name} (${engine.voice.lang})` : 'Browser default voice'),
+    listEnglishVoices,
+    setVoice,
     isSupported: () => engine.enabled,
   };
   document.documentElement.dataset.neuralListening = 'ready';

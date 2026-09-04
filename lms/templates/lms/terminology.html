@@ -36,6 +36,19 @@
     <button class="term-mode" type="button" data-mode="listening"><i class="bi bi-headphones me-2"></i>Listening Lab</button>
   </nav>
 
+  <section class="pronunciation-studio" aria-label="Pronunciation controls">
+    <div class="pronunciation-title"><i class="bi bi-soundwave"></i><span><strong>Pronunciation studio</strong><small>Natural English voice · бүх 508 үг, хэллэгт ажиллана</small></span></div>
+    <label class="visually-hidden" for="termVoiceSelect">English voice</label>
+    <select class="form-select form-select-sm" id="termVoiceSelect"><option value="">Natural English voice (device)</option></select>
+    <div class="pronunciation-rate" id="termSpeechRates" aria-label="Pronunciation speed">
+      <button type="button" data-speech-rate="0.72">Slow</button>
+      <button class="active" type="button" data-speech-rate="0.9">Natural</button>
+      <button type="button" data-speech-rate="1">Normal</button>
+    </div>
+    <button class="btn btn-primary btn-sm" id="termVoiceSample" type="button"><i class="bi bi-play-fill me-1"></i>Voice sample</button>
+    <span class="pronunciation-status" id="termVoiceStatus">Voice бэлдэж байна…</span>
+  </section>
+
   <section class="term-tools" aria-label="Terminology filters">
     <div class="term-search">
       <i class="bi bi-search" aria-hidden="true"></i>

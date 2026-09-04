@@ -53,6 +53,16 @@
 
 .term-mode.active { border-bottom-color: var(--gold); color: var(--blue); }
 
+.pronunciation-studio { align-items: center; background: #eef6ff; border: 1px solid #c9dced; display: grid; gap: 10px; grid-template-columns: minmax(210px, 1.2fr) minmax(240px, 1.4fr) auto auto; margin-bottom: 15px; padding: 12px 14px; }
+.pronunciation-title { align-items: center; color: var(--blue); display: flex; gap: 10px; }
+.pronunciation-title > i { font-size: 24px; }
+.pronunciation-title strong, .pronunciation-title small { display: block; }
+.pronunciation-title small { color: var(--muted); font-size: 10px; margin-top: 2px; }
+.pronunciation-rate { display: flex; gap: 3px; }
+.pronunciation-rate button { background: #fff; border: 1px solid #bfd0e0; color: #486079; font-size: 11px; font-weight: 750; padding: 6px 8px; }
+.pronunciation-rate button.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+.pronunciation-status { color: var(--muted); font-size: 10px; grid-column: 2 / -1; overflow-wrap: anywhere; }
+
 .term-tools {
   align-items: end;
   display: grid;
@@ -104,6 +114,9 @@
 .term-word { display: block; font-size: 14px; font-weight: 800; overflow-wrap: anywhere; }
 .term-translation { color: var(--muted); display: block; font-size: 12px; margin-top: 2px; overflow-wrap: anywhere; }
 .term-badges { align-items: center; display: flex; gap: 5px; }
+.term-row-audio { align-items: center; background: #e8f1fb; border: 1px solid #c2d7ec; color: var(--blue); display: inline-flex; height: 30px; justify-content: center; padding: 0; width: 30px; }
+.term-row-audio:hover { background: var(--blue); color: #fff; }
+.term-row-audio:disabled { opacity: .7; width: auto; padding: 0 8px; }
 .term-badge { background: #e8eef5; color: #334861; font-size: 10px; font-weight: 800; padding: 3px 6px; }
 .term-badge.core { background: #e4f4ea; color: #17623e; }
 .term-badge.learned { background: #1d7a50; color: #fff; }
@@ -217,6 +230,8 @@
 .listen-note { color: var(--muted); font-size: 11px; line-height: 1.55; padding: 15px; }
 
 @media (max-width: 1100px) {
+  .pronunciation-studio { grid-template-columns: 1fr 1fr; }
+  .pronunciation-status { grid-column: 1 / -1; }
   .term-tools { grid-template-columns: 1fr 1fr 1fr; }
   .term-search { grid-column: span 2; }
   .term-workspace { grid-template-columns: 1fr; }
@@ -224,6 +239,8 @@
 }
 
 @media (max-width: 700px) {
+  .pronunciation-studio { grid-template-columns: 1fr; }
+  .pronunciation-status { grid-column: auto; }
   .term-head { grid-template-columns: 1fr; }
   .term-head h1 { font-size: 23px; }
   .term-progress { min-width: 0; }

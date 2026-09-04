@@ -21,6 +21,7 @@ class LawQuizSeedTest(TestCase):
         self.assertEqual(questions.count(), 448)
         self.assertFalse(questions.filter(correct_answer='').exists())
         self.assertTrue(all(question.correct_answer in question.options for question in questions))
+        self.assertTrue(all('Legalinfo.mn:' in question.explanation for question in questions))
 
     def test_public_quiz_requires_no_login(self):
         response = self.client.get(reverse('public_law_quiz'))

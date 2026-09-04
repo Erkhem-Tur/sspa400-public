@@ -380,10 +380,9 @@ class Command(BaseCommand):
                         options=[item['options'][key] for key in item['options']],
                         correct_answer=item['options'][item['answer']],
                         explanation=(
-                            'Эх материалд энэ хувилбарыг зөв гэж тэмдэглэсэн. '
-                            'Таны сонголт үүнээс зөрсөн бол асуултын түлхүүр үг болон '
-                            'зөв хувилбарын бүрэн нөхцөлийг дахин харьцуулна уу.'
-                        ),
+                            f"{item.get('reasoning', '')}\n"
+                            f"Legalinfo.mn: {item.get('legal_url', '')}"
+                        ).strip(),
                         points=1,
                     )
                     for index, item in enumerate(chunk)

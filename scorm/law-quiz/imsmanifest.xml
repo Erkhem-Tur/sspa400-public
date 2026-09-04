@@ -10,7 +10,7 @@
   </organizations>
   <resources>
     <resource identifier="RES1" type="webcontent" adlcp:scormtype="sco" href="index.html">
-      <file href="index.html"/><file href="styles.css"/><file href="quiz.js"/><file href="law_quiz.json"/>
+      <file href="index.html"/><file href="styles.css"/><file href="legal-reasoning.css"/><file href="quiz.js"/><file href="law_quiz.json"/>
     </resource>
   </resources>
 </manifest>
